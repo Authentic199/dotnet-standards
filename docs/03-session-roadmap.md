@@ -151,7 +151,17 @@ code. Saying one thing while the code shows another is a defect, not a detail.
 
 One skill draws from exactly **one** project, chosen by the user. Other projects are for
 comparison only. On divergence, ask *"which one do you want from now on?"* — never average two
-conventions. Currently only `apsp-backend` exists, so this rule is defined but not yet exercised.
+conventions.
+
+**First exercised in S3.** The user named `ops-service` as the canonical source for A05
+`authentication` and A33 `serilog` — not `apsp-backend`, which S0 §9 recorded as the only project
+present. Two standing consequences:
+
+- **`reference/projects/` holds more than one project.** No session may default to `apsp-backend`;
+  every `adapt` row needs its canonical project named explicitly by the user, per row.
+- **R7 now has real work to do in S16+.** `observability` is genuinely `mixed`: A33 is
+  `from-my-code` while A21 and A26 are `from-kit`. Those must be assembled side by side and
+  labelled, never blended into one voice.
 
 ---
 
@@ -188,6 +198,12 @@ for their proper session:
 | Write any skill | S7+ |
 | Name the architecture skill | S7 |
 | Decide anything about hooks or agents | S4 |
+
+## Requests deferred out of S3
+
+| Request | Session | Note |
+|---|---|---|
+| *"Các reference setup thì quét để xem"* — scan the `Program.cs` / DI registration sites that consume `src/Infrastructure/Facades/Auth/` and `src/Infrastructure/Facades/Logging/` in `ops-service` | **S7** (`auth-and-security`) and **S16+** (`observability`) | Declined in S3 under hard constraint 1: S3 decides rows and does **not** open `reference/projects/`. R6 only requires the user to *name* exemplar paths to unlock `adapt`, which they did — reading them is Step 2 of the five-step adapt session. The paths are recorded in TRIAGE as **named but not verified**; the adapt session must confirm they exist before distilling, and must announce the setup-site trace as a targeted lookup rather than an exploratory scan. |
 
 ---
 
