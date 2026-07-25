@@ -1,4 +1,4 @@
-# Opening prompt — Session S5
+# Opening prompt — Session S6
 
 > Copy everything below the line into a **fresh** Claude Code session opened in
 > `D:\ALTA\Project\dotnet-standards`.
@@ -18,224 +18,184 @@ Reference material, **read-only, never installed as a plugin**:
 - `reference/dotnet-claude-kit` — codewithmukesh/dotnet-claude-kit (MIT), pinned at
   commit `cd83d315986c27621da178dad73bd95d503c1540`. Every decision is anchored to that SHA.
 - `reference/projects/` — my real .NET projects (gitignored): `apsp-backend` and `ops-service`.
-  Source of exemplar code for the later `adapt` sessions.
-  **Do not open it in S5.** No Group C or D row needs an exemplar.
+  Source of exemplar code for the `adapt` sessions. **Do not open it in S6.** S6 writes no skill
+  and distils no code; the first session that needs it is S7.
 
-S0–S4 are complete. **Group A is closed (33/33). Group B is closed (33/33).**
-`docs/TRIAGE.md` holds **94 rows, 66 decided**: Group A 33/33 ✅ · Group B 33/33 ✅ ·
-Group C 0/1 · Group D 0/27.
+**Phase 1 is over. Triage is closed.** `docs/TRIAGE.md` holds **94 rows, 94 decided** — Group A
+33/33 ✅ · Group B 33/33 ✅ · Group C 1/1 ✅ · Group D 27/27 ✅ — with **zero row-level `pending`
+in any group**, plus the three un-enumerated components S1 flagged (`mcp-configs/` `skip`, root
+`.mcp.json` `combine`, root `.editorconfig` `keep-tweak`). The decision log has **45 entries**
+(S1 ×3, S2 ×8, S3 ×10, S4 ×12, S5 ×12).
 
-**S5 is the gate into Phase 2.** Triage ends when this session ends — TRIAGE must reach
-**zero `pending` rows everywhere**, and the three un-enumerated components must be resolved.
+**S6 is the first Phase 2 session.** Phase 1 decided *what* travels. Phase 2 builds it, and S6
+builds the part that has nothing to do with .NET knowledge: **the plugin skeleton that makes
+everything else installable.** Nothing S6 produces contains domain content.
 
 ## FILES TO READ FIRST
 
-1. `docs/TRIAGE.md` — the Group C row, all 27 Group D rows, the progress block, and **the
-   decision log, which now has 33 entries** (S1 ×3, S2 ×8, S3 ×10, S4 ×12). Read the
-   **twelve S4 entries** — several bind S5
-   directly: the Q2/Q3/Q4 answers, the B04 memory conflict, the `combine`/`skip` line, the
-   B11 token-economics salvage, the B28 correction of record, and the context-discipline entry,
-   which lists four Group D rows already carrying known cross-references.
-2. `docs/01-triage-rules.md` — **§5 (Group C)** and **§6 (Group D)**, plus §7 (R4, R8, R9).
-   This is the rule set S5 runs on. It is short; read all of it.
-3. `docs/00-brainstorm.md` §2 (the out-of-scope table that drives R4) and §5 (the four review
-   rubrics — several Group D rows are candidate content for them).
+1. `docs/02-repo-structure.md` — **all of it.** This is S6's specification: §1 the directory
+   layout, §2 the five verified hard rules, §3 `plugin.json`, §4 the marketplace and the local
+   install/restart loop, §5 the component formats, §6 the Windows polyglot hook wrapper.
+   **Read §5 and §6 knowing they are partly stale** — see "WHAT S4 AND S5 MEASURED" below; S6
+   reconciles them rather than following them blind.
+2. `docs/TRIAGE.md` — the **three hook rows only** (B23 `hooks.json`, B24 `post-edit-format.sh`,
+   B31 `hooks/README.md`) and the **S5 decision-log entries** on C01 and on the closure of triage.
+   You do **not** need the Group A or Group D rows: S6 writes no skill.
+3. `docs/01-triage-rules.md` **§7 (R9)** — the MIT attribution obligation, one of the two the
+   `NOTICE` must discharge.
 
-`docs/02-repo-structure.md` is needed for the packaging questions at the end (`NOTICE`, the
-`run-hook.cmd` wrapper, where a kept MCP config would live). `docs/03-session-roadmap.md` is
-not needed except to record a deferred request.
+`docs/00-brainstorm.md` is not needed except §1 (purpose) for the plugin description string.
+`docs/03-session-roadmap.md` is not needed except to record a deferred request.
 
 ## THE SINGLE DELIVERABLE OF THIS SESSION
 
-**Decide the 1 Group C row and all 27 Group D rows, and resolve the 3 un-enumerated
-components. Nothing else.**
+**A `dotnet-standards` plugin that installs from my local marketplace and whose one hook
+demonstrably fires. Nothing else.** Six artifacts:
 
-| Block | Rows | Count |
+| # | Artifact | Source of truth |
 |---|---|---|
-| Group C — MCP | C01 `mcp/CWM.RoslynNavigator/` | 1 |
-| D.1 — `.claude/rules/` | D01–D10 | 10 |
-| D.2 — `knowledge/` | D11–D16 | 6 |
-| D.3 — `knowledge/decisions/` (ADRs) | D17–D22 | 6 |
-| D.4 — `templates/` | D23–D27 | 5 |
-| Un-enumerated | `mcp-configs/`, root `.mcp.json` → Group C · root `.editorconfig` → Group D | 3 |
+| 1 | Repo scaffold — the directories from `02-repo-structure.md` §1 | §1 + §2's hard rules |
+| 2 | `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` | §3 + §4 |
+| 3 | `NOTICE` — **two** MIT obligations | R9 + the S4 Q2 entry |
+| 4 | `hooks/run-hook.cmd` — the polyglot wrapper | §6, reconciled with S4's Q2 findings |
+| 5 | `hooks/post-edit-format` — **extensionless**, the only hook that survived triage | B24 |
+| 6 | `hooks/hooks.json` + `hooks/README.md` | B23 (rebuilt manifest) + B31 |
 
-**Every Group D row needs a `Destination`, and it is one of exactly three values** (rules §6):
-**skill content** · **project `CLAUDE.md` material** · **drop**. A row without a Destination is
-not decided. Note what the middle value means: shipping a per-project `CLAUDE.md` template is
-**backlog, not v1** (brainstorm §2, Q6), so "project `CLAUDE.md` material" means *recorded for
-tier 3*, never *shipped in v1*.
+**Done when:** the plugin installs via `/plugin marketplace add` + `/plugin install`; after a
+restart, editing a `.cs` file in a real test solution causes `post-edit-format` to run and the
+file to be formatted; `hooks/README.md` documents the one hook and the wrapper's failure mode;
+`NOTICE` credits both sources with licence text; committed.
 
-**Done when:** C01 has a Status and, if kept, its install command and `.mcp.json` shape are
-recorded per §5; all 27 Group D rows carry Status + Destination + Reason; the three
-un-enumerated components have a disposition; **`grep -c pending docs/TRIAGE.md` returns only
-legend and cross-reference hits — zero row-level `pending` in any group**; the progress block
-reads 94/94; committed.
+**Verify the hook by running it, not by reading it.** Create a throwaway solution under the
+scratchpad (not in this repo, not in `reference/`), edit a `.cs` file in it, and confirm the
+formatting actually happened. If the hook silently does not fire, say so plainly — that is the
+exact failure mode S4 measured, and a claim that it works without having seen it work is worse
+than no hook.
 
-## DECIDE C01 FIRST — SEVEN DECIDED ROWS ARE WAITING ON IT
+## WHAT S4 AND S5 MEASURED — THIS OVERRIDES `02-repo-structure.md` WHERE THEY DISAGREE
 
-C01 is the highest-leverage row in the file and it is **not** just another disposition. Seven
-already-decided rows state a C01 dependency in their Reason, and S5 is where those conditionals
-resolve. Do it before Group D, then note the consequence in the decision log.
+`02-repo-structure.md` was written in S0 from documentation. S4 measured the Windows behaviour
+and S5 measured the MCP server. **Four points where the doc is now stale or incomplete:**
 
-| Consumer | What it loses without C01 | Survives? |
-|---|---|---|
-| A02 `arch-check` | project-graph + cycle automation | yes — manual `.csproj` inspection |
-| A09 `code-review` | `detect_antipatterns`, `get_diagnostics` | yes — blast-radius + priority tables are the substance |
-| A13 `de-sloppify` | `find_dead_code`, `get_type_hierarchy` | yes — the taxonomy is tool-independent |
-| A32 `security-scan` | `get_endpoint_map` in Layer 4 only | yes — Layers 1, 2, 5, 6 are CLI scans |
-| B06 `outdated` | `get_nuget_packages` inventory | yes — degrades least; read `Directory.Packages.props` |
-| B10 verify pipeline | Phases 2 and 3 | yes — Phase 2 → build warnings, Phase 3 → B29's four grep patterns |
-| **B18 `ef-core-specialist`** | `find_references`/`find_symbol` — **its whole reason to exist** | **contingent — re-examine this row if C01 is dropped** |
+**1 — Hook scripts must be extensionless.** Claude Code on Windows **prepends `bash` to any
+command containing `.sh`**, which makes the kit's own `bash "…/x.sh"` command form unusable and
+breaks the wrapper's argument. §5's example command is
+`"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" format.sh` — **the `.sh` must go.** Name the script
+`post-edit-format` with no extension and pass it as `post-edit-format`. Fix §5 in the doc as part
+of this session, since a stale spec is what caused this.
 
-**B18 is the only row in the plugin whose disposition is conditional on C01.** It was kept
-because an N+1 hunt across a solution is the "verbose journey, concise answer" case that
-justifies a subagent — and that saving comes from the MCP tools. If C01 is dropped, revisit it
-and say so in the log.
+**2 — The wrapper exits 0 silently when no bash is found, and that is *accepted* here, not
+overlooked.** Superpowers' own `run-hook.cmd` behaves this way. Q2 decided a hook may ship on
+Windows **only if its silent absence is benign by design** — for `post-edit-format` it is (code
+is unformatted but correct, and B10 Phase 6 catches the drift before review), which is precisely
+why `pre-bash-guard` was refused: for a guard the same silence is fail-open. **§6's draft wrapper
+has no such fallback** — it would hard-fail instead. Decide deliberately which behaviour to ship,
+and document the choice in `hooks/README.md`. It is a real decision, not boilerplate.
 
-Two S4 findings feed this decision and are recorded for exactly this moment:
+**3 — The wrapper is copied in *pattern*, never referenced across plugins.** Depending on
+Superpowers' internal path would couple the plugins and is forbidden by the golden rule of
+`combine`. That copy is what creates the **second MIT obligation**.
 
-- **The quantified case (salvaged from B11).** A typical `.cs` file costs 500–2000 tokens; a
-  Roslyn MCP query costs 30–150. Understanding a type via four MCP calls costs ~310 tokens
-  against ~2900 for reading the four files. Until now the C01 case was a dependency list with
-  no numbers.
-- **The wiring gap (salvaged from B12).** Roslyn MCP tools need the solution located before
-  they work — "find `.slnx`/`.sln`: current dir, then parents, then children". S4 refused to
-  build a hook for it (Q4). If C01 is kept, that belongs in C01's `references/` wiring notes.
+**4 — C01 is an external tool, and S5 confirmed there is nothing for S6 to build for it.**
+`plugin.json` ships **without an `mcpServers` block** — §3 called this an S0 default; it is now a
+decided disposition. And do not build solution detection: S5 found that the S4-recorded "wiring
+gap" **is not a gap** — the server resolves the solution itself in four steps, including one-shot
+MCP roots discovery, and the kit's own `.mcp.json` passes no arguments at all. **S6 owes the MCP
+server zero code and zero config.** Its install command and `.mcp.json` shape are already
+recorded in the C01 row and become a `references/` file in **S7**, not now.
 
-The §5 default is **`keep` as an externally installed dotnet tool, not copied into the plugin** —
-it conflicts with nothing. If you keep it, §5 requires recording the **install command** and the
-**`.mcp.json` shape** in the destination skill's `references/`, so a future project can wire it
-up without rediscovery. `mcp-configs/` and the root `.mcp.json` are the un-enumerated components
-that belong to this decision — raise them here.
+## THE `NOTICE` FILE — TWO OBLIGATIONS, NOT ONE
 
-## APPLY THE R4 SHORT-CIRCUITS FIRST, BEFORE ANY READING
+Get this right; it is the one legal artifact in the project.
 
-Two Group D rows are R4 (`01-triage-rules.md` §7 — subject area excluded by brainstorm §2, set
-to `skip`, Reason `out-of-scope v1`, **no deep reading**):
+1. **R9 — codewithmukesh/dotnet-claude-kit (MIT).** Anything `keep`/`keep-tweak`/`adapt`-ed is a
+   derivative work, and after triage that is **30 rows** (Group A: 2 `adapt` + 20 `keep-tweak`;
+   Group B: 5 `keep`; Group D: 3 `keep-tweak`), plus **22 `combine` rows** (10 in Group B, 12 in
+   Group D) that carry kit material into new files.
+   Credit the project, reproduce the MIT text, and **name the pinned SHA** — the attribution
+   should say *what* was derived from, not just *who*. `reference/dotnet-claude-kit/LICENSE` is
+   the text to reproduce.
+2. **Superpowers (MIT) — the `run-hook.cmd` polyglot pattern.** Added by S4 because the wrapper is
+   copied rather than referenced. Credit it separately and say what was copied.
 
-- **D23 `templates/blazor-app/`** — Blazor is in the §2 exclusion table.
-- **D25 `templates/modular-monolith/`** — modular monolith is in the §2 exclusion table.
+**Do not invent a third obligation for C01.** Nothing of `CWM.RoslynNavigator` is copied — it is
+an external MIT NuGet dependency that this plugin *documents*, and it lives inside the same kit
+repository obligation 1 already covers. A sentence noting it is documented, not vendored, is
+correct; a separate licence block is not.
 
-Do these first; it is what freed the context budget in S3 and S4. **They are the only two.**
-Group A produced 4 R4 skips and Group B produced 1 — do not stretch R4 to cover a row whose
-subject merely overlaps an excluded area. Everything else that ends up `skip`/`drop` is a
-**reasoned** skip and its Reason must say so, so a later session cannot mistake it for a
-short-circuit.
+## WHAT IS SETTLED AND MUST NOT BE RE-LITIGATED
 
-## THE AUTO-INJECTION IS NOW THE DELIVERABLE, NOT A WIDENING
+**1 — The five hard rules of `02-repo-structure.md` §2 are verified, not assumed.** In particular:
+`.claude-plugin/` holds **manifests only** (skills, agents, hooks live at the plugin **root** —
+putting them inside breaks loading); `hooks/hooks.json` is **auto-loaded**, so it must **not**
+also be declared under `plugin.json`'s `manifest.hooks` field, which produces a *"Duplicate hooks
+file detected"* error; every path in a config file uses **`${CLAUDE_PLUGIN_ROOT}`, quoted**, never
+an absolute path; scripts need `chmod +x`.
 
-In S2, S3 and S4 the harness auto-injected the kit's root `CLAUDE.md` and all ten
-`.claude/rules/*.md` whenever a kit skill file was read, and all three sessions had to record
-that they had seen D01–D10 without deciding them. **In S5 that inversion ends: those ten files
-*are* rows D01–D10.** Seeing them is now legitimate and expected. Two consequences:
+**2 — Exactly one hook ships, and the other eight are decided.** B24 `post-edit-format` is the
+only `keep`. It runs `dotnet format <project> --include <file> --no-restore`, scoped to the
+nearest `.csproj`, and swallows all failures — that scoping is what makes the per-edit cost
+acceptable inside a tight red-green loop. **Do not add a second hook.** `pre-bash-guard` was
+refused on the fail-open reasoning above, and the `UserPromptSubmit` skill-index hook was refused
+outright by Q4. If a new hook seems necessary, that is a signal to re-read the Q2 and Q4 entries,
+not to write it.
 
-1. You may already have D01–D10 in context before you deliberately open anything. Use it.
-2. **The remaining 17 Group D rows are not auto-injected** — `knowledge/*.md` (D11–D16), the six
-   ADRs (D17–D22) and the five templates (D23–D27) must be read deliberately. Budget for that,
-   and skip D23 and D25 per R4 above.
+**3 — S6 writes no skill, no agent, no command, and no `references/` file.** The 15 gateway
+skills, the four review rubrics and every `references/*.md` named in TRIAGE belong to **S7–S8**.
+S6 creates the *directories* they will live in and nothing inside them. A scaffold with empty
+`skills/` is the correct output; a scaffold with one hand-written skill is scope creep.
 
-## WHAT S2–S4 DECIDED THAT BINDS S5
+**4 — Open questions S6 inherits and does not own.** **Q1** (my architecture, unnamed — S7), the
+**repository-over-EF-Core** question (four contradictory sources, two of them inside the kit),
+the **HybridCache-vs-Redis** resolution (four rows, one S7 decision), the **commercial-licence
+three-way choice** (see below), and the **AutoMapper-vs-projection** R7 question (S8). Q2, Q3, Q4
+and Q5 are closed. **None of these blocks S6** — S6 touches no domain content — so do not open
+them, and do not let one become a reason to stall.
 
-Settled. Apply them, do not re-litigate them.
+**5 — My stack, for the description string only.** Controllers (MVC), not Minimal API · Swagger
+UI / Swashbuckle, not Scalar · no API versioning · MediatR + FluentValidation + AutoMapper ·
+Redis · Elasticsearch. Web API and Worker service project shapes.
 
-**1 — My stack.** Controllers (MVC), **not** Minimal API · Swagger UI / Swashbuckle, **not**
-Scalar · **no** API versioning · MediatR + FluentValidation + AutoMapper · Redis · Elasticsearch.
-I am **staying on MediatR** — not migrating to Mediator or Wolverine. This has now killed or
-rewritten five rows across three sessions (A27, A35, part of B05, part of B06, and it shaped the
-`cqrs-feature-slice` `rebuild`). It bears directly on **D15** and **D16** below.
+## TWO S5 FINDINGS THAT TOUCH S6 IN PASSING
 
-**2 — Q1 is still open and S7 owns it.** My real architecture is explicitly **not** Clean
-Architecture, and it stays unnamed until S7. Any Group D row that *prescribes* a layering or
-selects between architectures pre-empts Q1 and cannot be inherited. This has already killed A03,
-A08, A35, B07 and B17. **D02 and D17 and D21 are the rows where it fires again.**
+Neither is S6's deliverable. Both are recorded so they are not lost between sessions.
 
-**3 — Four Group D rows already carry known cross-references**, flagged by S3 and S4 for exactly
-this session. These are flags, not decisions:
-- **D06 `hooks.md`** — contains a "never `--no-verify`" rule that **B29's own script contradicts**
-  by telling the user to bypass with it. B29 shipped only the four detection patterns, not the
-  blocking gate. Only one hook survives S4 (`post-edit-format`), so most of this file documents
-  hooks that do not exist here.
-- **D08 `performance.md`** — contains the **HybridCache default** that both **A06** and **B19**
-  diverge from, because my stack is Redis (§2). Strong candidate content for the
-  `dotnet-performance-review` rubric, which S4 gave its only anchor.
-- **D10 `testing.md`** — covers the same ground as **A34** (`from-kit + from-research`) and
-  **B09**'s combine. Do not ship the same material twice; decide which file owns it.
-- **D14 `dotnet-whats-new.md`** — overlaps **A24 `modern-csharp`**, which already carries the
-  C# 14 / .NET 10 feature material. Same instruction: one owner.
+**Perishable knowledge now has a home in the repo.** S5 found four kept items with hard expiry
+dates — the nearest being **.NET 11 GA on 2026-11-10**, which will stale D11's breaking-changes
+material and D14's "do not generate `net11.0`/C# 15" guardrail. S6 should make that survivable
+rather than solve it: put the **pinned kit SHA and an "as of" date** in `README.md`, and note in
+`CHANGELOG.md` that the knowledge layer carries dated content. The re-pin trigger in
+`01-triage-rules.md` §7 now has a second form — *the .NET release train moved past what we
+recorded* — and that sentence belongs in the rules file if it is not already there.
 
-**4 — Two more rows are pre-flagged by earlier decisions:**
-- **D15 `mediatr-to-mediator-migration.md`** — S2 recorded this is **less** relevant, not more,
-  because I am staying on MediatR. Both B05 and B06 had to have their pointers to it stripped.
-- **D12 `common-antipatterns.md`** — strong **R8** anti-example material for the review rubrics,
-  and it is referenced by rows that were skipped (B15, B19). If it is kept, A09/A13/A32 are its
-  consumers, not an agent.
-
-**5 — `.editorconfig` has a consumer now.** B28's `combine` carries a six-item solution-hygiene
-checklist into `solution-architecture ⚠️`, and one of the six checks is "`.editorconfig`
-present". B03 `convention-learner` (kept) also treats `.editorconfig` and
-`Directory.Build.props` as **always winning** over both kit and plugin defaults. So the
-un-enumerated root `.editorconfig` is not a loose end — decide it as a Group D row with a real
-consumer.
-
-**6 — The `combine` / `skip` line, adopted in S4.** A row is `combine` when named material ships
-to a **named destination**; it is `skip`/`drop` + a decision-log entry when the salvage is real
-but has no single destination. Group D's Destination column enforces the same discipline by
-construction — which is why a Destination is mandatory and "pending" is not one of the values.
-
-**7 — Two attribution obligations, not one.** **R9** requires a `NOTICE` crediting
-codewithmukesh/dotnet-claude-kit and reproducing the MIT text, since anything
-`keep`/`keep-tweak`/`adapt`-ed is a derivative work. S4 added a **second**: `dotnet-standards`
-ships its own copy of the polyglot `run-hook.cmd` pattern, copied from Superpowers (MIT), because
-referencing another plugin's internal path is forbidden. Both are **S6 work** — record them, do
-not create files.
-
-## THINGS S5 MUST HANDLE
-
-**An S1 summary is an enumeration artifact, not evidence.** S4 found that B28's summary
-described a check the script does not perform, and that error had been carried since S1 and
-would have produced the wrong disposition. **Where a Group C or D decision turns on what a file
-actually contains, open the file.** This matters most for D11–D16 and the six ADRs, whose
-one-line summaries were written without reading them.
-
-**The ADRs are the kit author's decisions, not mine.** D17–D22 are explicitly flagged in TRIAGE
-as such, and three are known to diverge: **D17** (VSA as default — pre-empts Q1), **D20**
-(HybridCache over `IDistributedCache` — my stack is Redis), **D21** (multi-architecture support —
-`dotnet-standards` targets exactly one architecture, mine). The kit being multi-architecture *by
-design* is the single largest cause of skips in this project; D21 is the ADR that states that
-design. Judge each ADR on whether it matches my real conventions, not on whether it is
-well-argued.
-
-**Templates are backlog, and two of the five are in-scope shapes.** D26 `web-api/` and D27
-`worker-service/` match my project shapes (§2), but shipping a per-project `CLAUDE.md` template
-was declined for v1 (Q6) — that is a **deferral, not an exclusion**, which is exactly why A16
-was a *reasoned* skip and not R4. Decide D24, D26 and D27 on that basis; D23 and D25 are R4.
-
-**Do not decide Group A or Group B rows.** Both groups are closed. If S5 surfaces something that
-looks like it changes a decided row — and the C01 decision may genuinely do this for **B18** —
-**record it in the decision log as a flag for S6/S7; do not edit the decided row's Status.**
-The one exception is B18, and only because its Reason already states the contingency in advance.
+**Three packages in my live stack are commercially licensed.** MediatR from v13, AutoMapper from
+v15, FluentAssertions from v8. This is an S7 matter (it lands in B06's licence table) and **not**
+a licensing question about this plugin — `dotnet-standards` ships none of them. Mentioned only so
+S6 does not confuse it with the `NOTICE` work, which is about the kit and Superpowers alone.
 
 ## HARD CONSTRAINTS
 
-**1 — One session, one deliverable.** S5 decides Group C and Group D rows and the three
-un-enumerated components. Do **not** write a skill, a hook, a `NOTICE` or a `plugin.json`; do not
-install the MCP server; do not touch `reference/projects/`; do not modify any Superpowers file.
-If I ask for more mid-session, refuse and record the request in `docs/03-session-roadmap.md`
-under a "Requests deferred out of S5" heading. This is a design constraint, not a suggestion.
+**1 — One session, one deliverable.** S6 builds the six artifacts above. Do **not** write a skill
+or a `references/` file; do not install `CWM.RoslynNavigator`; do not add a second hook; do not
+re-open a TRIAGE row — triage is closed and its rows are the input to S7, not a subject for S6.
+Do not touch `reference/projects/`. Do not modify any Superpowers file. If I ask for more
+mid-session, refuse and record the request in `docs/03-session-roadmap.md` under a
+"Requests deferred out of S6" heading. This is a design constraint, not a suggestion.
 
-**2 — Context discipline.** Apply the D23/D25 R4 short-circuits first, before any reading. Then
-decide C01, then D01–D10 (likely already injected), then read D11–D22 deliberately. The rules
-files are ≤100 lines each by the kit's own budget; the knowledge files and ADRs are longer.
-Announce any widening up front: what you are looking for, and why.
+**2 — Prove it, do not assert it.** This is the first session whose output either runs or does
+not. Install the plugin, restart, trigger the hook on a throwaway solution in the scratchpad, and
+report what actually happened including the failures. "A restart is required for changes to take
+effect" (§4) — a missing restart is the usual cause of "it didn't work", so rule that out before
+concluding anything is broken.
 
-**3 — Artifact language is English.** All generated files — docs, TRIAGE, and later skills and
-descriptions — are written in English. Talk to me in Vietnamese.
+**3 — Artifact language is English.** All generated files — docs, TRIAGE, `NOTICE`, `README.md`,
+and later skills and descriptions — are written in English. Talk to me in Vietnamese.
 
 **4 — End-of-session ritual.** Commit with a clear message, then rewrite
-`docs/next-session-prompt.md` so it opens **S6**. S6 is the first Phase 2 session: repo scaffold,
-`plugin.json`, the `NOTICE` file for **both** MIT obligations, the `run-hook.cmd` wrapper, and
-the `post-edit-format` hook plus its manifest — the only hook that survived triage. Before
-writing that prompt, confirm the triage phase is genuinely closed: **94/94, zero row-level
-`pending`.**
+`docs/next-session-prompt.md` so it opens **S7**. S7 is the first knowledge session: it resolves
+**Q1** by naming my real architecture from the `ops-service` exemplars, promotes A05 and A33 from
+recorded paths to distilled content, and starts building the gateway skills — which means S7 is
+the first session allowed to open `reference/projects/`. Before writing that prompt, confirm the
+scaffold genuinely works: **plugin installs, hook fires, verified by running it.**
 
 Start by confirming you understand the constraints, then read the files listed above.
