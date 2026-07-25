@@ -171,9 +171,9 @@ This is a real cost and must be weighed in S4, not discovered later.
 
 ## 9. Environment notes recorded during this session
 
-- The reference kit actually lives at `reference/reference/dotnet-claude-kit` — the `reference/`
-  directory is nested twice. All later sessions must use the real path.
-- The exemplar source directory `reference/reference/projects/` currently holds **one** project:
+- The reference kit lives at `reference/dotnet-claude-kit`. (It was briefly nested twice as
+  `reference/reference/`; the user flattened it at the end of S0.)
+- The exemplar source directory `reference/projects/` currently holds **one** project:
   `apsp-backend`. The "one canonical project per skill" rule (**R7**) is defined but not yet
   exercised.
 - `docs/TRIAGE.md` already exists as a committed skeleton. S1 **fills** it; it does not create it.

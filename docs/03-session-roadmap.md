@@ -5,7 +5,7 @@
 > that produces two deliverables has violated the plan even if both are correct.
 >
 > **Context discipline applies to every session.** Never bulk-scan the reference kit, and never
-> bulk-scan `reference/reference/projects/`. Read only (a) the files named in the opening prompt,
+> bulk-scan `reference/projects/`. Read only (a) the files named in the opening prompt,
 > and (b) targeted lookups — grep/glob for a specific symbol, or Roslyn MCP — where each lookup
 > is announced with what is being sought and why.
 
@@ -110,7 +110,7 @@ One skill per session, in priority order.
 Applies to **every** `adapt` session without exception.
 
 **Step 1 — INPUT (supplied by the user in the opening prompt)**
-A list of exemplar file paths under `reference/reference/projects/`, plus **anti-examples** where
+A list of exemplar file paths under `reference/projects/`, plus **anti-examples** where
 they exist — code the user does *not* want repeated. Claude never selects exemplars on the
 user's behalf: a real codebase contains both good code and technical debt, and only the user can
 tell them apart.

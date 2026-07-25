@@ -15,9 +15,9 @@ Three-tier architecture: Superpowers = process · `dotnet-standards` = knowledge
 per-project `CLAUDE.md` = glue.
 
 Reference material, **read-only, never installed as a plugin**:
-- `reference/reference/dotnet-claude-kit` — codewithmukesh/dotnet-claude-kit (MIT), pinned at
-  commit `cd83d315986c27621da178dad73bd95d503c1540`. Note the doubled `reference/` in the path.
-- `reference/reference/projects/` — my real .NET projects (gitignored). Currently one:
+- `reference/dotnet-claude-kit` — codewithmukesh/dotnet-claude-kit (MIT), pinned at
+  commit `cd83d315986c27621da178dad73bd95d503c1540`.
+- `reference/projects/` — my real .NET projects (gitignored). Currently one:
   `apsp-backend`. Source of exemplar code for later `adapt` sessions. **Not used in S1.**
 
 Session S0 (planning) is complete. Its output is in `docs/`.
@@ -59,7 +59,7 @@ suggestion.
 
 **2 — Context discipline.** Do **not** read the contents of the reference kit's files in S1.
 Directory listings (`ls`/`tree`) and file names are enough to build rows — deciding is a later
-session's job. Do not open `reference/reference/projects/` at all this session.
+session's job. Do not open `reference/projects/` at all this session.
 Any widening must be announced: what you are looking for, and why.
 
 **3 — Artifact language is English.** All generated files (docs, TRIAGE, and later skills and
