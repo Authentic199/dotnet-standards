@@ -1,4 +1,4 @@
-# Opening prompt — Session S4
+# Opening prompt — Session S5
 
 > Copy everything below the line into a **fresh** Claude Code session opened in
 > `D:\ALTA\Project\dotnet-standards`.
@@ -17,182 +17,225 @@ per-project `CLAUDE.md` = glue.
 Reference material, **read-only, never installed as a plugin**:
 - `reference/dotnet-claude-kit` — codewithmukesh/dotnet-claude-kit (MIT), pinned at
   commit `cd83d315986c27621da178dad73bd95d503c1540`. Every decision is anchored to that SHA.
-- `reference/projects/` — my real .NET projects (gitignored). Contains at least `apsp-backend`
-  and `ops-service`. Source of exemplar code for the later `adapt` sessions.
-  **Do not open it in S4.** S4 decides process components; no exemplar is relevant.
+- `reference/projects/` — my real .NET projects (gitignored): `apsp-backend` and `ops-service`.
+  Source of exemplar code for the later `adapt` sessions.
+  **Do not open it in S5.** No Group C or D row needs an exemplar.
 
-S0 (planning), S1 (TRIAGE scaffolding), S2 (Group A batch 1) and S3 (Group A batch 2) are
-complete. **Group A is closed — 33/33, zero `pending`.**
-`docs/TRIAGE.md` holds **94 rows, 33 decided**: Group A 33/33 ✅ · Group B 0/33 · Group C 0/1 ·
-Group D 0/27.
+S0–S4 are complete. **Group A is closed (33/33). Group B is closed (33/33).**
+`docs/TRIAGE.md` holds **94 rows, 66 decided**: Group A 33/33 ✅ · Group B 33/33 ✅ ·
+Group C 0/1 · Group D 0/27.
+
+**S5 is the gate into Phase 2.** Triage ends when this session ends — TRIAGE must reach
+**zero `pending` rows everywhere**, and the three un-enumerated components must be resolved.
 
 ## FILES TO READ FIRST
 
-1. `docs/TRIAGE.md` — the Group B rows, the progress block, and **the decision log**. There are
-   now 19 entries. Read the **ten S3 entries** carefully: several bind S4 directly, especially
-   the ones on A19→B33, the four rubric anchors, and the Group C dependency.
-2. `docs/01-triage-rules.md` — §4 (Group B rules and **R5**, the five-item conflict check) and
-   §7 (R4, R7, R9). This is the rule set S4 runs on.
-3. `docs/00-brainstorm.md` §5 (the four review rubrics) and §6 (the three process-layer gaps I
-   identified, plus the Windows hook cost).
+1. `docs/TRIAGE.md` — the Group C row, all 27 Group D rows, the progress block, and **the
+   decision log, which now has 33 entries** (S1 ×3, S2 ×8, S3 ×10, S4 ×12). Read the
+   **twelve S4 entries** — several bind S5
+   directly: the Q2/Q3/Q4 answers, the B04 memory conflict, the `combine`/`skip` line, the
+   B11 token-economics salvage, the B28 correction of record, and the context-discipline entry,
+   which lists four Group D rows already carrying known cross-references.
+2. `docs/01-triage-rules.md` — **§5 (Group C)** and **§6 (Group D)**, plus §7 (R4, R8, R9).
+   This is the rule set S5 runs on. It is short; read all of it.
+3. `docs/00-brainstorm.md` §2 (the out-of-scope table that drives R4) and §5 (the four review
+   rubrics — several Group D rows are candidate content for them).
 
-`docs/02-repo-structure.md` is needed **only** if a hook row survives — it holds the
-`run-hook.cmd` wrapper design. `docs/03-session-roadmap.md` is not needed except to record a
-deferred request.
+`docs/02-repo-structure.md` is needed for the packaging questions at the end (`NOTICE`, the
+`run-hook.cmd` wrapper, where a kept MCP config would live). `docs/03-session-roadmap.md` is
+not needed except to record a deferred request.
 
 ## THE SINGLE DELIVERABLE OF THIS SESSION
 
-**Decide all 33 Group B rows in `docs/TRIAGE.md`. Nothing else.**
+**Decide the 1 Group C row and all 27 Group D rows, and resolve the 3 un-enumerated
+components. Nothing else.**
 
 | Block | Rows | Count |
 |---|---|---|
-| B.1 — Meta / workflow skills | B01–B12, plus **B32** `scaffold` and **B33** `health-check` | 14 |
-| B.2 — Agents | B13–B22 | 10 |
-| B.3 — Hooks | B23–B31 (7 `.sh` scripts + `hooks.json` + `README.md`) | 9 |
+| Group C — MCP | C01 `mcp/CWM.RoslynNavigator/` | 1 |
+| D.1 — `.claude/rules/` | D01–D10 | 10 |
+| D.2 — `knowledge/` | D11–D16 | 6 |
+| D.3 — `knowledge/decisions/` (ADRs) | D17–D22 | 6 |
+| D.4 — `templates/` | D23–D27 | 5 |
+| Un-enumerated | `mcp-configs/`, root `.mcp.json` → Group C · root `.editorconfig` → Group D | 3 |
 
-For each row fill in: **Superpowers equivalent? · Conflict check (all five R5 items) · Status ·
-Reason.**
+**Every Group D row needs a `Destination`, and it is one of exactly three values** (rules §6):
+**skill content** · **project `CLAUDE.md` material** · **drop**. A row without a Destination is
+not decided. Note what the middle value means: shipping a per-project `CLAUDE.md` template is
+**backlog, not v1** (brainstorm §2, Q6), so "project `CLAUDE.md` material" means *recorded for
+tier 3*, never *shipped in v1*.
 
-**Done when:** all 33 rows carry those four fields; every `keep` and `combine` row answers all
-five R5 items explicitly; every hook row states the Windows `run-hook.cmd` cost; Q2, Q3 and Q4
-are answered and recorded in the decision log; the Group B progress counter reads 33/33;
-committed.
+**Done when:** C01 has a Status and, if kept, its install command and `.mcp.json` shape are
+recorded per §5; all 27 Group D rows carry Status + Destination + Reason; the three
+un-enumerated components have a disposition; **`grep -c pending docs/TRIAGE.md` returns only
+legend and cross-reference hits — zero row-level `pending` in any group**; the progress block
+reads 94/94; committed.
 
-## THE RULE THAT MAKES GROUP B DIFFERENT FROM GROUP A
+## DECIDE C01 FIRST — SEVEN DECIDED ROWS ARE WAITING ON IT
 
-**Never default to `skip`** (`01-triage-rules.md` §4). Group A could skip a row for having no
-consumer. Group B may not. Every row is compared against the equivalent Superpowers capability
-and assigned one of exactly three outcomes:
+C01 is the highest-leverage row in the file and it is **not** just another disposition. Seven
+already-decided rows state a C01 dependency in their Reason, and S5 is where those conditionals
+resolve. Do it before Group D, then note the consequence in the decision log.
 
-- `skip` — Superpowers already does this as well or better.
-- `keep` — Superpowers does not have it and I need it.
-- `combine` — Superpowers has a base version; the kit's material extends it.
-
-**R5 — the conflict check is mandatory for every `keep` and `combine`.** Five items, each
-answered explicitly in the row, not summarised:
-
-1. **Hook events** — same event as a Superpowers hook?
-2. **Slash-command names** — collides with Superpowers *or* a Claude Code built-in
-   (`/code-review`, `/security-review`, `/review`, `/init`, `/simplify`, `/run`)?
-3. **Skill names** — collides with a Superpowers skill name?
-4. **Instructions** — contradicts the brainstorm → plan → TDD → review flow?
-5. **Agent names** — collides with an existing agent?
-
-**An unresolvable conflict downgrades the row to `skip`.** And the golden rule: any extension
-lives inside `dotnet-standards` as a new skill or hook. No Superpowers file is ever modified.
-
-To answer items 2, 3 and 5 you need the actual Superpowers inventory — list its skills, commands
-and agents at the start of the session. That is an announced widening and it is expected.
-
-## OPEN QUESTIONS S4 MUST RESOLVE
-
-| # | Question | Rows it decides |
+| Consumer | What it loses without C01 | Survives? |
 |---|---|---|
-| **Q2** | Can a `.cs` format hook coexist with Superpowers' hooks, and is the `run-hook.cmd` cost worth it? | B24, and the shape of B23 |
-| **Q3** | Which of the kit's 10 agents (if any) survive Superpowers' review flow? | B13–B22 |
-| **Q4** | Should the deferred `UserPromptSubmit` skill-index hook (mechanism E) be built? | A **new** component — not a kit row. Record it as such. |
+| A02 `arch-check` | project-graph + cycle automation | yes — manual `.csproj` inspection |
+| A09 `code-review` | `detect_antipatterns`, `get_diagnostics` | yes — blast-radius + priority tables are the substance |
+| A13 `de-sloppify` | `find_dead_code`, `get_type_hierarchy` | yes — the taxonomy is tool-independent |
+| A32 `security-scan` | `get_endpoint_map` in Layer 4 only | yes — Layers 1, 2, 5, 6 are CLI scans |
+| B06 `outdated` | `get_nuget_packages` inventory | yes — degrades least; read `Directory.Packages.props` |
+| B10 verify pipeline | Phases 2 and 3 | yes — Phase 2 → build warnings, Phase 3 → B29's four grep patterns |
+| **B18 `ef-core-specialist`** | `find_references`/`find_symbol` — **its whole reason to exist** | **contingent — re-examine this row if C01 is dropped** |
 
-Record each answer in the decision log, not only in the row Reasons.
+**B18 is the only row in the plugin whose disposition is conditional on C01.** It was kept
+because an N+1 hunt across a solution is the "verbose journey, concise answer" case that
+justifies a subagent — and that saving comes from the MCP tools. If C01 is dropped, revisit it
+and say so in the log.
 
-## WHAT S2 AND S3 DECIDED THAT BINDS S4
+Two S4 findings feed this decision and are recorded for exactly this moment:
+
+- **The quantified case (salvaged from B11).** A typical `.cs` file costs 500–2000 tokens; a
+  Roslyn MCP query costs 30–150. Understanding a type via four MCP calls costs ~310 tokens
+  against ~2900 for reading the four files. Until now the C01 case was a dependency list with
+  no numbers.
+- **The wiring gap (salvaged from B12).** Roslyn MCP tools need the solution located before
+  they work — "find `.slnx`/`.sln`: current dir, then parents, then children". S4 refused to
+  build a hook for it (Q4). If C01 is kept, that belongs in C01's `references/` wiring notes.
+
+The §5 default is **`keep` as an externally installed dotnet tool, not copied into the plugin** —
+it conflicts with nothing. If you keep it, §5 requires recording the **install command** and the
+**`.mcp.json` shape** in the destination skill's `references/`, so a future project can wire it
+up without rediscovery. `mcp-configs/` and the root `.mcp.json` are the un-enumerated components
+that belong to this decision — raise them here.
+
+## APPLY THE R4 SHORT-CIRCUITS FIRST, BEFORE ANY READING
+
+Two Group D rows are R4 (`01-triage-rules.md` §7 — subject area excluded by brainstorm §2, set
+to `skip`, Reason `out-of-scope v1`, **no deep reading**):
+
+- **D23 `templates/blazor-app/`** — Blazor is in the §2 exclusion table.
+- **D25 `templates/modular-monolith/`** — modular monolith is in the §2 exclusion table.
+
+Do these first; it is what freed the context budget in S3 and S4. **They are the only two.**
+Group A produced 4 R4 skips and Group B produced 1 — do not stretch R4 to cover a row whose
+subject merely overlaps an excluded area. Everything else that ends up `skip`/`drop` is a
+**reasoned** skip and its Reason must say so, so a later session cannot mistake it for a
+short-circuit.
+
+## THE AUTO-INJECTION IS NOW THE DELIVERABLE, NOT A WIDENING
+
+In S2, S3 and S4 the harness auto-injected the kit's root `CLAUDE.md` and all ten
+`.claude/rules/*.md` whenever a kit skill file was read, and all three sessions had to record
+that they had seen D01–D10 without deciding them. **In S5 that inversion ends: those ten files
+*are* rows D01–D10.** Seeing them is now legitimate and expected. Two consequences:
+
+1. You may already have D01–D10 in context before you deliberately open anything. Use it.
+2. **The remaining 17 Group D rows are not auto-injected** — `knowledge/*.md` (D11–D16), the six
+   ADRs (D17–D22) and the five templates (D23–D27) must be read deliberately. Budget for that,
+   and skip D23 and D25 per R4 above.
+
+## WHAT S2–S4 DECIDED THAT BINDS S5
 
 Settled. Apply them, do not re-litigate them.
 
 **1 — My stack.** Controllers (MVC), **not** Minimal API · Swagger UI / Swashbuckle, **not**
 Scalar · **no** API versioning · MediatR + FluentValidation + AutoMapper · Redis · Elasticsearch.
-I am **staying on MediatR** — not migrating to Mediator or Wolverine. Any Group B row that
-assumes otherwise is wrong about my project, not right about my future.
+I am **staying on MediatR** — not migrating to Mediator or Wolverine. This has now killed or
+rewritten five rows across three sessions (A27, A35, part of B05, part of B06, and it shaped the
+`cqrs-feature-slice` `rebuild`). It bears directly on **D15** and **D16** below.
 
-**2 — I write no tests today.** This is a deliberate gap I want filled from kit + research
-(A34, provenance `from-kit + from-research`). It bears directly on **B09 `tdd`** and
-**B22 `test-engineer`**: do not treat the absence of tests as evidence that testing tooling
-should be skipped. S3 flagged that B09's .NET substance (xUnit v3, `WebApplicationFactory`,
-Testcontainers, Verify) **may belong in A34's reference file rather than in a Group B skill** —
-that is a live option for B09, and choosing it is a `combine`, not a `skip`.
+**2 — Q1 is still open and S7 owns it.** My real architecture is explicitly **not** Clean
+Architecture, and it stays unnamed until S7. Any Group D row that *prescribes* a layering or
+selects between architectures pre-empts Q1 and cannot be inherited. This has already killed A03,
+A08, A35, B07 and B17. **D02 and D17 and D21 are the rows where it fires again.**
 
-**3 — Two ⇄ rows arrived in Group B from Group A, and both carry salvage notes.**
-- **B32 `scaffold`** (was A30, moved in S2) — its durable knowledge is the 9-item
-  feature-completeness checklist; its CQRS substance lives in
-  `references/architecture-patterns.md`, which no session has read yet.
-- **B33 `health-check`** (was A19, moved in S3) — **read its Reason column before deciding it.**
-  Its Step 2.5 **Triage Gate** and `references/grading-rubric.md` are cross-rubric quality
-  material that S7 must harvest **even if you set B33 to `skip`.** A `skip` here must preserve
-  that, the way S2's A08 `skip` preserved four anti-pattern blocks in the decision log.
+**3 — Four Group D rows already carry known cross-references**, flagged by S3 and S4 for exactly
+this session. These are flags, not decisions:
+- **D06 `hooks.md`** — contains a "never `--no-verify`" rule that **B29's own script contradicts**
+  by telling the user to bypass with it. B29 shipped only the four detection patterns, not the
+  blocking gate. Only one hook survives S4 (`post-edit-format`), so most of this file documents
+  hooks that do not exist here.
+- **D08 `performance.md`** — contains the **HybridCache default** that both **A06** and **B19**
+  diverge from, because my stack is Redis (§2). Strong candidate content for the
+  `dotnet-performance-review` rubric, which S4 gave its only anchor.
+- **D10 `testing.md`** — covers the same ground as **A34** (`from-kit + from-research`) and
+  **B09**'s combine. Do not ship the same material twice; decide which file owns it.
+- **D14 `dotnet-whats-new.md`** — overlaps **A24 `modern-csharp`**, which already carries the
+  C# 14 / .NET 10 feature material. Same instruction: one owner.
 
-**4 — The four review rubrics stayed in Group A and are not up for re-decision.** A02
-`arch-check`, A09 `code-review`, A13 `de-sloppify`, A32 `security-scan` ship as **rubrics with no
-slash-command name**, which is what defuses the collisions with the built-in `/code-review` and
-`/security-review`. This matters for S4 because their Group B counterparts — **B15
-`code-reviewer`**, **B20 `refactor-cleaner`**, **B21 `security-auditor`**, **B19
-`performance-analyst`** — are the *agents* that would consume them. Deciding an agent `keep`
-while its rubric already exists in Group A is coherent; deciding it `keep` as a competing review
-*workflow* is not.
+**4 — Two more rows are pre-flagged by earlier decisions:**
+- **D15 `mediatr-to-mediator-migration.md`** — S2 recorded this is **less** relevant, not more,
+  because I am staying on MediatR. Both B05 and B06 had to have their pointers to it stripped.
+- **D12 `common-antipatterns.md`** — strong **R8** anti-example material for the review rubrics,
+  and it is referenced by rows that were skipped (B15, B19). If it is kept, A09/A13/A32 are its
+  consumers, not an agent.
 
-**5 — Group C is still undecided until S5, and three Group B rows depend on it.** B06
-`outdated`, B15 `code-reviewer` and B20 `refactor-cleaner` all consume the Roslyn MCP server
-(C01). As in S3: **the dependency belongs in the Reason, and it is not by itself a reason to
-skip.** State how the row degrades without C01.
+**5 — `.editorconfig` has a consumer now.** B28's `combine` carries a six-item solution-hygiene
+checklist into `solution-architecture ⚠️`, and one of the six checks is "`.editorconfig`
+present". B03 `convention-learner` (kept) also treats `.editorconfig` and
+`Directory.Build.props` as **always winning** over both kit and plugin defaults. So the
+un-enumerated root `.editorconfig` is not a loose end — decide it as a Group D row with a real
+consumer.
 
-**6 — `combine` is real here, unlike in Group A.** S2 rejected `combine` for Group A in favour
-of 1-1 traceability. That decision was about `references/*.md` file mapping and **does not carry
-over to Group B** — §4 of the rules names `combine` as one of the three legitimate Group B
-outcomes, and brainstorm §6 already proposes it for `dotnet-build-loop` and the `.cs` format
-hook. Do not import the Group A policy here.
+**6 — The `combine` / `skip` line, adopted in S4.** A row is `combine` when named material ships
+to a **named destination**; it is `skip`/`drop` + a decision-log entry when the salvage is real
+but has no single destination. Group D's Destination column enforces the same discipline by
+construction — which is why a Destination is mandatory and "pending" is not one of the values.
 
-## THINGS S4 MUST HANDLE
+**7 — Two attribution obligations, not one.** **R9** requires a `NOTICE` crediting
+codewithmukesh/dotnet-claude-kit and reproducing the MIT text, since anything
+`keep`/`keep-tweak`/`adapt`-ed is a derivative work. S4 added a **second**: `dotnet-standards`
+ships its own copy of the polyglot `run-hook.cmd` pattern, copied from Superpowers (MIT), because
+referencing another plugin's internal path is forbidden. Both are **S6 work** — record them, do
+not create files.
 
-**The Windows hook cost is a decision input, not an implementation detail.** The kit's hooks are
-`.sh`. Claude Code on Windows runs hooks through `CMD.exe`, which cannot execute them — it opens
-them in an editor. Keeping *any* kit hook requires shipping a polyglot `run-hook.cmd` wrapper and
-depends on Git for Windows being installed. **Every hook row's Reason must state this cost**, and
-Q2 is partly a question about whether the cost is worth paying at all.
+## THINGS S5 MUST HANDLE
 
-**B16 `devops-engineer` is an R4 short-circuit.** Its entire subject area — Docker, GitHub
-Actions / Azure DevOps pipelines, Aspire orchestration — is excluded by brainstorm §2, and the
-matching Group A rows (A04, A07, A11, A15) are already R4 skips. Set it to `skip`, Reason
-`out-of-scope v1`, no deep reading. It is the only R4 row in Group B; do not stretch R4 to cover
-rows whose subject is merely overlapping.
+**An S1 summary is an enumeration artifact, not evidence.** S4 found that B28's summary
+described a check the script does not perform, and that error had been carried since S1 and
+would have produced the wrong disposition. **Where a Group C or D decision turns on what a file
+actually contains, open the file.** This matters most for D11–D16 and the six ADRs, whose
+one-line summaries were written without reading them.
 
-**B04 `instinct-system` needs conflict-check item 4 read carefully.** It writes to
-`.claude/instincts.md`, `MEMORY.md` and `.claude/learning-log.md`. Check what it would do to the
-memory conventions this environment already has before deciding.
+**The ADRs are the kit author's decisions, not mine.** D17–D22 are explicitly flagged in TRIAGE
+as such, and three are known to diverge: **D17** (VSA as default — pre-empts Q1), **D20**
+(HybridCache over `IDistributedCache` — my stack is Redis), **D21** (multi-architecture support —
+`dotnet-standards` targets exactly one architecture, mine). The kit being multi-architecture *by
+design* is the single largest cause of skips in this project; D21 is the ADR that states that
+design. Judge each ADR on whether it matches my real conventions, not on whether it is
+well-argued.
 
-**B07 `plan`, B08 `spec`, B10 `verify`, B11 `workflow-mastery`, B12 `wrap-up` are the
-head-on collisions.** Each overlaps a Superpowers skill by name or by function
-(`writing-plans` / plan mode, `brainstorming`, `verification-before-completion`, several at once,
-`finishing-a-development-branch`). These are where R5 item 3 and item 4 earn their place — I
-would rather have five well-reasoned `skip`s here than five skills that fight Superpowers.
+**Templates are backlog, and two of the five are in-scope shapes.** D26 `web-api/` and D27
+`worker-service/` match my project shapes (§2), but shipping a per-project `CLAUDE.md` template
+was declined for v1 (Q6) — that is a **deferral, not an exclusion**, which is exactly why A16
+was a *reasoned* skip and not R4. Decide D24, D26 and D27 on that basis; D23 and D25 are R4.
 
-**Do not decide Group C or Group D rows.** Reading kit files will again auto-inject the kit's
-root `CLAUDE.md` and all ten `.claude/rules/*.md` into context — this happened in both S2 and S3
-and is now known to be deterministic. Seeing D01–D10 is not permission to decide them.
-**D06 `.claude/rules/hooks.md` will be especially tempting while you work on B23–B31 — leave it
-`pending`.** S3 also flagged D10 (testing) and D14 (`dotnet-whats-new`) as overlapping decided
-Group A rows; those flags are for S5.
+**Do not decide Group A or Group B rows.** Both groups are closed. If S5 surfaces something that
+looks like it changes a decided row — and the C01 decision may genuinely do this for **B18** —
+**record it in the decision log as a flag for S6/S7; do not edit the decided row's Status.**
+The one exception is B18, and only because its Reason already states the contingency in advance.
 
 ## HARD CONSTRAINTS
 
-**1 — One session, one deliverable.** S4 decides Group B rows only. Do **not** decide Group C or
-D rows, do not write a skill or a hook, do not create `plugin.json`, do not touch
-`reference/projects/`, do not modify any Superpowers file. If I ask for more mid-session, refuse
-and record the request in `docs/03-session-roadmap.md` under a "Requests deferred out of S4"
-heading. This is a design constraint, not a suggestion.
+**1 — One session, one deliverable.** S5 decides Group C and Group D rows and the three
+un-enumerated components. Do **not** write a skill, a hook, a `NOTICE` or a `plugin.json`; do not
+install the MCP server; do not touch `reference/projects/`; do not modify any Superpowers file.
+If I ask for more mid-session, refuse and record the request in `docs/03-session-roadmap.md`
+under a "Requests deferred out of S5" heading. This is a design constraint, not a suggestion.
 
-**2 — Context discipline.** Apply the B16 R4 short-circuit first, before any reading. Then read
-only what a decision actually needs: the kit's 10 agent files are short, the 7 hook scripts are
-short, and `hooks.json` decides conflict-check item 1 for every hook row — read that early. For
-the 14 meta/workflow skills, the `SKILL.md` is enough; do not open their `references/` unless a
-specific decision turns on it. Announce any widening up front: what you are looking for, and why.
-Listing the Superpowers inventory is a required widening, not an optional one.
+**2 — Context discipline.** Apply the D23/D25 R4 short-circuits first, before any reading. Then
+decide C01, then D01–D10 (likely already injected), then read D11–D22 deliberately. The rules
+files are ≤100 lines each by the kit's own budget; the knowledge files and ADRs are longer.
+Announce any widening up front: what you are looking for, and why.
 
 **3 — Artifact language is English.** All generated files — docs, TRIAGE, and later skills and
 descriptions — are written in English. Talk to me in Vietnamese.
 
 **4 — End-of-session ritual.** Commit with a clear message, then rewrite
-`docs/next-session-prompt.md` so it opens **S5** (Group C + Group D — the MCP server, the 10
-kit rules, 6 knowledge files, 6 ADRs and 5 templates; every Group D row needs a Destination of
-*skill content* · *project `CLAUDE.md` material* · *drop*; plus the three components S1 recorded
-as un-enumerated: `mcp-configs/`, root `.mcp.json`, root `.editorconfig`). **S5 is the gate into
-Phase 2** — TRIAGE must reach zero `pending` rows everywhere.
+`docs/next-session-prompt.md` so it opens **S6**. S6 is the first Phase 2 session: repo scaffold,
+`plugin.json`, the `NOTICE` file for **both** MIT obligations, the `run-hook.cmd` wrapper, and
+the `post-edit-format` hook plus its manifest — the only hook that survived triage. Before
+writing that prompt, confirm the triage phase is genuinely closed: **94/94, zero row-level
+`pending`.**
 
 Start by confirming you understand the constraints, then read the files listed above.
