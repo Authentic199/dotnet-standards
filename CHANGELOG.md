@@ -8,6 +8,41 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.3] — S13 (Lane B), 2026-07-26
+
+### Added
+- **`error-handling`** — fourth skill, second Lane B deliverable, built under the
+  three-way authoring process (A/B independent drafts per piece, `skill-arbiter`
+  file-verified verdicts: P1 MERGE, P2 MERGE, P3 MERGE B-dominant; user delegated
+  adjudication after P1). Owns: when to throw which of the four sealed exceptions,
+  catch/bubble/wrap doctrine, the exception middleware's envelope contract
+  (`ErrorResultWrapper`), and the growth sanction's boundary. Decision-layer body
+  plus one reference (`middleware-behavior.md`: full handler walkthrough, the three
+  shaping paths, diagnostics fields, `HiddenProperties` redaction mechanics,
+  pipeline position and its consequences, the dedicated-catch anti-example, and a
+  symptom→cause troubleshooting table).
+- Session rulings recorded: **business not-found = `BadRequestException` 400** (no
+  `NotFoundException`, ever; 404 stays routing's answer per `{id:guid}`);
+  current-principal-not-found → `UnAuthorizedException` 401; `ForbiddenException`
+  documented honestly (zero throw sites — real 403s are bare authorization
+  short-circuits, never enveloped; reserved leaf for a domain-decided enveloped
+  403); **bubble by default** — wrap into `InternalServerException(message, inner)`
+  only when the catch adds context, `(ex.Message, ex)` is not house style; growth
+  sanction boundary — a status-pinning sealed leaf is free, a payload-carrying
+  exception demanding middleware compensation is outside the sanction; the
+  "middleware is the only producer" doctrine scoped to *thrown* exceptions, with
+  the invalid-model-state `{ message }` carve-out named (Web's
+  `InvalidModelStateResponseFactory`, consistent with the architecture skill's
+  Web-owns line; validator rules → `cqrs-feature-slice`).
+- Labelled anti-examples (user-confirmed): a leaf constructor that fails to pin
+  `StatusCode` (latent status-0 defect); the middleware's dedicated file-upload
+  `catch` that compensates but never writes a response — framed as a defect of the
+  shared shape (present, identical, in both reference codebases).
+- Roadmap: **`distributed-lock` row added** at S13's open by user direction
+  (lane-ownership exception) — it owns `ConcurrencyHandlers` and `LockedException`
+  (423); `error-handling` cites 423 only as the growth worked example and routes
+  lock semantics there.
+
 ## [0.3.2] — S12 (Lane B), 2026-07-26
 
 ### Added
