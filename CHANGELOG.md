@@ -8,6 +8,37 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.3] — S8 (Lane A), 2026-07-26
+
+### Added
+- **`module-feature`** — fourth skill, Lane A's refounding of the `cqrs-feature-slice`
+  charter under its new name (user ruling: MediatR is in-process messaging, not CQRS,
+  so the old name lied). Built under the three-way authoring process (A/B independent
+  drafts per piece, `skill-arbiter` file-verified verdicts: P0–P6 all MERGE; user
+  adjudication through P3, then blanket delegation). Owns writing one feature inside a
+  module: the service file (one file interface+implementation, `IScopedService` on the
+  interface, suffix partials, `Services/` purity with two authorized dumping-ground
+  inventories), request/response files (one-file law, tiers, facade bases),
+  `<X>Validation.cs` (IsExist… predicates / ThrowIf… guards, symmetric boundary), and
+  thin MediatR envelopes (`internal sealed`, handler-delegates-to-service absolute).
+  Decision-layer body (282 lines) + four references (`service-growth.md`,
+  `request-response-families.md`, `validation-rules.md`, `mediatr-envelopes.md`).
+- Session rulings recorded: ct mandatory on every service operation (`= default`,
+  last parameter; private helpers required-no-default); XML `<summary>` law (English,
+  no TODOs); response tier suffix naming with strict chain; `DeleteRange<X>Request`
+  standard; Expressions/-mandatory for business-computed members; `IsExist…` prefix
+  law; envelope visibility law with the `internal`-blocks-Web (not module-vs-module)
+  mechanism; `GetByIdAsync`-token trap documented.
+
+### Changed
+- **Rename ripple:** `cqrs-feature-slice` → `module-feature` across
+  `facade-module-architecture` (description + Not-this-skill) and `api-surface`
+  (description Not-for, Overview, body, `request-response-dtos.md`) — routing text
+  otherwise untouched; api-surface's "validation rules" hand-back preserved.
+- Cross-lane alignment: `module-feature`'s request/response piece amended to the
+  shipped api-surface DTO chain law (base request Profile only when customized);
+  open `[MessageDisplay]` vs `Messages<T>`-lambda conflict logged for `message-keys`.
+
 ## [0.3.2] — S12 (Lane B), 2026-07-26
 
 ### Added

@@ -8,7 +8,7 @@ description: >-
   response DTO base-class chains, colocated validator and mapping profile,
   pagination and search contracts, API versioning, or Swashbuckle/OpenAPI
   setup. Not for: where a controller file goes — facade-module-architecture;
-  handler and service internals, validation rules — cqrs-feature-slice;
+  handler and service internals, validation rules — module-feature;
   entities, DbContext, queries — ef-core-data-access; JWT, policies,
   permission internals — auth-and-security; exception flow, error responses —
   error-handling; success and error message text — message-keys.
@@ -21,7 +21,7 @@ signature, the request/response DTO pair, and the OpenAPI document generated
 from them. This skill owns the *shape* of all four. **Where** a controller or
 DTO file lives is `facade-module-architecture`'s law; **what goes inside it**
 is decided here. What an endpoint or a validator *does* belongs to the module
-service — `cqrs-feature-slice`.
+service — `module-feature`.
 
 **Stack stances — settled; do not propose the alternative.**
 
@@ -282,7 +282,7 @@ optional filter expression is how a bulk operation is scoped to the caller's own
 rows — pass it whenever ownership matters.
 
 **Which rules a validator declares, and how a rule reaches the database, belong
-to `cqrs-feature-slice`.** This skill fixes only the file's shape and the
+to `module-feature`.** This skill fixes only the file's shape and the
 inheritance obligation.
 
 ## Response DTOs
@@ -384,7 +384,7 @@ debugging a missing description, enum or security padlock.
 
 Which project or folder a controller or DTO file belongs in —
 `facade-module-architecture`. Handler, service and validator rule internals —
-`cqrs-feature-slice`. Entities, `DbContext`, queries and how a paged query is
+`module-feature`. Entities, `DbContext`, queries and how a paged query is
 executed — `ef-core-data-access`. JWT schemes, policy handlers and permission
 internals — `auth-and-security`. Exception types, middleware and how the error
 envelope is built — `error-handling`. The wording of success and error messages
