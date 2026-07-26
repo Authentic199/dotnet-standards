@@ -78,7 +78,7 @@ Ordered by implementation priority. Names marked ⚠️ are provisional.
 
 | # | Skill | Activates when | `references/` sub-topics | Provenance |
 |---|---|---|---|---|
-| 1 | `solution-architecture` ⚠️ | Creating a project, placing a new file, "where does this belong?" | layering, project references, composition root, dependency rules | `from-my-code` |
+| 1 | `facade-module-architecture` ✅ | Creating a project, placing a new file, "where does this belong?" | layering, project references, composition root, dependency rules | `from-my-code` |
 | 2 | `cqrs-feature-slice` | Adding or changing a feature: command, query, handler | MediatR, FluentValidation, AutoMapper, pipeline behaviors | `from-my-code` |
 | 3 | `ef-core-data-access` | Touching DbContext, entities, migrations, queries | entity configuration, migrations, query patterns, transactions, N+1 | `from-my-code` |
 | 4 | `distributed-caching` | Redis, cache-aside, invalidation | key conventions, TTL, invalidation, `IDistributedCache` vs raw client | `from-my-code` |
@@ -96,10 +96,13 @@ Ordered by implementation priority. Names marked ⚠️ are provisional.
 
 ### Special note on #1 and #8
 
-**#1 `solution-architecture`** — the user stated their real architecture is **not** Clean
-Architecture, despite the wording of the kickoff prompt. The name is therefore a placeholder.
-The real name and the real layering are decided in the S7 adapt session, from exemplar files
-the user names. Nothing downstream may assume Clean Architecture.
+**#1 `facade-module-architecture`** — ✅ **RESOLVED IN S7 (2026-07-26).** The user stated their
+real architecture is **not** Clean Architecture, despite the wording of the kickoff prompt, so the
+name was a placeholder until Q1 was answered from real code. It now reads: a three-project chain
+`Core` → `Infrastructure` → `Web` (plus `Migrators.<Provider>`), whose `Infrastructure` project is
+split on two axes — `Facades/` for technical capabilities, `Modules/` for business ones — wired by
+per-facade `Startup.cs` extension methods into a single flat composition root. **Not Clean
+Architecture and not VSA.** Full evidence in the `TRIAGE.md` decision log under *Q1 — RESOLVED*.
 
 **#8 `dotnet-testing`** — the user does not currently write tests, so there is **no exemplar to
 distil**. This is a deliberate gap the user wants filled: the goal is both unit and integration
@@ -162,7 +165,7 @@ This is a real cost and must be weighed in S4, not discovered later.
 
 | # | Question | Resolved in |
 |---|---|---|
-| Q1 | What *is* the user's real architecture, and what should skill #1 be called? Explicitly **not** Clean Architecture. | S7 |
+| Q1 | ✅ **CLOSED S7 (2026-07-26).** What *is* the user's real architecture, and what should skill #1 be called? Explicitly **not** Clean Architecture. → **Facade / Module layering**, three projects, two axes inside `Infrastructure`; skill named `facade-module-architecture`. | S7 |
 | Q2 | Can a `.cs` format hook coexist with Superpowers' hooks, and is the `run-hook.cmd` cost worth it? | S4 |
 | Q3 | Which of the kit's 10 agents (if any) are worth keeping, given Superpowers' review flow? | S4 |
 | Q4 | Should the deferred `UserPromptSubmit` skill-index hook (mechanism E) be built, once conflict-checked? | S4 |

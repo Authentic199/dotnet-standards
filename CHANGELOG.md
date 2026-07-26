@@ -8,6 +8,65 @@ components change materially — not only on releases.
 
 ---
 
+## [0.2.0] — 2026-07-26
+
+The first knowledge session. Q1 — open since S0 — is answered from real code, and
+the first skill ships on top of the answer.
+
+### Q1 resolved — the architecture has a name
+
+The architecture is a **three-project chain** — `Core` → `Infrastructure` → `Web`,
+with `Migrators.<Provider>` between the last two — whose `Infrastructure` project is
+split on **two axes**: `Facades/` for technical capabilities and `Modules/` for
+business ones. Every facade wires itself through a `Startup.cs` exposing
+`AddX()`/`UseX()`, composed into a single flat fluent chain.
+
+**It is not Clean Architecture and not Vertical Slice Architecture.** `Core` holds no
+entities, business logic lives inside `Infrastructure`, and there is no `Domain` or
+`Application` project — so it is not "close to" Clean Architecture either. Three
+skipped triage rows (A03, A08, A35) are confirmed by this answer rather than reopened.
+
+### Added
+- `skills/facade-module-architecture/SKILL.md` — the first skill in the plugin, and
+  the gateway that answers "where does this file belong?". Its description carries
+  **anti-triggers** naming six sibling skills to use instead.
+- `skills/facade-module-architecture/references/solution-layout.md` — solution and
+  build files, package-version discipline, and the six solution-hygiene checks
+  (TRIAGE A28 + D07 + B28).
+- `skills/facade-module-architecture/references/configuration-and-options.md` — the
+  Options pattern, startup validation, and the per-capability configuration-file
+  convention (TRIAGE A10).
+- `skills/facade-module-architecture/references/dependency-injection.md` — lifetimes,
+  the captive-dependency bug, keyed services, and where registration lives
+  (TRIAGE A14).
+
+### Changed
+- Gateway renamed **`solution-architecture ⚠️` → `facade-module-architecture`**
+  across TRIAGE rows A10, A14, A28, B28 and D07, and in `00-brainstorm.md` §4.
+  Historical decision-log entries keep the old name — the log is append-only.
+- `00-brainstorm.md` §8: **Q1 closed**. Roadmap S7 row marked complete.
+- TRIAGE **A05** and **A33**: setup sites traced from named-but-unverified to
+  concrete paths, and confirmed to exist. Traced only — neither is distilled here.
+
+### Fixed
+- **TRIAGE A33 carried a wrong configuration path.** The row claimed Serilog is
+  configured from a `Serilog` section in `appsettings*.json`. No such section exists;
+  configuration is a strongly-typed POCO bound from a per-capability `logger.json`
+  and applied imperatively in code. Corrected in the row and logged.
+
+### Notes
+- **One anti-example ships**, adjudicated by the user rather than assumed:
+  target-framework drift. Four further divergences from the kit (no central package
+  management, no `global.json`, a rules-free `.editorconfig`, classic `.sln`) are
+  recorded as **observed conventions — neither endorsed nor faulted**, per R7's
+  "label, don't blend".
+- All version-specific content is dated **2026-07-26**. The stack targets **.NET 8**,
+  not the kit's .NET 10. Next R10 trigger: **.NET 11 GA, 2026-11-10**.
+- `NOTICE` unchanged — no new *kind* of artifact carries kit material; the three
+  `references/` files are derived components already covered.
+
+---
+
 ## [0.1.0] — 2026-07-26
 
 The scaffold. No .NET knowledge ships in this version; this is the plumbing that

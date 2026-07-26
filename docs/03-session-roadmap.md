@@ -118,7 +118,7 @@ One skill per session, in priority order.
 
 | Session | Skill | Notes |
 |---|---|---|
-| S7 | `solution-architecture` | **Also resolves Q1** — the real architecture name and layering. Nothing downstream may assume Clean Architecture until this lands. |
+| S7 ✅ | `facade-module-architecture` | **Q1 RESOLVED (2026-07-26)** — Facade / Module layering: `Core` → `Infrastructure` → `Web`, with `Facades/` × `Modules/` inside `Infrastructure`. Not Clean Architecture, not VSA. Shipped with three `references/` files (solution layout, configuration/options, DI). Also traced A05 and A33's setup sites. |
 | S8 | `cqrs-feature-slice` | |
 | S9 | `ef-core-data-access` | |
 | S10 | `distributed-caching` | |
@@ -229,6 +229,14 @@ for their proper session:
 | Request | Session | Note |
 |---|---|---|
 | *"Các reference setup thì quét để xem"* — scan the `Program.cs` / DI registration sites that consume `src/Infrastructure/Facades/Auth/` and `src/Infrastructure/Facades/Logging/` in `ops-service` | **S7** (`auth-and-security`) and **S16+** (`observability`) | Declined in S3 under hard constraint 1: S3 decides rows and does **not** open `reference/projects/`. R6 only requires the user to *name* exemplar paths to unlock `adapt`, which they did — reading them is Step 2 of the five-step adapt session. The paths are recorded in TRIAGE as **named but not verified**; the adapt session must confirm they exist before distilling, and must announce the setup-site trace as a targeted lookup rather than an exploratory scan. |
+
+## Requests deferred out of S7
+
+| Request | Session | Note |
+|---|---|---|
+| **Distil** A05 `authentication` and A33 `serilog` into content, rather than only tracing their setup sites | **`auth-and-security`** (S16+) and **`observability`** (S16+) | The S6 prompt said S7 "promotes A05 and A33 from recorded paths to distilled content"; the two TRIAGE rows say *tracing* is the S7 task. The one-deliverable rule agrees with TRIAGE, so S7 traced and stopped. The wording drift was flagged to the user in the S7 opening prompt rather than resolved silently, and the user did not override it. **Both rows now carry verified concrete paths, so both sessions start from fact rather than from a named guess.** |
+| Fix the `app.Run()` / `ApplicationStopping.Register` ordering bug found in `ops-service` | none — not a `dotnet-standards` task | S7 writes nothing into a real project. Recorded in the TRIAGE decision log so it is not lost. |
+| Decide whether `ops-service` should adopt central package management, `global.json`, or `.slnx` | none — each is its own migration | Adjudicated by the user in S7 as **observed conventions, not faults**. `references/solution-layout.md` explicitly instructs against migrating any of them as a side effect of unrelated work. |
 
 ---
 
