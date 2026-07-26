@@ -130,6 +130,7 @@ One skill per session, in priority order.
 | S14 | `dotnet-testing` | **Research variant** — no exemplar exists |
 | S15 | `choosing-a-dotnet-skill` | Router. Runs after the core skills exist so the decision table has real targets. |
 | S16+ | `auth-and-security`, `observability`, `background-worker`, `http-resilience`, `domain-modeling`, `modern-csharp`, `project-scaffolding` | one per session |
+| S16+ | `distributed-lock` | **Row added at S13's open by user direction** (lane-ownership exception, explicit — `distributed-caching` v0.3.1's `Not for:` already routes here, but no row existed). Owns `ConcurrencyHandlers` internals and **`LockedException` (HTTP 423)** — the fifth sealed exception, verified in S13: all 3 throw sites live in `apsp-backend` `Facades/Common/Services/ConcurrencyHandlers/ConcurrencyHandler.cs`; the exception middleware needed no change for it (growth-by-leaf). `error-handling` (S13) cites it only as the growth worked example and routes lock semantics here, per user ruling at S13 open. |
 | then | `dotnet-code-review`, `dotnet-architecture-review`, `dotnet-security-review`, `dotnet-performance-review` | one per session |
 
 ### The five-step adapt session — standard structure
