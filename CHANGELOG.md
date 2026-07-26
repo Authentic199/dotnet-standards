@@ -8,6 +8,30 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.2] — S12 (Lane B), 2026-07-26
+
+### Added
+- **`api-surface`** — third skill, first Lane B deliverable, built under the three-way
+  authoring process (A/B independent drafts per piece, `skill-arbiter` file-verified
+  verdicts: P1 MERGE, P2 MERGE + user-approved errata, P3–P5 MERGE, user adjudication
+  throughout). Claims routes, request/response DTO base-class chains, versioning stance
+  (**none**), Swashbuckle/OpenAPI, and controller endpoint-writing conventions.
+  Decision-layer body plus three references (`endpoint-anatomy.md` with two worked
+  controllers and two authorized anti-examples; `request-response-dtos.md` with both
+  DTO chains, the conditional base-Profile rule and pagination contracts;
+  `openapi-swashbuckle.md` with the full facade walkthrough and a debugging table).
+- Session rulings recorded: expression-bodied endpoints only (body-style hand-off from
+  `facade-module-architecture` explicitly claimed); signature wrapping counts every
+  parameter including the token; strict binding sources on new endpoints; `{id:guid}`
+  always; suffix-partial base-list law with three named anti-patterns; request
+  inheritance law (base-first, lookup before defining) and response ladder rooted at
+  `BaseEntity`/`ElkBaseEntity`; base request `Profile` only when customized
+  (`.IncludeAllDerived()`), response base rungs always carry it;
+  `PaginationResponse` as the only list envelope, `MoreInfo` = companion computed by
+  the same search; `[HasPermission]` single constructor, three call shapes, positional
+  trap documented; `Messages<T>` text conventions assigned to a **dedicated future
+  `message-keys` skill** (neither api-surface nor error-handling).
+
 ## [0.3.1] — S10 (Lane C), 2026-07-26
 
 ### Added
