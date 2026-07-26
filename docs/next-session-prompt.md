@@ -28,30 +28,26 @@ Reference material, **read-only, never installed as a plugin**:
 one hook, and that hook demonstrably formats C# files. No skill exists yet. **S7 is the first
 knowledge session** — the first session whose output is .NET content rather than plumbing.
 
-## FIRST ACTION, BEFORE ANYTHING ELSE
+## STATUS: THE LIVE-HOOK GAP IS CLOSED
 
-S6 could not close the loop on one thing, and it is thirty seconds of work.
+S6 could prove the hook worked by running it directly, but not that it fires *inside a live
+Claude Code session* — the session that installs a plugin predates its hooks. **That gap is now
+closed**, confirmed 2026-07-26 in a separate test project with a project-scoped install
+(`--scope local`) and a fresh session after restart: a `.cs` file written through Claude's Write
+tool with irregular indentation came back correctly formatted. See `CHANGELOG.md`. **S7 does not
+need to repeat this.**
 
-**S6 proved the hook works by running it directly** — through `cmd.exe` and through `bash`,
-with an explicit argument and with `PostToolUse` stdin JSON, formatting real `.cs` files in a
-throwaway solution. It **could not** prove the hook fires *inside a live Claude Code session*,
-because the session that installs a plugin predates its hooks. That needs a restart, which S6
-did not have.
-
-So: **create a throwaway console project in the scratchpad, `Write` a badly-formatted `.cs`
-file into it with the Write tool, then read the file back.** If it comes back formatted, the
-loop is closed and S6's claim is fully discharged — record it in `CHANGELOG.md` and move on. If
-it does not, that is a real finding: say so plainly and diagnose it before writing any skill.
-`hooks/README.md` has the diagnosis path, and it names **two** independent silent-failure modes,
-so do not stop at the first.
-
-If the plugin is not installed in this environment:
+If the plugin is not yet installed in *this* environment (a different project, or the same one
+in a new working tree):
 
 ```
-claude plugin marketplace add D:/ALTA/Project/dotnet-standards
-claude plugin install dotnet-standards@dotnet-standards-dev
+claude plugin marketplace add D:/ALTA/Project/dotnet-standards --scope local
+claude plugin install dotnet-standards@dotnet-standards-dev --scope local
 # restart, then delete reference/ from the cache copy — see below
 ```
+
+`--scope local` writes to `.claude/settings.local.json` (gitignored) rather than the shared
+project config — the right default while this is still a personal test loop.
 
 ## FILES TO READ FIRST
 
@@ -232,5 +228,4 @@ Talk to me in Vietnamese.
 to `rebuild` from scratch because the kit's pipeline is Mediator while mine is MediatR, and the
 kit has no AutoMapper anywhere.
 
-Start by confirming you understand the constraints, then run the first action, then read the
-files listed above.
+Start by confirming you understand the constraints, then read the files listed above.

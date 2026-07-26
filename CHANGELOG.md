@@ -40,6 +40,16 @@ makes everything else installable.
 - `post-edit-format` — the project walk now recognises `.slnx`, the `dotnet new sln`
   default since .NET 10, alongside `.sln`.
 
+### Verified
+- **Live confirmation, closing the one gap S6 could not close itself.** S6 proved
+  the hook worked by running `run-hook.cmd` directly; it could not prove the
+  hook fires *inside a live Claude Code session*, because the session that
+  installs a plugin predates its hooks. Confirmed 2026-07-26 in a separate test
+  project, project-scoped install (`--scope local`), fresh session after
+  restart: writing a `.cs` file with irregular indentation through Claude's
+  Write tool triggered `post-edit-format` and the file came back re-indented
+  to 4-space / brace-on-own-line convention. **The hook fires end to end.**
+
 ### Notes
 - **Installing this plugin copies the whole source directory and ignores
   `.gitignore`** — including `reference/`, which holds the kit clone and the
