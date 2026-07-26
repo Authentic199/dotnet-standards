@@ -124,8 +124,9 @@ One skill per session, in priority order.
 | S9 | `ef-core-data-access` | |
 | S10 | `distributed-caching` | |
 | S11 | `elasticsearch-search` | |
-| S12 | `api-surface` | |
+| S12 ✅ | `api-surface` | Shipped v0.3.2 (2026-07-26, Lane B) under the three-way process — see CHANGELOG and `next-session-prompt-B.md` Lane log. |
 | S13 | `error-handling` | |
+| S13b | `message-keys` | **Row added at S12's close by user direction** (lane-ownership exception, explicit). Dedicated skill for the `Messages<T>` key grammar — ruled in S12 OUT of both `api-surface` and `error-handling` so the two never collide; both point here. Sources: `be-booking/CONVENTION.md` "Message Keys" section (verified in S12 to match `apsp-backend` `Facades/Definitions/Messages.cs` key-for-key) plus that file and its call sites. Must settle: `Messages<T>.X(selector)` vs bare `MessagesType` constants in validators (constants more frequent by raw count; `Messages<T>` matches the shared facade and both shipped skill bodies). Runs in Lane B, immediately after S13, which needs it. |
 | S14 | `dotnet-testing` | **Research variant** — no exemplar exists |
 | S15 | `choosing-a-dotnet-skill` | Router. Runs after the core skills exist so the decision table has real targets. |
 | S16+ | `auth-and-security`, `observability`, `background-worker`, `http-resilience`, `domain-modeling`, `modern-csharp`, `project-scaffolding` | one per session |

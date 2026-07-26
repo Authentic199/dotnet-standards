@@ -132,9 +132,9 @@ no secrets.
 - S12 ruling: `Messages<T>` conventions get a **dedicated `message-keys` skill**
   (sources: `be-booking/CONVENTION.md` "Message Keys" section — verified to
   match `apsp-backend/src/Infrastructure/Facades/Definitions/Messages.cs`
-  key-for-key — plus that file and its references). Needs a roadmap row and its
-  own session; suggested slot: immediately after S13, since error-handling
-  wants it. Roadmap edit belongs to the index session, not a lane.
+  key-for-key — plus that file and its references). **Roadmap row S13b added at
+  S12's close by explicit user direction** (`docs/03-session-roadmap.md`); it
+  runs in Lane B immediately after S13.
 - S12 deferred to `message-keys`: validators use two message forms —
   `Messages<T>.X(selector)` and bare `MessagesType` constants (constants are
   MORE frequent by raw count; `Messages<T>` matches the shared facade and both
