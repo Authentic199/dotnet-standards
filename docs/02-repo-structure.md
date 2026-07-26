@@ -149,6 +149,20 @@ description: Use when [triggering conditions] - [what it does]
 Per rule **C** from `00-brainstorm.md` §3, every description in this plugin also states its
 **anti-triggers**: what it is *not* for, and which sibling skill to use instead.
 
+> **⚠️ The voice above is contested and is NOT settled — do not treat it as decided.**
+> This section prescribes the **second person** (`Use when …`). The user's own authoring
+> convention, `apsp-backend/skills/skill-creator/SKILL.md`, prescribes the **third person**
+> (*"This skill should be used when…"*, explicitly not *"Use this skill when…"*), "pushy"
+> phrasing, **under 100 words**, and explicit trigger phrases — and S7 designated that file the
+> highest-tier `from-my-code` source. The already-shipped `facade-module-architecture`
+> description follows this section and exceeds 100 words.
+>
+> **Resolution is owned by the `skill-arbiter` agent**, which loads Anthropic's official
+> `skill-creator`, and it must decide **with stated reasons** after competing drafts exist —
+> not before. See the three-way authoring process in `03-session-roadmap.md`. Whichever voice
+> wins, this section is rewritten to match it and the shipped description is brought into line.
+> Until then, **anti-triggers are the only part of this rule that is settled.**
+
 ### Agent — `agents/<name>.md`
 
 ```markdown

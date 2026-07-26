@@ -118,7 +118,8 @@ One skill per session, in priority order.
 
 | Session | Skill | Notes |
 |---|---|---|
-| S7 ✅ | `facade-module-architecture` | **Q1 RESOLVED (2026-07-26)** — Facade / Module layering: `Core` → `Infrastructure` → `Web`, with `Facades/` × `Modules/` inside `Infrastructure`. Not Clean Architecture, not VSA. Shipped with three `references/` files (solution layout, configuration/options, DI). Also traced A05 and A33's setup sites. |
+| S7 ◐ | `facade-module-architecture` | **Q1 RESOLVED (2026-07-26)** — Facade / Module layering: `Core` → `Infrastructure` → `Web`, with `Facades/` × `Modules/` inside `Infrastructure`. Not Clean Architecture, not VSA. Shipped with three `references/` files. Also traced A05 and A33's setup sites. **Superseded in part:** distilled from `ops-service`, which the user then identified as a base project rather than production. R7 canonical source re-designated to **`apsp-backend`**, which *confirms* the architecture but changes six details. |
+| S7b | `facade-module-architecture` — **rebuild** | Redo from `apsp-backend`, under the **three-way authoring process** below. Q1's answer is settled and is **not** reopened; only its evidence base and details change. First session in which `skill-writer-sp` and `skill-arbiter` are loadable. |
 | S8 | `cqrs-feature-slice` | |
 | S9 | `ef-core-data-access` | |
 | S10 | `distributed-caching` | |
@@ -171,6 +172,67 @@ code. Saying one thing while the code shows another is a defect, not a detail.
 - **Step 3** — write exemplar code from scratch; it must still be self-contained and sanitized.
 - **Step 4–5** — unchanged, plus: **cite source URLs inside the skill**, so its provenance is
   auditable later.
+
+### The three-way authoring process — mandatory for every skill from S7b onward
+
+Adopted at the close of S7, after the first skill had already shipped under the old
+single-author process. It replaces "Claude writes the skill" in step 3 of the five-step
+adapt session. Everything else in that structure is unchanged.
+
+**Why three authors.** A skill written by one author reflects one methodology's blind spots.
+Three independent methodologies exist and they genuinely disagree — the repo's own format
+rules, Superpowers' `writing-skills`, and Anthropic's official `skill-creator` — so the
+disagreements are surfaced and adjudicated instead of being silently resolved by whoever
+happened to be writing.
+
+| Author | Loads | Never loads |
+|---|---|---|
+| **A — main session** | `docs/02-repo-structure.md` §5, `docs/00-brainstorm.md` §3, the reference kit's skill format | **Not** `superpowers:writing-skills` — deliberately, so A and B do not share a source |
+| **B — `skill-writer-sp` agent** | `superpowers:writing-skills` | Never opens `reference/projects/`; all source material arrives in its prompt |
+| **Arbiter — `skill-arbiter` agent** | Anthropic's official `skill-creator` | Never opens `reference/projects/`; judges drafts, not code |
+
+**The loop, per piece — not per skill:**
+
+1. **A explains first, in Vietnamese.** What it intends to write, why it decided that way,
+   what is good about it, and how it combines with the other pieces. The user comments.
+2. **A and B each draft the same piece, independently.** Both return text. **Neither writes a
+   file.**
+3. **The arbiter decides**: `A`, `B`, `MERGE`, or `NEITHER` — never "either is fine" — and
+   states *which specific property* decided it, plus what it cut and why.
+4. **The user reviews the verdict and the reasons, then approves.** Only then does the main
+   session write the file.
+5. Repeat until the skill is complete.
+
+**Structure is not pre-decided.** Which sections a skill has — and whether the body follows the
+knowledge shape (Core Principles → Patterns → Anti-patterns → Decision Guide) or a
+workflow shape (Prerequisites → Steps → Conventions → Examples → Common Mistakes) — is
+**an output of the arbiter's analysis, not an input to it**. The user's ruling, verbatim:
+*fixing the architecture before any draft or perspective exists is over-engineering.*
+
+**Two live conflicts the arbiter inherits**, both recorded in the TRIAGE decision log:
+- **Description voice** — `02-repo-structure.md` §5 says second person (`Use when …`);
+  `apsp-backend/skills/skill-creator/SKILL.md` says **third person**, "pushy", **under 100
+  words**, explicit trigger phrases. The shipped skill follows §5 and exceeds 100 words.
+- **Body shape** — knowledge shape versus the user's own workflow-shaped template.
+
+**The main session must load the arbiter's context.** The arbiter cannot open
+`reference/projects/`, so it does not know what `apsp-backend/skills/skill-creator/SKILL.md`
+requires unless the prompt says so. Supplying all three rule sets is A's job, and skipping it
+silently converts a three-way decision into a two-way one.
+
+**Sub-agent questions bounce back, turn by turn.** Agents cannot interrupt mid-run; they end
+their report with a `## QUESTIONS` section. The main session answers what it can and escalates
+only genuine user decisions, then continues the same agent with `SendMessage` so its context
+survives. The main session **must announce when an agent is in use** and relay progress at
+natural milestones.
+
+**Agent definitions live in `.claude/agents/`, never in the plugin's `agents/`.** They are
+tooling for building the plugin, not plugin content — triage settled that exactly one agent
+ships (`ef-core-specialist`, B18), and shipping authoring agents to consumers would contradict it.
+
+**A definition does not load in the session that creates it.** Adding an agent, hook or skill
+requires a restart before it is dispatchable — the same constraint S6 measured for hooks. Plan
+for it: define in one session, exercise in the next.
 
 ### Canonical-source rule (R7) in practice
 

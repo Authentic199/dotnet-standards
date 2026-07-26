@@ -8,6 +8,58 @@ components change materially — not only on releases.
 
 ---
 
+## [Unreleased] — process change, 2026-07-26
+
+**No version bump, deliberately.** No plugin component changed — the version is the only
+signal an installed copy is stale, and bumping it would mint a fresh 41 MB cache directory
+for a docs-and-tooling change. Everything here is process.
+
+### Added
+- `.claude/agents/skill-writer-sp.md` and `.claude/agents/skill-arbiter.md` — the second and
+  third authors in the new three-way skill authoring process. **Project tooling, not plugin
+  content**: they live in `.claude/agents/`, never in the plugin's `agents/`, because triage
+  settled that exactly one agent ships (`ef-core-specialist`, B18). Neither agent may write a
+  file; both return draft text so nothing is written before the user approves.
+- `docs/03-session-roadmap.md` — the **three-way authoring process**, mandatory from S7b
+  onward. Main session drafts A from the repo's own rules; `skill-writer-sp` drafts B from
+  Superpowers' `writing-skills`; `skill-arbiter` decides using Anthropic's official
+  `skill-creator`. Piece by piece, explained in Vietnamese, user-approved before any write.
+
+### Changed
+- **R7 canonical source re-designated: `apsp-backend`, not `ops-service`.** The user
+  identified `ops-service` as a base project rather than production. `apsp-backend`
+  **confirms** the Facade/Module architecture — identical project graph, identical `Core`
+  shape, identical two-axis split, identical 13-file configuration load order — so **Q1's
+  answer stands**. Six details change, and `facade-module-architecture` is queued for rebuild
+  in S7b.
+- `docs/02-repo-structure.md` §5 — the description **voice** is now marked contested and
+  explicitly undecided. Second person (§5) versus third person (the user's own
+  `skill-creator` convention). Assigned to the arbiter, to be settled with reasons *after*
+  drafts exist. Anti-triggers remain the settled part of the rule.
+
+### Known issues in the shipped skill, pending the S7b rebuild
+- `references/dependency-injection.md` documents two DI marker interfaces; `apsp-backend` has
+  **three** (`ISingletonService` is missing).
+- The principle *"`Core` holds primitives only"* is **wrong**. `Core` also holds an exception
+  hierarchy and result wrappers.
+- The one shipped anti-example — target-framework drift — **does not reproduce in
+  `apsp-backend`**, where every project including both test projects targets `net7.0`. It was
+  an `ops-service`-only defect and loses its standing unless re-authorised on new evidence.
+
+### Notes
+- **Definitions do not load in the session that creates them.** A newly written agent type is
+  undispatchable until restart — the same constraint S6 measured for hooks, now confirmed to
+  generalise to project-level agents. This is why S7 stopped at defining the process rather
+  than exercising it.
+- `apsp-backend` ships **eleven skills of its own**, now designated the highest-tier
+  `from-my-code` source. `dotnet-standards` generalises an existing personal convention rather
+  than writing on a blank page.
+- **S8's blocking question is answered by the user's own written rule:** MediatR is
+  *in-process messaging, not CQRS read/write separation*. The `cqrs-feature-slice` gateway as
+  named describes a pipeline the user does not run.
+
+---
+
 ## [0.2.0] — 2026-07-26
 
 The first knowledge session. Q1 — open since S0 — is answered from real code, and
