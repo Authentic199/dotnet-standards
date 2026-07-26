@@ -8,6 +8,35 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.6] — S11 (Lane C), 2026-07-26
+
+### Changed
+- **`distributed-caching`** — `references/usage-patterns.md` now names the real search
+  facade type `IElasticSearchWrapper` in the pipeline-handoff producer example instead
+  of the sanitized `ISearchWrapper`, per the cross-skill vocabulary ruling made when
+  `elasticsearch-search` shipped.
+
+## [0.3.5] — S11 (Lane C), 2026-07-26
+
+### Added
+- **`elasticsearch-search`** — Lane C's second deliverable, built under the
+  three-way authoring process (A/B independent drafts per piece, `skill-arbiter`
+  file-verified verdicts: P1–P4 all MERGE; user adjudication through P2, delegated
+  auto-approval from P3 onward). Owns the Elasticsearch facade
+  (`IElasticSearchWrapper`, `ElasticSearchRepositoryBase<T>`, `AddElasticsearch`,
+  `IndexSettingsMapper<T>`) and the `ElkEntities/` convention — `Elk*` documents,
+  never index a DB entity, the root-vs-embedded document distinction, projection
+  profiles, query and re-index patterns. Decision-layer body plus two references
+  (`implementation.md` with the full corrected scaffold bodies; `usage-patterns.md`
+  with document authoring, read/write-back patterns and the single authorized
+  blocking-pair anti-example).
+- Session rulings recorded: `ElasticsearchSettings` stays nested in `DatabaseSettings`
+  (deliberate divergence from the Redis extraction); two-folder facade anatomy taught
+  as-is; `ElkBaseEntity` normalized into the facade; canonical registration split kept
+  (wrapper registered in the persistence facade's `Startup`); `Querry` spellings
+  corrected with an honest note; blocking `Search(out)`/`BulkAll` omitted from the
+  scaffold and treated as the sole BAD/GOOD pair.
+
 ## [0.3.4] — S13 (Lane B), 2026-07-26
 
 ### Added

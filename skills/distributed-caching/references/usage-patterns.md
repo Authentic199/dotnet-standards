@@ -35,7 +35,7 @@ public static class ProcessingPipelineExtensions
     private static readonly TimeSpan HandoffExpiration = TimeSpan.FromMinutes(5);
 
     public static async Task UpsertRange<TDocument>(
-        this ISearchWrapper searchWrapper,
+        this IElasticSearchWrapper searchWrapper,
         IRedisCacheService cacheService,
         IEnumerable<TDocument> documents)
         where TDocument : IProcessingDocument
