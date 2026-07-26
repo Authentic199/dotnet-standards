@@ -8,6 +8,30 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.0] — S7b, 2026-07-26
+
+### Changed
+- **`facade-module-architecture` rebuilt from scratch** under the three-way authoring
+  process (independent A/B drafts, `skill-arbiter` verdicts with file-verified reasons,
+  user adjudication per piece). Evidence base re-founded on the user's per-area canonical
+  designations (`ops-service` as the base project for solution/Core/facade-startup/
+  composition-root conventions; `apsp-backend` as the production source for modules and
+  controllers; `be-booking` for one anti-example only). All six recorded defects of the
+  0.2.0 version are fixed, plus rulings made this session: two lifetime markers (no
+  singleton marker), four sealed exceptions with no serialization ceremony on new ones,
+  unified suffix-partial law (base list only in the suffix-less core file — services and
+  controllers alike), `Enums/` unconditional, `<X>Validation.cs` naming, settings follow
+  their service, `Facades/Common` fractal growth with reach-not-size placement,
+  Expressions write-once, no `Mappings/` folder.
+- **New shape:** a ~300-line decision-layer body plus six verbatim-approved
+  `references/` files (`solution-layout`, `core-contracts`, `facades`, `modules`,
+  `composition-root`, `web-controllers`), replacing the three 0.2.0 references.
+  Nine authorized anti-examples live in the references, none in the body.
+- **Description voice settled** by the arbiter loading Anthropic's official
+  `skill-creator`: third person, under 100 words, trigger-noun "pushy", `Not for:`
+  routing list. `docs/02-repo-structure.md` §5 rewritten to match; the shipped
+  description is the reference example.
+
 ## [Unreleased] — process change, 2026-07-26
 
 **No version bump, deliberately.** No plugin component changed — the version is the only

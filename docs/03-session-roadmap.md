@@ -119,7 +119,7 @@ One skill per session, in priority order.
 | Session | Skill | Notes |
 |---|---|---|
 | S7 ◐ | `facade-module-architecture` | **Q1 RESOLVED (2026-07-26)** — Facade / Module layering: `Core` → `Infrastructure` → `Web`, with `Facades/` × `Modules/` inside `Infrastructure`. Not Clean Architecture, not VSA. Shipped with three `references/` files. Also traced A05 and A33's setup sites. **Superseded in part:** distilled from `ops-service`, which the user then identified as a base project rather than production. R7 canonical source re-designated to **`apsp-backend`**, which *confirms* the architecture but changes six details. |
-| S7b | `facade-module-architecture` — **rebuild** | Redo from `apsp-backend`, under the **three-way authoring process** below. Q1's answer is settled and is **not** reopened; only its evidence base and details change. First session in which `skill-writer-sp` and `skill-arbiter` are loadable. |
+| S7b ✅ | `facade-module-architecture` — **rebuild** (2026-07-26, v0.3.0) | Rebuilt under the **three-way authoring process** — six body pieces + assembly + description, each through A/B drafts, arbiter verdict, user approval. Per-area canonical designation (ops-service base / apsp-backend production / be-booking one anti-example). All six recorded defects fixed; description voice settled (§5 rewritten); 6 `references/` files; verified `Skills (1)`. **From here Phase 3 splits into three parallel lanes — see `next-session-prompt.md` (index) + `-A/-B/-C` files. Lane sessions log deferred notes in their own prompt files, consolidated to this roadmap at a later solo session.** |
 | S8 | `cqrs-feature-slice` | |
 | S9 | `ef-core-data-access` | |
 | S10 | `distributed-caching` | |
@@ -246,6 +246,32 @@ ships (`ef-core-specialist`, B18), and shipping authoring agents to consumers wo
 requires a restart before it is dispatchable — the same constraint S6 measured for hooks. Plan
 for it: define in one session, exercise in the next.
 
+### The `references/` mechanism — standing instruction (adopted S7b)
+
+Confirmed by the user in S7b as the standard way to keep a gateway skill's body inside
+the ~500-line budget, after evaluating the kit's mechanism against Anthropic's
+`skill-creator` progressive-disclosure model. It operationalizes what S0 already adopted
+as mechanism A (`00-brainstorm.md` §3). Every skill session from S7b onward follows it:
+
+1. **Three tiers.** `description` (~100 words, always in context) → SKILL.md body
+   (loads on trigger, **under ~500 lines**) → `references/*.md` (loaded only when the
+   agent actually opens them). A reference file over ~300 lines carries a table of
+   contents.
+2. **`references/` files do not auto-load.** The body must point at them explicitly,
+   and every pointer states *when* to open the file ("read `references/x.md` when
+   doing Y"). A bare "see references/x.md" is dead weight.
+3. **The body stays self-sufficient for placement decisions** — the gateway's core
+   job. `references/` holds depth (full code anatomies, extended examples), never the
+   rules themselves.
+4. **Split along "always needed / sometimes needed"**, not by topic symmetry. If
+   answering one common question requires opening more than one reference file, the
+   split is wrong.
+5. **The split itself is a piece** — it goes through the three-way loop (A proposes,
+   B proposes independently, the arbiter decides, the user approves), because
+   structure is an output, not an input.
+6. Install copies the whole skill directory (measured in S6), so `references/` ships
+   with no extra mechanics.
+
 ### Canonical-source rule (R7) in practice
 
 One skill draws from exactly **one** project, chosen by the user. Other projects are for
@@ -311,6 +337,21 @@ for their proper session:
 | **Distil** A05 `authentication` and A33 `serilog` into content, rather than only tracing their setup sites | **`auth-and-security`** (S16+) and **`observability`** (S16+) | The S6 prompt said S7 "promotes A05 and A33 from recorded paths to distilled content"; the two TRIAGE rows say *tracing* is the S7 task. The one-deliverable rule agrees with TRIAGE, so S7 traced and stopped. The wording drift was flagged to the user in the S7 opening prompt rather than resolved silently, and the user did not override it. **Both rows now carry verified concrete paths, so both sessions start from fact rather than from a named guess.** |
 | Fix the `app.Run()` / `ApplicationStopping.Register` ordering bug found in `ops-service` | none — not a `dotnet-standards` task | S7 writes nothing into a real project. Recorded in the TRIAGE decision log so it is not lost. |
 | Decide whether `ops-service` should adopt central package management, `global.json`, or `.slnx` | none — each is its own migration | Adjudicated by the user in S7 as **observed conventions, not faults**. `references/solution-layout.md` explicitly instructs against migrating any of them as a side effect of unrelated work. |
+
+## Requests deferred out of S7b
+
+| Request | Session | Note |
+|---|---|---|
+| Fix `ops-service` analyzer-version drift: `Directory.Build.props` pins Roslynator 4.3.0 / SonarAnalyzer 9.0.0.68202 while five csproj `Update` to 4.5.0 / 9.12.0.78982, leaving the two migrator projects on the old versions — two analyzer versions run at once | none — the user's own project task, not a `dotnet-standards` deliverable | User adjudicated in S7b: **a defect to fix**, not an observed convention. The approved piece-1 text already describes the `Include`-once/`Update`-per-project mechanism correctly and warns the props version is a floor. |
+| Fix `ops-service` `tests/Infrastructure.IntegrationTests`: no `ProjectReference` at all (cannot test anything) — plus it is the `net7.0` TFM-drift project | none — the user's own project task | User in S7b: integration testing was never implemented; likely dead scaffolding, fix it, then the recorded architecture stays as the norm ("a test project references `Infrastructure` and nothing else"). |
+| `stylecop.json` unwired in `ops-service` (no `AdditionalFiles` item anywhere; only listed in `.sln` Solution Items) | none | User in S7b: leave as-is. The approved piece-1 text documents the observed truth: the file has no build effect until wired. |
+| Decide the `JwtSettings` convention: ops (`double` expirations + `GetSecurityKey()`/expiry helpers) vs apsp (`string` expirations, no helpers, extra business schemes) | `auth-and-security` (S16+) | Reported to the user in S7b; deliberately not decided there — it is an auth convention, not an architecture one. |
+| Document that mapping travels with its source class — the standard module has **no `Mappings/` folder** (apsp `Modules/Users/Mappings/` is non-standard) | the AutoMapper/mapping skill session | User ruling in S7b. The rebuilt architecture skill lists the standard module folders without `Mappings/`. |
+| Repeat the "module `Services/` is not a dumping ground" convention at file-creation level | S8 `cqrs-feature-slice` | User in S7b authorized the anti-examples (apsp `Modules/Customers/Services`, be-booking `Modules/Campaigns/Services`) and asked that later stages carry the convention so it never needs re-flagging. |
+| Clean up `ops-service/src/Core/` defects surfaced by S7b verification | none — the user's own project tasks | (a) `ForbiddenException.cs` / `UnAuthorizedException.cs` declare `namespace Infrastructure.Exceptions.HttpExceptions` inside Core; (b) `HttpCustomException.Value` is dead code — set, never read (middleware reads `StatusCode` + `Message`); (c) `new HttpCustomException()` is public/non-abstract and yields `StatusCode = 0`; (d) `UnAuthorizedException` is the one unsealed concrete exception — now non-compliant with the S7b sealed rule; (e) legacy `[Serializable]`/`SerializationInfo` ceremony on all six exception files — S7b ruled new exceptions drop it (SYSLIB0051), so existing files are cleanup candidates; (f) unused `using System.Net;` in `CustomException.cs`; mixed file-/block-scoped namespaces in one folder. |
+| `Core/Helpers/` (PropertyFlatten, ReflectionHelper) | undocumented by user ruling | S7b: the skill says nothing about `Helpers/` at all — dropped from the folder tree and the body. Revisit only if a future skill needs it. |
+| Detail the `ElkEntities/` convention (Elk-prefixed search entities when a module has an Elasticsearch projection — never reuse DB entities) | **S11 `elasticsearch-search`** | User ruling in S7b: the architecture skill only introduces the folder so placement is unambiguous; the how belongs to S11. |
+| Settle the controller file-writing conventions: expression-bodied vs block-bodied endpoints, long-signature wrapping, and enforcement of the unified partial rule (base list only in the suffix-less core file — user ruling S7b) | **S12 `api-surface`** | The canonical controllers mix both body styles and one module carries its base list on a non-core part; S7b ruled the flags "skip" for the architecture skill but the API-design session owns the definitive convention. Also account for the multi-permission/multi-scheme `[HasPermission]` overload (real second shape the single-permission sample does not show). **Cross-skill contract set by the S7b description verdict:** `api-surface` claims routes, DTOs, versioning, OpenAPI and endpoint-writing conventions — it must NOT claim controller *placement*, which `facade-module-architecture` owns. |
 
 ---
 

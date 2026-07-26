@@ -1,0 +1,13 @@
+bây giờ hãy mang tư duy mà bạn đã quét từ project ops-serice và nhìn sang project apsp, đây là chủ đích mà tôi yêu cầu
+  bạn. Vì ops-service chỉ là 1 project base chưa phải dự án thực tế, còn APSP là một dự án thật là lên production và chạy
+  thực tế.  Và quy trình viết thiết kế và write skill tôi muốn chỉnh sửa cho từ session này apply cho tất cả các session
+  về sau như sau:
+  - chúng ta sẽ cùng nhau viết từng phần 1 của skill, tức là bạn định viết gì bạn hãy giải trình cho tôi bằng tiếng Việt
+  là bạn sẽ viết như vậy, tại sao bạn lại quyết định như vậy, nó tốt ở điểm nào, khi kết hợp với các phần khác nữa thì ưu
+  điểm gì, tôi nhận xét, duyêt thì mới ghi, và chúng ta sẽ ghép từng mảnh một cho đến khi hoàn thành toàn bộ 1 skill. Điều
+  này giúp tôi vừa hiểu bạn viết gì và vừa chỉnh sửa tính đúng đắn cho bạn.
+  - và bây  giờ không phải 1 mình bạn làm việc này nữa mà đầu tiên là hãy tạo ra 1 agent, nạp skill writtingSkill của
+  supperpower vào nó, mối khi tạo skill thì dùng agent này, nếu sub-agent trong quá trình tạo skill có câu hỏi thì back ngược lại cho bạn trả lời còn nếu bạn không tự trả lời được vì cần quyết định của user thì tôi sẽ là người trả lời
+  - chính bản thân main session là bạn sẽ dựa theo 3 nguồn chính trong repo và tạo skill như hiện tại không cần nạp skill của supperpower làm gì
+  - Sau khi có 2 phiên bản skill do bạn và agent tạo skill được nạp writingskill của superpower rồi thì lúc này ta cần 1 agent khác để review, eval và ra quyết định cuối cùng, agent này sẽ được nạp skillCreator của anthropic official. Nó sẽ có nhiệm vụ đánh giá từng phần một của một bộ skill và quyết định phần đó nên chọn của ai tạo, ví dụ: phần description nó sẽ đánh giá xem description của ai tạo tốt hơn, dễ kích hoạt hơn, phù hợp với ngữ cảnh hơn rồi ra quyết định cuối cùng là dùng của ai, hoặc là kết hợp và chọn lọc điểm mạnh giữa 2 phiên bản sau đó ghi lại thành 1 phiên bản hoàn hảo cuối cùng, tương tự cho các phần khác của skill, ví dụ như phần 1 thì agent viết tốt hơn, nhưng phần 2 thì main session viết tốt hơn, hoặc khi kết hợp điểm mạnh ở cả 2 phiên bản mới là tốt nhất, hoặc ở main session có phần references hỗ trợ thêm cho skill tốt nhưng phiên bản của agent thì không có thì lúc này agent review này sẽ có nhiệm vụ phân tích và đánh giá, mục tiêu cuối cùng là phiên bản hoàn hảo, đúng best-practices khi creating skills nhưng cũng không quá dài dòng và dư thừa.
+Nếu yêu cầu này của tôi có mâu thuẫn, quá dài dòng làm bạn bị nhiễu và chưa rõ ràng thì hãy đặt câu hỏi làm rõ, còn nếu không có gì mơ hồ thì hãy chỉnh sửa các phần cho phù hợp để kể từ sesssion này trở đi khi tạo skill sẽ áp dụng theo cơ chế này

@@ -142,26 +142,32 @@ Later distribution options, if the plugin is ever shared: direct GitHub
 ```markdown
 ---
 name: skill-name
-description: Use when [triggering conditions] - [what it does]
+description: >-
+  This skill should be used when [trigger situations, with the distinguishing
+  nouns folded in]. Not for: [nouns] — [sibling-skill]; [nouns] — [sibling-skill].
 ---
 ```
 
-Per rule **C** from `00-brainstorm.md` §3, every description in this plugin also states its
-**anti-triggers**: what it is *not* for, and which sibling skill to use instead.
+**Settled in S7b by `skill-arbiter`, which loaded Anthropic's official `skill-creator`.**
+Every description is written in the **third person** and opens with
+`This skill should be used when …` — never `Use when …` or `Use this skill when …`.
+The official methodology prescribes no grammatical person, so this follows the
+user's own authored convention (`apsp-backend/skills/skill-creator/SKILL.md`
+Step 6, restated in its `skill-template.md`); that file's own frontmatter breaks
+the rule, and is treated as drift, not as a competing convention.
 
-> **⚠️ The voice above is contested and is NOT settled — do not treat it as decided.**
-> This section prescribes the **second person** (`Use when …`). The user's own authoring
-> convention, `apsp-backend/skills/skill-creator/SKILL.md`, prescribes the **third person**
-> (*"This skill should be used when…"*, explicitly not *"Use this skill when…"*), "pushy"
-> phrasing, **under 100 words**, and explicit trigger phrases — and S7 designated that file the
-> highest-tier `from-my-code` source. The already-shipped `facade-module-architecture`
-> description follows this section and exceeds 100 words.
->
-> **Resolution is owned by the `skill-arbiter` agent**, which loads Anthropic's official
-> `skill-creator`, and it must decide **with stated reasons** after competing drafts exist —
-> not before. See the three-way authoring process in `03-session-roadmap.md`. Whichever voice
-> wins, this section is rewritten to match it and the shipped description is brought into line.
-> Until then, **anti-triggers are the only part of this rule that is settled.**
+A description stays **under 100 words**, and is **"pushy"** — dense enough in
+concrete trigger nouns that Claude fires the skill without the user naming it.
+There is **no separate `Covers …` sentence**: what a skill covers is expressed as
+the situations that trigger it, so the metadata offers nothing summary-shaped for
+an agent to follow instead of reading the body.
+
+Per rule **C** from `00-brainstorm.md` §3, every description ends with a
+`Not for:` list naming **every** sibling that owns an excluded area, in the form
+`<2–3 distinguishing nouns> — <sibling-skill-name>`, separated by semicolons.
+This list is a routing mechanism, not decoration — no entry may be dropped for
+length. Cut the nouns instead. The shipped `facade-module-architecture`
+description follows this rule and is the reference example.
 
 ### Agent — `agents/<name>.md`
 
