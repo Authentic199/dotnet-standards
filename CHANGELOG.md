@@ -8,6 +8,14 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.6] — S11 (Lane C), 2026-07-26
+
+### Changed
+- **`distributed-caching`** — `references/usage-patterns.md` now names the real search
+  facade type `IElasticSearchWrapper` in the pipeline-handoff producer example instead
+  of the sanitized `ISearchWrapper`, per the cross-skill vocabulary ruling made when
+  `elasticsearch-search` shipped.
+
 ## [0.3.5] — S11 (Lane C), 2026-07-26
 
 ### Added
