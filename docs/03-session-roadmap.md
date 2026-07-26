@@ -77,13 +77,38 @@
 
 ## Phase 2 — Scaffold
 
-### S6 — Working plugin skeleton
+### S6 — Working plugin skeleton ✅ (2026-07-26)
 
 - **Input:** `docs/02-repo-structure.md`; completed TRIAGE.
-- **Deliverable:** `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `README.md`,
-  `LICENSE`, `NOTICE` (rule R9), and one trivial smoke-test skill.
-- **Done when:** `/plugin marketplace add` + `/plugin install` succeed, Claude Code is restarted,
-  and the smoke-test skill demonstrably activates; committed.
+- **Deliverable as originally planned:** `.claude-plugin/plugin.json`,
+  `.claude-plugin/marketplace.json`, `README.md`, `LICENSE`, `NOTICE` (rule R9), and one trivial
+  smoke-test skill.
+- **Deliverable as executed:** the manifests, `README.md`, `CHANGELOG.md`, `NOTICE` (two MIT
+  obligations, not one), and the **hook set** — `hooks/run-hook.cmd`, `hooks/post-edit-format`,
+  `hooks/hooks.json`, `hooks/README.md` — plus empty `skills/` and `agents/`.
+- **Three planned deviations, all deliberate:**
+  1. **No smoke-test skill.** By the time S6 ran, triage had produced a *real* smoke test — the
+     one surviving hook. A hook that formats a file is stronger proof than a skill that
+     activates, and writing a throwaway skill would have been the scope creep the
+     one-deliverable rule exists to prevent.
+  2. **No `LICENSE`.** Asked and answered during the session: the repo is personal and
+     unpublished, so it stays "all rights reserved" by default. `NOTICE` discharges the
+     third-party obligations regardless. **Open item — revisit if there is ever a reason to
+     publish.**
+  3. **No `commands/` directory**, per `02-repo-structure.md` §5.
+- **Done when / what was actually verified:** the plugin installs from the local marketplace and
+  `claude plugin details` reports `Hooks (1) PostToolUse` with no duplicate-hooks error; the
+  wrapper and hook format a real `.cs` file in a throwaway solution, through `cmd.exe` and
+  through `bash`, with an explicit argument and with `PostToolUse` stdin JSON, with no `jq`
+  installed. Committed.
+
+**Open items carried out of S6 — none of them block S7:**
+
+| Item | Where it is recorded |
+|---|---|
+| Installing copies the source directory and **ignores `.gitignore`**, so `reference/` (39 MB, incl. the real project checkouts) lands in the plugin cache. Two candidate fixes, neither chosen because both change what §1 specifies. | `02-repo-structure.md` §4 |
+| Whether this repo ever gets a `LICENSE`. | above |
+| Final end-to-end confirmation that the hook fires **inside a live session** — it cannot fire in the session that installed it. Requires a restart plus one `.cs` edit. | `next-session-prompt.md` |
 
 ---
 
