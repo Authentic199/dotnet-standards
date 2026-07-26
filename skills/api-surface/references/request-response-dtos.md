@@ -64,7 +64,7 @@ public class CreateOrderRequestMapping : Profile
 **Contract, validator, profile — that order, one file.** The `Include(...)` is
 the first statement in the derived validator: base rules first, then the
 properties this request adds. Which rules to write, and how a rule reaches the
-database, belong to `cqrs-feature-slice`.
+database, belong to `module-feature`.
 
 > Samples here use the `Messages<T>.X(selector)` form, which is what the shared
 > facade validators themselves use. A second form built from message-type

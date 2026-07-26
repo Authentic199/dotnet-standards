@@ -7,7 +7,7 @@ description: >-
   adding a project, facade or module, where a controller, settings file or
   solution-level build file goes, wiring the composition root, or reviewing
   project references and dependency direction. Not for: feature handlers —
-  cqrs-feature-slice; DbContext, entities and migrations — ef-core-data-access;
+  module-feature; DbContext, entities and migrations — ef-core-data-access;
   routes, DTOs and OpenAPI — api-surface; JWT, policies and secrets —
   auth-and-security; Serilog sinks and tracing — observability; a brand-new
   repository — project-scaffolding.
@@ -324,7 +324,7 @@ splitting a controller that has grown.
 
 ## Not this skill
 
-The handler, request or service internals of one feature → `cqrs-feature-slice`.
+The handler, request or service internals of one feature → `module-feature`.
 `DbContext`, entities, migrations, queries → `ef-core-data-access`. Route shapes,
 DTOs, versioning, OpenAPI → `api-surface`. JWT, policies, permission internals,
 secrets → `auth-and-security`. Serilog sinks, tracing, health endpoints →
