@@ -1,6 +1,6 @@
 {
   "name": "dotnet-standards",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Personal .NET knowledge layer: architecture, CQRS pipeline (MediatR + FluentValidation + AutoMapper), EF Core, Redis caching, Elasticsearch, controller-based Web API conventions, worker services, observability and testing. Knowledge only — the brainstorm/plan/TDD/review process stays with Superpowers.",
   "author": {
     "name": "Authentic199",
