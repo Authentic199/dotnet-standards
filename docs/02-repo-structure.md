@@ -28,7 +28,7 @@ dotnet-standards/                     <- plugin root (this repository)
 ├── hooks/
 │   ├── hooks.json                    auto-loaded by Claude Code
 │   ├── run-hook.cmd                  polyglot wrapper — REQUIRED on Windows
-│   └── *.sh                          actual hook logic
+│   └── <hook-name>                   actual hook logic — EXTENSIONLESS, see §6
 ├── docs/                             planning docs (this directory)
 ├── reference/                        gitignored — kit clone + exemplar projects
 ├── LICENSE
@@ -105,6 +105,32 @@ Install / iterate:
 
 A restart is required for changes to take effect. "It didn't work" is usually a missing restart.
 
+**Two things S6 measured about this loop, both of which change how it is used:**
+
+**1 — Install *copies* the directory; it does not link to it.** The plugin lands at
+`~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` as a full copy. Editing a file in this
+repository therefore changes **nothing** in the installed plugin until the uninstall/install/restart
+cycle is run. There is no live-reload.
+
+**2 — The copy ignores `.gitignore`, and that is a problem this repository specifically has.**
+The whole source directory is copied, including `reference/` — the kit clone *and*
+`reference/projects/`, the user's real .NET projects. The first install copied **39 MB**, of which
+essentially all was `reference/`, into the plugin cache. The plugin itself is ~330 KB.
+
+`claude plugin marketplace add` offers `--sparse` for git sources, but this marketplace is
+registered as a `directory` source and no exclusion mechanism applies to it. Two candidate fixes,
+**neither decided in S6 because both change what §1 specifies**: register the marketplace as a
+*git* source so the checkout only contains tracked files, or move the plugin root into a
+subdirectory so `docs/` and `reference/` sit outside it. Until one is chosen, the mitigation is
+manual: delete `reference/` from the cache copy after each install. It is dead weight there —
+no shipped component references it.
+
+**Also verified in S6:** `claude plugin` exposes the whole loop as CLI subcommands
+(`marketplace add`, `install`, `list`, `details`, `validate`, `uninstall`), so the loop can be
+driven without the interactive `/plugin` commands. `claude plugin details dotnet-standards`
+prints the component inventory the harness actually loaded, which is the fastest way to confirm a
+manifest was parsed — it reported `Hooks (1) PostToolUse` and no duplicate-hooks error.
+
 Later distribution options, if the plugin is ever shared: direct GitHub
 (`/plugin marketplace add <org>/<repo>`), a separate marketplace repository, or
 `extraKnownMarketplaces` in team settings. Not needed for personal use.
@@ -147,16 +173,23 @@ one is needed and clears conflict-check item 2.
 
 ### Hook — `hooks/hooks.json`
 
+> **Corrected in S6.** The S0 draft of this example passed `format.sh` to the wrapper. That is
+> wrong on Windows and was the stale spec that S4's measurement caught: Claude Code prepends
+> `bash` to any command containing `.sh`. **The script name passed to the wrapper carries no
+> extension**, and the script file on disk carries none either. This is the shipped form.
+
 ```json
 {
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" format.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" post-edit-format",
+            "shell": "bash",
+            "async": false
           }
         ]
       }
@@ -164,6 +197,12 @@ one is needed and clears conflict-check item 2.
   }
 }
 ```
+
+`"shell": "bash"` and `"async": false` are copied from Superpowers' working manifest.
+**Verified in S6:** the wrapper produces identical, correct results whether Claude Code invokes it
+through `cmd.exe` or through `bash`, both with an explicit path argument and with the `PostToolUse`
+stdin JSON. `jq` is **not** installed in this environment and the script's `sed` fallback extracts
+the Windows path correctly, escaped backslashes and all.
 
 Available events: `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`, `SessionEnd`,
 `Stop`, `SubagentStop`, `PreCompact`, `Notification`.
@@ -174,37 +213,43 @@ The user's environment is Windows 11. Claude Code invokes hooks through **`CMD.e
 cannot execute `.sh` files — it tries to open them in a text editor. The kit's eight hooks are
 all `.sh`.
 
-The fix is a single reusable polyglot wrapper, valid in both CMD and POSIX sh:
+The fix is a single reusable polyglot wrapper, valid in both CMD and POSIX sh.
 
-```cmd
-: << 'CMDBLOCK'
-@echo off
-REM Polyglot wrapper: runs .sh scripts cross-platform
-REM Usage: run-hook.cmd <script-name> [args...]
-"C:\Program Files\Git\bin\bash.exe" -l "%~dp0%~1"
-exit /b
-CMDBLOCK
-
-# Unix shell runs from here
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SCRIPT_NAME="$1"
-shift
-"${SCRIPT_DIR}/${SCRIPT_NAME}" "$@"
-```
+> **Superseded in S6.** The sketch below was written in S0 from documentation. It has a single
+> hard-coded bash path and no fallback, so it hard-fails on any machine where Git is installed
+> elsewhere. **The shipped wrapper is `hooks/run-hook.cmd`** — read that file, not this sketch.
+> It follows the pattern Superpowers actually uses: three discovery attempts, then a silent
+> `exit /b 0`. The two structural facts below still hold and are why the pattern works at all.
 
 - CMD reads `:` as a label and ignores the rest of the line, runs `bash.exe`, then `exit /b`
   stops it before the Unix half.
-- POSIX sh treats `:` as a no-op and swallows the CMD block as a heredoc.
+- POSIX sh treats `:` as a no-op and swallows the CMD block as a quoted heredoc.
 - `$0` is used instead of `${BASH_SOURCE[0]}` — the latter fails on systems where `/bin/sh` is
   dash.
 
 **Requirements and consequences**
-- **Git for Windows must be installed**, at `C:\Program Files\Git\bin\bash.exe`. A different
-  install location requires editing the wrapper.
+- **A bash must be installed.** The shipped wrapper looks in `C:\Program Files\Git\bin\bash.exe`,
+  then `C:\Program Files (x86)\Git\bin\bash.exe`, then whatever `where bash` finds.
+- **If none is found the wrapper exits 0 in silence** — the hook never runs and nothing reports
+  it. That behaviour is deliberate, not an oversight; it is the whole substance of **Q2**, and it
+  is why a hook may ship only when its silent absence is benign by design. See `hooks/README.md`.
 - Quote `${CLAUDE_PLUGIN_ROOT}` in `hooks.json` — on Windows it can contain spaces.
-- Hook scripts should stick to bash builtins; external tools (`sed`, `awk`, `grep`) exist in
-  Git Bash but require the `-l` login shell for a correct PATH.
-- `run-hook.cmd` needs `chmod +x` for Unix.
+- Hook scripts should stick to bash builtins where possible. **Measured in S6:** `jq` is absent in
+  this environment; `sed` and `find` are present and work without a `-l` login shell.
+- `run-hook.cmd` and every hook script need `chmod +x` for Unix.
+
+**A third Windows fact, measured in S6 — `dotnet format` path handling.** This one is not about
+the wrapper; it broke the hook silently and cost the most to find.
+
+- An **absolute project path containing forward slashes** makes `dotnet format` log
+  *"Skipping referenced project"* and report *"Formatted 0 of 0 files"*. Since a hook script under
+  Git Bash normalises backslashes to forward slashes so its own directory walk works, this is the
+  default state, not an edge case.
+- **`--include` only ever matches a path relative to the current working directory.** Every
+  absolute form — forward slash or backslash — silently matches zero files.
+- Both failures exit 0 and print nothing, so the hook looks like it is working.
+- **The fix that works:** run from the project's own directory and pass both the project and the
+  `--include` path relative to it.
 
 **This is a real, non-trivial cost.** It is an input to the S4 hook triage decision, not an
 afterthought.

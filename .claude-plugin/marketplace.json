@@ -1,0 +1,19 @@
+{
+  "name": "dotnet-standards-dev",
+  "description": "Personal development marketplace hosting the dotnet-standards plugin from a local checkout.",
+  "owner": {
+    "name": "Authentic199",
+    "email": "chanh.am.me@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "dotnet-standards",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "Personal .NET knowledge layer for Claude Code.",
+      "author": {
+        "name": "Authentic199"
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+# Gateway skills live here, one directory per skill:
+#   skills/<skill-name>/SKILL.md          required
+#   skills/<skill-name>/references/*.md   sub-topic docs, loaded on demand
+#   skills/<skill-name>/assets/           distilled, sanitized exemplar code
+#   skills/<skill-name>/scripts/          optional executable helpers
+# Empty in v0.1.0. Built in S7-S8.

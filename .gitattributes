@@ -1,0 +1,8 @@
+# Hook scripts MUST keep LF endings on every platform.
+#
+# This machine has core.autocrlf=true, so without these rules a fresh clone gets
+# CRLF and the hook dies on the first line with `$'\r': command not found`.
+# run-hook.cmd is listed too: it is read by bash as well as by cmd.exe, and
+# cmd.exe handles LF fine.
+hooks/post-edit-format  text eol=lf
+hooks/run-hook.cmd      text eol=lf

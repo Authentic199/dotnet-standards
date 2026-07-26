@@ -1,0 +1,134 @@
+NOTICE — third-party attributions for `dotnet-standards`
+========================================================
+
+`dotnet-standards` is a personal Claude Code plugin. It carries material derived
+from two MIT-licensed projects. Both are credited below, with the full licence
+text reproduced as the MIT licence requires.
+
+Two obligations, no more: everything derived from the reference kit is covered by
+obligation 1, and the polyglot hook wrapper copied from Superpowers is covered by
+obligation 2. Nothing else in this plugin is third-party material.
+
+
+--------------------------------------------------------------------------------
+1. codewithmukesh/dotnet-claude-kit
+--------------------------------------------------------------------------------
+
+Project:   dotnet-claude-kit
+Author:    Mukesh Murugan (codewithmukesh)
+Source:    https://github.com/codewithmukesh/dotnet-claude-kit
+Licence:   MIT
+Pinned at: commit cd83d315986c27621da178dad73bd95d503c1540
+
+WHAT IS DERIVED FROM IT
+
+Every triage decision in this repository is anchored to the commit named above,
+not to the project's moving `main` branch. At that commit, `dotnet-standards`
+takes material from 52 of the kit's components:
+
+  - 30 components carried as derivative works
+      2  `adapt`      (kit skeleton, substance replaced with the author's own code)
+      23 `keep-tweak` (kit content, edited for stack, .NET version and conventions)
+      5  `keep`       (kit content taken essentially as-is)
+  - 22 components merged into new files (`combine`), each carrying kit material
+    into a file this plugin authors
+
+Shipped in this release (v0.1.0):
+
+  - `hooks/post-edit-format` — derived from the kit's `hooks/post-edit-format.sh`.
+    Renamed extensionless; logic otherwise unchanged.
+  - `hooks/hooks.json` — rebuilt, not copied. The kit's event map (PostToolUse on
+    `Edit|Write`) is the input; the file itself is written here because the kit's
+    `bash "…/x.sh"` command form cannot run on Windows and because this plugin
+    ships only one of the three hooks the kit's manifest registers.
+  - `hooks/README.md` — the kit's three-kinds hook taxonomy, rewritten for the
+    one hook this plugin actually ships.
+
+The remaining derived material lands in skills and reference documents in later
+releases. This notice covers all of it.
+
+A NOTE ON `CWM.RoslynNavigator`
+
+The kit repository also contains the `CWM.RoslynNavigator` MCP server (MIT,
+`PackageLicenseExpression=MIT`). `dotnet-standards` **documents** that server as
+an externally installed dotnet tool — `dotnet tool install -g CWM.RoslynNavigator`
+— and does not vendor, bundle or copy any part of it. It therefore creates no
+separate attribution obligation; it lives in the repository this section already
+covers.
+
+MIT LICENCE TEXT (reproduced verbatim from the kit's LICENSE at the pinned commit)
+
+    MIT License
+
+    Copyright (c) 2025 Mukesh Murugan
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+2. obra/superpowers
+--------------------------------------------------------------------------------
+
+Project:   superpowers
+Author:    Jesse Vincent (obra)
+Source:    https://github.com/obra/superpowers
+Licence:   MIT
+Read at:   installed version 6.2.0
+
+WHAT IS COPIED FROM IT
+
+  - `hooks/run-hook.cmd` — the polyglot CMD/POSIX hook wrapper. This is a copy of
+    Superpowers' `hooks/run-hook.cmd`: the same heredoc structure, the same bash
+    discovery order (Program Files, Program Files (x86), then `where bash`), and
+    the same silent `exit /b 0` when no bash is found. Only the comments differ.
+
+WHY IT IS COPIED RATHER THAN REFERENCED
+
+`dotnet-standards` and Superpowers are independent plugins. Pointing this
+plugin's `hooks.json` at Superpowers' internal path would couple the two and
+would break the moment Superpowers is updated, moved or uninstalled. The
+project's own rules forbid it, and forbid modifying any Superpowers file. So the
+pattern is copied — which is exactly what creates this attribution obligation.
+
+Nothing else from Superpowers is copied. Superpowers remains installed and
+unmodified as the process layer alongside this plugin.
+
+MIT LICENCE TEXT (reproduced verbatim from Superpowers' LICENSE, version 6.2.0)
+
+    MIT License
+
+    Copyright (c) 2025 Jesse Vincent
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.

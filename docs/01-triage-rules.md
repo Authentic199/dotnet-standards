@@ -148,6 +148,20 @@ the MIT license text. This is a legal obligation, not a courtesy.
 commit is a deliberate act recorded in the TRIAGE decision log, and it invalidates nothing
 automatically — but rows touching changed files must be revisited.
 
+**R10 — Two re-pin triggers, not one.** The second was added in S6 after S5 found four kept items
+with hard expiry dates.
+
+1. **The kit moved.** A file a decided row depends on changed upstream. Revisit that row.
+2. **The .NET release train moved past what we recorded.** Version guidance, breaking-change
+   notes, package-version advice and "do not generate X yet" guardrails all go stale on a
+   schedule, independently of whether the kit changed a line. The nearest known date is
+   **.NET 11 GA on 2026-11-10**.
+
+Trigger 2 obliges a check even when the kit is untouched, and it can force a re-pin *or* a
+straight rewrite of the affected content from current sources. `README.md` carries both the pinned
+SHA and an **"as of" date** so the second trigger is checkable at a glance; a stale "as of" line is
+a defect, not cosmetics.
+
 ---
 
 ## 8. TRIAGE row schema
