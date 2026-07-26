@@ -8,6 +8,25 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.1] — S10 (Lane C), 2026-07-26
+
+### Added
+- **`distributed-caching`** — second skill, first Lane C deliverable, built under the
+  three-way authoring process (A/B independent drafts per piece, `skill-arbiter`
+  file-verified verdicts: P1 MERGE, P2 NEITHER-redraft, P3 MERGE, P4 MERGE, user
+  adjudication throughout). Canonical source: the user-designated
+  `Facades/Common/RedisCaches` cache exemplar (RedisCache only). Decision-layer body
+  plus two references (`implementation.md` scaffold with pre-scaffold guard and two
+  STOP prerequisites; `usage-patterns.md` with the handoff read-once and cache-aside
+  patterns, one authorized anti-example, and the HybridCache
+  considered-not-adopted ruling).
+- Session rulings recorded: cache facade taught at `Facades/Common/RedisCaches/`
+  (scaffold-if-missing); normalized anatomy (`internal` Startup, Options four calls,
+  `RedisSettings` extracted from `DatabaseSettings` per settings-follow-their-service,
+  entry point `AddRedisCache`); named key legal for singleton rows; Redis queue
+  scrubbed from the skill entirely; canonical `IValidatableObject` +
+  `validationContext.Required()` validation with the helper as a STOP prerequisite.
+
 ## [0.3.0] — S7b, 2026-07-26
 
 ### Changed
