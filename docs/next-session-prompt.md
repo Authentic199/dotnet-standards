@@ -92,11 +92,19 @@ line by line; the plugin reinstalls and `claude plugin details dotnet-standards`
 
 ## THE THREE-WAY AUTHORING PROCESS — MANDATORY, READ `03-session-roadmap.md` FOR THE FULL RULE
 
-| Author | Loads | Never loads |
-|---|---|---|
-| **A — you, the main session** | `docs/02-repo-structure.md` §5, `docs/00-brainstorm.md` §3, the kit's skill format | **Not** `superpowers:writing-skills` — deliberately, so A and B do not share a source |
-| **B — `skill-writer-sp`** | `superpowers:writing-skills` | Never opens `reference/projects/` |
-| **Arbiter — `skill-arbiter`** | Anthropic's official `skill-creator` | Never opens `reference/projects/` |
+| Author | Loads (the only thing that differs) |
+|---|---|
+| **A — you, the main session** | `docs/02-repo-structure.md` §5, `docs/00-brainstorm.md` §3, the kit's skill format — **not** `superpowers:writing-skills`, so A and B do not share a methodology |
+| **B — `skill-writer-sp`** | `superpowers:writing-skills` |
+| **Arbiter — `skill-arbiter`** | Anthropic's official `skill-creator` |
+
+**Equal source access.** All three of you read the **same exemplar files I name** in
+`reference/projects/` — directly, each with your own eyes. Do not feed B or the arbiter your
+summary in place of the code; the whole point is three independent readings. The reading
+discipline binds all three identically: I name the files, widening requires asking, no bulk
+scans, `apsp-backend` is canonical, Bash not Glob. When the arbiter finds the drafts disagree
+about a fact in the code, it opens the file and checks rather than guessing which author read
+it right.
 
 **Per piece, not per skill:**
 
@@ -112,9 +120,11 @@ line by line; the plugin reinstalls and `claude plugin details dotnet-standards`
 knowledge shape and my workflow-shaped template, before drafts exist. Deciding that in advance
 without analysis or perspective is over-engineering — that is my ruling and it stands.
 
-**You must load the arbiter's context.** It cannot open `reference/projects/`, so it will not
-know what my own `skill-creator` requires unless your prompt says so. Supplying all three rule
-sets is your job; skipping it silently turns a three-way decision into a two-way one.
+**You still own the agents' prompts.** Equal access means they read the named exemplars
+themselves — not that they can find the rule sets alone. Every agent prompt must carry: the
+exemplar file list I named, the two live conflicts below, and the fact that
+`apsp-backend/skills/` is the highest-tier `from-my-code` source. Skipping any of these
+silently turns a three-way decision into a two-way one.
 
 **Two live conflicts the arbiter inherits:**
 - **Description voice** — `02-repo-structure.md` §5 says second person (`Use when …`); my

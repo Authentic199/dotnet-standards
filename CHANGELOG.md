@@ -19,7 +19,14 @@ for a docs-and-tooling change. Everything here is process.
   third authors in the new three-way skill authoring process. **Project tooling, not plugin
   content**: they live in `.claude/agents/`, never in the plugin's `agents/`, because triage
   settled that exactly one agent ships (`ef-core-specialist`, B18). Neither agent may write a
-  file; both return draft text so nothing is written before the user approves.
+  file; both return draft text so nothing is written before the user approves. **Amended same
+  day at the user's direction: all three participants — main session, writer, arbiter — read
+  the user-named exemplar files in `reference/projects/` directly, with equal access.** The
+  first design fed the agents only material pre-digested by the main session, which made every
+  draft inherit one reading of the code and left the arbiter judging two drafts that shared
+  one pair of eyes. Equal capability, differing only in loaded methodology; the reading
+  discipline (user names the files, widening requires asking, no bulk scans, R7, Bash not
+  Glob) binds all three identically.
 - `docs/03-session-roadmap.md` — the **three-way authoring process**, mandatory from S7b
   onward. Main session drafts A from the repo's own rules; `skill-writer-sp` drafts B from
   Superpowers' `writing-skills`; `skill-arbiter` decides using Anthropic's official

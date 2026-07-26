@@ -185,11 +185,22 @@ rules, Superpowers' `writing-skills`, and Anthropic's official `skill-creator` �
 disagreements are surfaced and adjudicated instead of being silently resolved by whoever
 happened to be writing.
 
-| Author | Loads | Never loads |
+| Author | Loads (the only thing that differs) | Does not load |
 |---|---|---|
-| **A — main session** | `docs/02-repo-structure.md` §5, `docs/00-brainstorm.md` §3, the reference kit's skill format | **Not** `superpowers:writing-skills` — deliberately, so A and B do not share a source |
-| **B — `skill-writer-sp` agent** | `superpowers:writing-skills` | Never opens `reference/projects/`; all source material arrives in its prompt |
-| **Arbiter — `skill-arbiter` agent** | Anthropic's official `skill-creator` | Never opens `reference/projects/`; judges drafts, not code |
+| **A — main session** | `docs/02-repo-structure.md` §5, `docs/00-brainstorm.md` §3, the reference kit's skill format | **Not** `superpowers:writing-skills` — deliberately, so A and B do not share a methodology |
+| **B — `skill-writer-sp` agent** | `superpowers:writing-skills` | Not the repo's format docs beyond what its prompt carries |
+| **Arbiter — `skill-arbiter` agent** | Anthropic's official `skill-creator` | Neither author's methodology as its own |
+
+**Equal source access — amended at the user's direction, replacing the original design.**
+All three participants read the **same user-named exemplar files** in `reference/projects/`
+directly. The first design fed B and the arbiter only material pre-digested by A, which made
+the three perspectives fake: every draft inherited A's reading of the code, and the arbiter
+judged two drafts that shared one pair of eyes. The user's rule, verbatim in intent: *the
+writers and the referee must have equal rights and equal source to trust — equal capability,
+differing only in the knowledge loaded into them, so that reasoning and results differ, not
+access.* The reading discipline (user names the files; widening requires asking; no bulk
+scans; R7; Bash not Glob) binds **all three identically** — it is about who *chooses* the
+exemplars, and that remains the user alone.
 
 **The loop, per piece — not per skill:**
 
@@ -215,10 +226,11 @@ workflow shape (Prerequisites → Steps → Conventions → Examples → Common 
   words**, explicit trigger phrases. The shipped skill follows §5 and exceeds 100 words.
 - **Body shape** — knowledge shape versus the user's own workflow-shaped template.
 
-**The main session must load the arbiter's context.** The arbiter cannot open
-`reference/projects/`, so it does not know what `apsp-backend/skills/skill-creator/SKILL.md`
-requires unless the prompt says so. Supplying all three rule sets is A's job, and skipping it
-silently converts a three-way decision into a two-way one.
+**The main session still owns the agents' prompts.** Equal access means the agents read the
+named exemplars themselves — it does not mean they can find the *rule sets* on their own. A's
+prompt to each agent must carry: the user-named exemplar file list, the two live conflicts
+below, and the fact that `apsp-backend/skills/` is the highest-tier `from-my-code` source.
+Skipping any of these silently converts a three-way decision into a two-way one.
 
 **Sub-agent questions bounce back, turn by turn.** Agents cannot interrupt mid-run; they end
 their report with a `## QUESTIONS` section. The main session answers what it can and escalates
