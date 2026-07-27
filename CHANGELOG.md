@@ -8,6 +8,42 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.7] — S13b (Lane B), 2026-07-27
+
+### Added
+- **`message-keys`** — third Lane B deliverable, built under the three-way
+  authoring process (A/B independent drafts per piece; `skill-arbiter` ran with a
+  LIVE skill-creator invocation after a mid-session plugin install plus parent
+  session restart; verdicts: P1 MERGE, P2 NEITHER with arbiter-corrected
+  doctrine, P3 MERGE). Owns the `Messages<T>` key grammar: key anatomy
+  (`Mes.{Module}.{Rest}`), the success/action helper family, the `Action`
+  overload family and its no-default trap, the 15-member `MessagesType` matrix,
+  `[MessageDisplay]`, and which form is used where. Decision-layer body plus
+  `references/key-grammar.md`.
+- Session rulings recorded:
+  - Single-style doctrine: `Messages<T>.X(selector)` is THE validator-message
+    law; the `WithMessage(MessagesType.X)` extension is legacy — recognised when
+    reading, never written new.
+  - `[MessageDisplay]` and the selector lambda are complementary, not competing:
+    every request class carries `[MessageDisplay(nameof(Entity))]`; validator
+    messages are request-typed; cross-entity existence checks entity-typed.
+  - Two generics, two jobs (arbiter-discovered against BOTH authors' drafts):
+    requests type validator messages, entities type outcome messages —
+    corpus-verified (zero request-typed success calls in either project; the
+    written convention's request-typed worked example ruled drift against its
+    own repo's code).
+  - Growth-by-reuse: the `MessagesType` enum is closed; the action family may
+    grow — an unnamed action starts as `Action("X", true)`, and promotion to a
+    dedicated facade helper is permitted (not required) once the action recurs
+    across modules (Approve/Reject/Cancel named as typical).
+  - The enum is authoritative at 15 members; the written convention's 14-item
+    list is stale. Overload coverage is non-uniform and a missing shape is
+    final (the absence pattern tracks the enum's own resource/value split).
+  - Older entity-typed validation of a request's own properties acknowledged in
+    one clause as superseded.
+  - Sanctioned anti-example (generic form only): a request class without
+    `[MessageDisplay]` leaks its type name into every key.
+
 ## [0.3.6] — S11 (Lane C), 2026-07-26
 
 ### Changed
