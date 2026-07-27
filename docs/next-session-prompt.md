@@ -1,69 +1,65 @@
-# Next sessions — the three parallel lanes (index)
+# LANE BOARD — the living index (open this first)
 
-**S7b is complete.** `facade-module-architecture` v0.3.0 shipped: rebuilt under the
-three-way process, 6 references, settled description voice, verified `Skills (1)`.
+**What this file is.** The one place that says, for every lane: where it
+stands, what its next session does, and which file to open. **Every lane
+session, at close, updates its own row here and appends to the PENDING log
+below if it parks work.** Keep entries to 2–4 lines; depth stays in the
+per-lane files. Do not let this file go stale — it is the first thing a
+returning session reads.
 
-From here the skill roadmap splits into **three lanes that run as three parallel
-sessions**. The user adjudicated the split: lanes may run concurrently because their
-skills are content-disjoint; anything that is NOT parallel-safe is excluded from every
-lane (see below). Open exactly one of these prompts per session:
+Shipped through **v0.3.13 (13 skills)** as of 2026-07-27:
+facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
+error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
+message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
+choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
+0.3.12 · auth-and-security 0.3.13.
 
-> **REPRIORITIZED 2026-07-27 (S14 close, explicit user direction — ship the lean
-> plugin first).** `dotnet-testing` and `choosing-a-dotnet-skill` are PROMOTED out
-> of the excluded list into lanes B and C respectively. Everything else still
-> unshipped is **PENDING**: `auth-and-security`, `observability`,
-> `background-worker`, `http-resilience`, `domain-modeling`, `modern-csharp`,
-> `project-scaffolding`, and Lane A's queue beyond `ef-core-data-access` (in
-> flight — it finishes; nothing new starts after it). Rules those pending skills
-> would have owned get folded into the review phase later if still wanted. After
-> the two promoted skills ship → **the four review rubrics run next**, per the
-> user's order.
+## Lane status
 
-| Lane | File | Sessions in order |
-|---|---|---|
-| **A — Data & Feature Spine** | `next-session-prompt-A.md` | `cqrs-feature-slice` (S8) → `ef-core-data-access` (S9, in flight — finishes, then lane STOPS) → ~~`domain-modeling` → `modern-csharp`~~ (pending) |
-| **B — API & Security Surface** | `next-session-prompt-B.md` | `api-surface` (S12) → `error-handling` (S13) → `message-keys` (S13b) → **`dotnet-testing` (B4, promoted)** → ~~`auth-and-security` → `observability`~~ (pending) |
-| **C — Infrastructure Services** | `next-session-prompt-C.md` | `distributed-caching` (S10) → `elasticsearch-search` (S11) → `distributed-lock` (S14) → **`choosing-a-dotnet-skill` (S15, promoted router)** → ~~`background-worker` → `http-resilience`~~ (pending) |
+| Lane | Open this file | Status (last update) | Next session does |
+|---|---|---|---|
+| **A — Data & Feature Spine** | `next-session-prompt-A.md` | S9b closed 2026-07-27: `auth-and-security` v0.3.13 shipped (module-feature, ef-core-data-access before it) | Confirm with the user whether the queue is unfrozen; if yes: `domain-modeling`, then `modern-csharp` (order TBC). Warm-up task carried: fix the stale line `module-feature/references/validation-rules.md:322` (S15 flag) |
+| **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
+| **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md while C is in flight) | S16 closed 2026-07-27: `automapper-mapping` v0.3.12 shipped; **S17 in flight: `mediatr-messaging`** | Finish S17 (mediatr-messaging + mandatory router edits, same commit). After that: `observability` / `background-worker` / `http-resilience` remain user-PENDING |
+| **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | Not started. All lane ledgers now feed them (biggest: S9b's 37-item auth ledger in CHANGELOG 0.3.13 + lane-A log) | Run one rubric per session, solo, sequential — never in parallel with a lane |
+| **D — Process Integration** | `next-session-prompt-D.md` | Blocked by design: runs ONLY after the four rubrics (dotnet-testing prerequisite already shipped) | Closed-loop workflows + specialist agents per the approved S14 spec |
 
-**Excluded from every lane — run solo, never in parallel:** `project-scaffolding`
-(pending) and the four review rubrics (NEXT after the two promoted skills — one per
-session). A lane that finishes its queue STOPS and says so; it does not pull
-from this list.
+**Solo-only (never in a lane):** `project-scaffolding` (pending), the four
+rubrics, Lane D.
 
-**Lane D — Process Integration (NEW, designed 2026-07-27 in S14):**
-`next-session-prompt-D.md`. Closed-loop workflows (feature + review, bugfix
-v1.5) + specialist agents + the Superpowers dependency check, per the approved
-spec `docs/superpowers/specs/2026-07-27-process-integration-design.md`.
-**Runs ONLY after the four rubrics AND `dotnet-testing` ship** — its agents bind
-to them. Full order from here: promoted pair (`dotnet-testing` in B ∥ router in
-C) → four rubrics (solo, sequential) → Lane D.
+## PENDING log (append-only; any lane may park work here)
 
-**Parallel-run caveat for the promoted pair:** the router ships a decision-table
-row for `dotnet-testing`; if the two run concurrently, the router lane aligns that
-row's wording against the actually-shipped `dotnet-testing` description at merge
-time (the standard cross-skill alignment rule).
+Format: `- [lane, date] what was parked — where the detail lives — what unblocks it`
 
-## The parallel protocol (binds all three lanes)
+- [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
+  `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze
+  is lifted for them and picks the order.
+- [A, 2026-07-27] `module-feature/references/validation-rules.md:322` stale
+  line ("every message… `T` is the entity" — superseded by the S15 ruling:
+  requests type validator messages) — flagged in the S15 log — any Lane A
+  session may fix it as a warm-up chore.
+- [B→rubrics, 2026-07-27] Rubric feed: S13 error-handling candidates
+  (CHANGELOG 0.3.4), S13b message-keys candidates, S12 anti-example list —
+  detail in `next-session-prompt-B.md` — consumed by the rubric sessions.
+- [A→rubrics, 2026-07-27] S9b auth ledger: 37 candidates, 4 embedded, the
+  rest rubric feed incl. security findings (username enumeration,
+  revoke-no-evict + sliding expiry, Type.GetType fail-open, committed keys in
+  two config files) and three banked design forks — detail in CHANGELOG
+  0.3.13 + `next-session-prompt-A.md` Lane log.
+- [C, 2026-07-27] `observability`, `background-worker`, `http-resilience` —
+  user-PENDING since S14 — unblocked only by user direction.
+- [roadmap, 2026-07-27] `dotnet-test-report` hook (Group B, post-rubrics) and
+  the architecture-tests roadmap row — detail in `docs/03-session-roadmap.md`.
 
-1. **Ownership.** A lane session may write ONLY: `skills/<its-current-skill>/` and its
-   own `docs/next-session-prompt-<A|B|C>.md`. It never touches another lane's skill
-   folders or prompt file, the router, or TRIAGE rows.
-2. **Isolation.** Each lane session works on its own git branch
-   (`lane-<x>/<skill-name>`), created from the latest `main` — in its own worktree or
-   checkout if sessions run at the same moment in time.
-3. **Deferred notes.** Mid-session rulings, deferred requests and canonical-source
-   records go into the lane's own prompt file under a `## Lane log` heading — NOT into
-   `03-session-roadmap.md` or `TRIAGE.md` mid-flight. A future solo session
-   consolidates the lane logs into the roadmap.
-4. **Merge & version.** At session end: rebase onto latest `main`, bump the PATCH
-   version by +1 relative to whatever `main` then carries (both manifests must agree —
-   `claude plugin validate` checks), append the CHANGELOG entry at the top, merge.
-   On conflict: keep both CHANGELOG entries, renumber your own version above theirs.
-5. **Prove it, one at a time.** After merging: `claude plugin uninstall … --scope local`
-   + install + `claude plugin details dotnet-standards` must report `Skills (n+1)`.
-   If another lane is mid-install, wait — never two installs concurrently.
-6. **Self-perpetuation.** Each session ends by rewriting ONLY its own lane prompt file
-   so it opens the lane's next skill, carrying the lane log forward. The
-   one-session-one-deliverable rule holds inside every lane.
-7. **No duplication.** Each lane prompt lists what the other two lanes own; a lane must
-   refuse (and log) any request that belongs to another lane or to the excluded list.
+## Standing rules (unchanged, summarized)
+
+- One session, one deliverable; lanes share one working tree — stage only your
+  own paths; expect mid-session `main` movement (conflict rule: keep both
+  CHANGELOG entries, renumber yours above theirs).
+- The three-way loop (`three-way-skill-loop` skill) is mandatory for any skill
+  piece; main session coordinates only. R7/R8 stay with the user.
+- Prove-it at ship: validate + `claude plugin update
+  dotnet-standards@dotnet-standards-dev` + details shows the new count +
+  `installed_plugins.json` points at the new cache + delete `reference/` from
+  the new cache dir. Both manifests must agree on the version.
+- Artifact language English; talk to the user in Vietnamese.
