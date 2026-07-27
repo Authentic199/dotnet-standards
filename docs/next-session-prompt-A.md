@@ -20,7 +20,7 @@ projects (gitignored): `BE-Ops-Service` (reusable base), `apsp-backend`
 (`docs/TRIAGE.md`) is closed input.
 
 **This is Lane A of three parallel lanes.** You own ONLY
-`skills/domain-modeling/` and this file. Lane A has shipped `module-feature`
+`skills/auth-and-security/` and this file. Lane A has shipped `module-feature`
 (v0.3.3) and `ef-core-data-access` (v0.3.9). Lane B owns `api-surface`
 (v0.3.2), `error-handling` (v0.3.4), `message-keys` (v0.3.7),
 `auth-and-security` (B4, may be in flight), `observability`. Lane C owns
@@ -33,24 +33,45 @@ ONLY your own paths.** Expect mid-session `main` movement (S9 absorbed two
 merges mid-flight); conflict rule: keep both CHANGELOG entries, renumber yours
 above theirs, align any cross-skill names that changed under you.
 
-## THE DELIVERABLE — `domain-modeling` (next Lane A session)
+## THE DELIVERABLE — `auth-and-security` (next Lane A session)
 
-Provenance `from-kit` (brainstorm §4 row 13): aggregates, value objects, domain
-events, invariants — adapted to MY codebase, not copied from the kit. Known
-boundary facts already shipped that this skill must fit UNDER, not fight:
-`ef-core-data-access` v0.3.9 teaches entities as data + configuration with
-"small fluent setters returning `this` are as far as entity behaviour goes
-here; anything that makes a decision belongs to domain-modeling" — so THIS
-skill owns that routed territory: entity behaviour that makes decisions,
-invariant enforcement, and whatever the user rules in from the kit's
-aggregate/VO/domain-event material. `Vehicle.cs` imports
-`OilChangeHistories.DomainEvents` — real domain events exist in apsp; ask the
-user whether they are exemplar or anti-example BEFORE reading them. Expressions/
-computed values stay with `module-feature`; mapping with future
-`automapper-mapping`; persistence shape with `ef-core-data-access`.
-**Consolidation caveat:** the roadmap parks `domain-modeling` in S16+ and a
-solo consolidation session may re-order the queue — confirm the deliverable
-with the user at session start before anything else.
+**Reassigned to Lane A by explicit user direction at S9's close (2026-07-27)**
+— this deliverable previously sat in Lane B's queue, and the CLAUDE.md written
+at S13b's close still opens it as Lane B's B4: that opener is STALE. If a Lane
+B session appears to be building `auth-and-security`, stop and surface the
+collision to the user immediately.
+
+**What this skill owns:** JWT schemes and their settings (the `JwtScheme`
+family — Device/User/Customer observed in apsp — and how a scheme binds to its
+settings); the **JwtSettings divergence decision** queued in the roadmap
+(BE-Ops-Service `double` expirations + helpers vs apsp `string` expirations +
+extra schemes — the user must adjudicate; do NOT average, R7); policies and
+the permission handler internals behind `[HasPermission]`; secrets handling.
+
+**Boundary facts already settled elsewhere (do not re-derive, do not
+contradict):** `[HasPermission]` has a single ctor `(string[] schemes =
+default!, params string[] permissions)` with three call shapes and a
+positional trap — the *usage* side shipped in `api-surface` v0.3.2; this skill
+owns the *internals* (the attribute's handler, policy wiring, grant-permission
+plumbing). UnAuthorized throw-site census (S13): 3 in `VerifyJwtUserMiddleware`
++ 2 current-principal. Exception SHAPES and middleware belong to
+`error-handling`; message wording to `message-keys` (route ALL key composition
+there).
+
+**Not this skill:** message keys (`message-keys`); exception flow / middleware
+envelope (`error-handling`); endpoints, wrappers, `[HasPermission]` usage
+shapes (`api-surface`); validator/service internals (`module-feature`);
+persistence (`ef-core-data-access`); anything Lane C. Sanitize is LOAD-BEARING
+here: never quote real key material, connection strings, or issuer/audience
+values from configs.
+
+**Likely exemplar starting points the user may name (WAIT for the list):**
+`apsp-backend/src/Infrastructure/Facades/Auth/` (JwtScheme, HasPermission),
+`Facades/Identity/` (token generation, grant permission, ICurrentUser), both
+projects' JwtSettings + `security.json` configs, `VerifyJwtUserMiddleware`.
+
+`domain-modeling` and `modern-csharp` remain in Lane A's queue after this,
+order to be confirmed at consolidation.
 
 ## THE THREE-WAY PROCESS — MANDATORY
 
@@ -128,12 +149,21 @@ genuinely undecidable. R8 labelling and piece approval stay with the user.
    moves between home and company machines — verify install state and paths
    at session start instead of trusting the previous session's notes.
 3. Artifact language English; talk to me in Vietnamese.
-4. End: commit per protocol (lane branch `lane-a/domain-modeling`, feat
+4. End: commit per protocol (lane branch `lane-a/auth-and-security`, feat
    commit, merge into main per the conflict rule), then rewrite THIS file so
    it opens Lane A's following session, carrying the Lane log forward.
 
 ## Lane log
 
+- **Post-S9 reassignment (2026-07-27, user direction):** Lane A's next
+  deliverable changed from `domain-modeling` to `auth-and-security` (pulled
+  from Lane B's queue). Lane B's B4 opener in the tree's CLAUDE.md is stale as
+  a result; only the user resolves what Lane B runs next. `domain-modeling`
+  and `modern-csharp` stay queued behind this in Lane A. Also noted at the
+  same close: `.claude/agents/skill-writer-a.md` and a `three-way-skill-loop`
+  skill appeared in the checkout (Author A is now a dispatchable agent and the
+  loop is codified as a skill) — the next session should ping THREE agents and
+  follow the skill's coordinator role where it applies.
 - **S9 (ef-core-data-access, 2026-07-27, company machine) — shipped v0.3.9.**
   Verdicts: P1 NEITHER→merge (arbitrated TWICE — first pass provenance-tainted
   because skill-creator was installed mid-session and invisible to subagents;
