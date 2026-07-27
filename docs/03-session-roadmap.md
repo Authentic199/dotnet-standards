@@ -133,6 +133,22 @@ One skill per session, in priority order.
 | S16+ | `distributed-lock` | **Row added at S13's open by user direction** (lane-ownership exception, explicit — `distributed-caching` v0.3.1's `Not for:` already routes here, but no row existed). Owns `ConcurrencyHandlers` internals and **`LockedException` (HTTP 423)** — the fifth sealed exception, verified in S13: all 3 throw sites live in `apsp-backend` `Facades/Common/Services/ConcurrencyHandlers/ConcurrencyHandler.cs`; the exception middleware needed no change for it (growth-by-leaf). `error-handling` (S13) cites it only as the growth worked example and routes lock semantics here, per user ruling at S13 open. |
 | then | `dotnet-code-review`, `dotnet-architecture-review`, `dotnet-security-review`, `dotnet-performance-review` | one per session |
 
+> **REPRIORITIZED 2026-07-27 (S14 close, explicit user direction — lane-ownership
+> exception, recorded in the Lane C log).** The user wants the lean plugin shipped
+> first. Effective order from here: (1) `dotnet-testing` → **Lane B** (B4) and
+> `choosing-a-dotnet-skill` → **Lane C** (S15), promoted out of the solo/excluded
+> list, may run in parallel (router aligns its `dotnet-testing` row at merge
+> time); Lane A finishes `ef-core-data-access` (already in flight), then stops.
+> (2) The four review rubrics run immediately after, one per session. PENDING
+> until further notice: `auth-and-security`, `observability`, `background-worker`,
+> `http-resilience`, `domain-modeling`, `modern-csharp`, `project-scaffolding`.
+> Conventions those pending skills would have owned are folded into the review
+> rubrics later if still wanted. Rubric input already banked in the lane logs:
+> S13's four unruled candidates (CHANGELOG 0.3.4 / Lane B log) and S14's two
+> (Pattern-3 catch filter rule "a filter that converts status must exclude
+> exceptions that already carry one"; the semaphore-registry cleanup race) —
+> harvest the lane logs + CHANGELOG before re-mining source.
+
 ### The five-step adapt session — standard structure
 
 Applies to **every** `adapt` session without exception.

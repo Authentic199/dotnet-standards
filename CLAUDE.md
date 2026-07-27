@@ -1,3 +1,17 @@
+> **PRIORITY OVERRIDE — 2026-07-27, S14 close, explicit user direction (recorded
+> in the Lane C log; ship-the-lean-plugin-first reorder, see
+> `docs/next-session-prompt.md` and `docs/03-session-roadmap.md`).** Lane B's B4
+> deliverable is now **`dotnet-testing`**, not `auth-and-security` — own
+> `skills/dotnet-testing/` instead. It is the research-variant row: no exemplar
+> exists (both projects' test projects are dead/empty scaffolding per S7b);
+> distil from the kit's testing skills + research, adapted to the stack; confirm
+> specifics with the user at session start. The process, description law,
+> standing delegation and SETTLED sections below still bind. `auth-and-security`
+> is PENDING with its JwtSettings divergence still queued; the four review
+> rubrics run after the promoted pair (`dotnet-testing` here,
+> `choosing-a-dotnet-skill` in Lane C) ships. The auth brief below is kept
+> intact for when it resumes.
+
 ## CONTEXT
 
 I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET

@@ -1,4 +1,23 @@
-# Lane B — API & Security Surface · Session B4: `auth-and-security`
+# Lane B — API & Security Surface · Session B4: `dotnet-testing` (REPRIORITIZED)
+
+> **PRIORITY OVERRIDE — 2026-07-27, S14 close, explicit user direction (recorded
+> in the Lane C log; ship-the-lean-plugin-first reorder, see the index and
+> `03-session-roadmap.md`).** B4's deliverable is now **`dotnet-testing`** — the
+> S14 research-variant row: NO exemplar exists in `reference/projects/` (both
+> projects' test projects are dead/empty scaffolding per S7b), so this skill is
+> distilled from the kit's testing skills + research, adapted to the stack
+> (xUnit-family conventions against Controllers/MediatR/FluentValidation/EF —
+> confirm specifics with the user at session start; the R7 ask-first rule still
+> applies to any `reference/projects/` peek). The three-way process, description
+> law, standing delegation (memory `delegate-on-recommendation`) and all
+> SETTLED/HARD-CONSTRAINT sections below still bind — read them with
+> `auth-and-security` mentally replaced by `dotnet-testing`, and own
+> `skills/dotnet-testing/` instead. **`auth-and-security` is PENDING** (queue
+> frozen after this skill: the four review rubrics run next). Everything below
+> this banner is the auth-and-security brief, kept intact for when it resumes —
+> its JwtSettings divergence decision stays queued, untouched.
+
+# ~~Lane B — API & Security Surface · Session B4: `auth-and-security`~~ (pending)
 
 > Copy everything below the line into a fresh Claude Code session in
 > `D:\agentic-plugin\dotnet-standards`. Lane B runs in parallel with lanes A and C —
