@@ -1,7 +1,7 @@
 # Lane B — API & Security Surface · Session B4: `auth-and-security`
 
 > Copy everything below the line into a fresh Claude Code session in
-> `D:gentic-plugin\dotnet-standards`. Lane B runs in parallel with lanes A and C —
+> `D:\agentic-plugin\dotnet-standards`. Lane B runs in parallel with lanes A and C —
 > read `next-session-prompt.md` (the index) for the parallel protocol, which binds
 > all lanes. This file was rewritten at S13b's close (message-keys v0.3.7 shipped).
 
