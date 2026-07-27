@@ -4,37 +4,43 @@ I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET
 knowledge, alongside Superpowers (process layer). **No Superpowers file may ever be
 modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
 `cd83d315986c27621da178dad73bd95d503c1540`); `reference/projects/` holds my real
-projects (gitignored): `ops-service` (reusable base), `apsp-backend` (production,
-canonical for this lane), `be-booking` (anti-example quarry only). Triage
+projects (gitignored): `BE-Ops-Service` (reusable base), `apsp-backend`
+(production, canonical), `BE-service-booking` (anti-example quarry),
+`digitalcity-backend` (older project — call-site quarry only). Triage
 (`docs/TRIAGE.md`) is closed input.
 
 **This is Lane A of three parallel lanes.** You own ONLY
-`skills/ef-core-data-access/` and this file. Lane B owns `api-surface` (shipped
-v0.3.2), `error-handling` (S13, may be in flight), `auth-and-security`,
-`observability`. Lane C owns `distributed-caching` (shipped v0.3.1),
-`elasticsearch-search` (S11 — files may exist uncommitted in the tree; NEVER stage
-them), `background-worker`, `http-resilience`. The router, testing, scaffolding
-and review rubrics are excluded from all lanes. Refuse and log anything outside
-your ownership. **Lanes share one working tree: before every commit run
-`git status` and stage ONLY your own paths.**
+`skills/domain-modeling/` and this file. Lane A has shipped `module-feature`
+(v0.3.3) and `ef-core-data-access` (v0.3.9). Lane B owns `api-surface`
+(v0.3.2), `error-handling` (v0.3.4), `message-keys` (v0.3.7),
+`auth-and-security` (B4, may be in flight), `observability`. Lane C owns
+`distributed-caching` (v0.3.6), `elasticsearch-search` (v0.3.5),
+`distributed-lock` (v0.3.8), `background-worker` (S15, may be in flight),
+`http-resilience`. The router, testing, scaffolding and review rubrics are
+excluded from all lanes. Refuse and log anything outside your ownership.
+**Lanes share one working tree: before every commit run `git status` and stage
+ONLY your own paths.** Expect mid-session `main` movement (S9 absorbed two
+merges mid-flight); conflict rule: keep both CHANGELOG entries, renumber yours
+above theirs, align any cross-skill names that changed under you.
 
-## THE DELIVERABLE — `ef-core-data-access` (S9)
+## THE DELIVERABLE — `domain-modeling` (next Lane A session)
 
-The data-access gateway. It owns: **repository-over-EF-Core** with the real
-`RepositoryBase` / `IRepositoryWrapper` evidence (the kit's "never wrap DbContext
-in a repository" stance was explicitly overruled by the codebase — document the
-wrapper as the law); `DbContext`; entities (BaseEntity/BaseEntity<TId>, ICode);
-entity configurations including `HasCode<T>` / `ICode`; migrations (the
-`Migrators.<Provider>` contract is placement — the *workflow* is yours); query
-conventions (`Find(isAsNoTracking:)`, `ProjectTo`, includes, pagination
-internals, transactions — `module-feature` P4 explicitly handed the
-where-a-transaction-begins-and-ends lane to you). Known traps to carry:
-`GetByIdAsync(params object[])` has NO ct overload on the relational repository
-(documented in `module-feature`'s `references/service-growth.md` — cite, don't
-re-teach); `IsExistByUnique`'s `object uniqueValue` + property-type restriction
-(documented in `references/validation-rules.md`).
-**Not this skill:** service/feature internals (`module-feature`), placement
-(`facade-module-architecture`), HTTP (Lane B), Lane C areas.
+Provenance `from-kit` (brainstorm §4 row 13): aggregates, value objects, domain
+events, invariants — adapted to MY codebase, not copied from the kit. Known
+boundary facts already shipped that this skill must fit UNDER, not fight:
+`ef-core-data-access` v0.3.9 teaches entities as data + configuration with
+"small fluent setters returning `this` are as far as entity behaviour goes
+here; anything that makes a decision belongs to domain-modeling" — so THIS
+skill owns that routed territory: entity behaviour that makes decisions,
+invariant enforcement, and whatever the user rules in from the kit's
+aggregate/VO/domain-event material. `Vehicle.cs` imports
+`OilChangeHistories.DomainEvents` — real domain events exist in apsp; ask the
+user whether they are exemplar or anti-example BEFORE reading them. Expressions/
+computed values stay with `module-feature`; mapping with future
+`automapper-mapping`; persistence shape with `ef-core-data-access`.
+**Consolidation caveat:** the roadmap parks `domain-modeling` in S16+ and a
+solo consolidation session may re-order the queue — confirm the deliverable
+with the user at session start before anything else.
 
 ## THE THREE-WAY PROCESS — MANDATORY
 
@@ -44,98 +50,144 @@ kit's skill format — NOT superpowers:writing-skills) and `skill-writer-sp` (au
 B) draft independently, neither writes files; (3) `skill-arbiter` verdicts
 A/B/MERGE/NEITHER with file-verified reasons; (4) I approve; only then write.
 Both agents exist in `.claude/agents/` and are dispatchable — verify with a ping
-before relying on them. Agent prompts must carry: the exemplar list I name, all
-relevant settled rulings, and equal-source-access discipline. Announce every agent
-use; relay milestones; agents end with `## QUESTIONS`; continue them via
-SendMessage. Run agents in the current working directory — no worktree for
-subagents.
+before relying on them; the ping doubles as the context-package load; continue
+the same agents across pieces via SendMessage. Agent prompts must carry: the
+exemplar list I name, all relevant settled rulings, and equal-source-access
+discipline. Announce every agent use; relay milestones; agents end with
+`## QUESTIONS`. Run agents in the current working directory — no worktree.
+**skill-creator is INSTALLED (user scope) and the arbiter MUST invoke it live
+(`skill-creator:skill-creator`).** A subagent's skill roster is snapshotted
+from the parent session's startup state — a plugin installed mid-session is
+invisible to all subagents until the parent session restarts (proven in S13b
+AND S9). If the arbiter reports `Unknown skill`, restart the parent session;
+do not accept fallbacks. S9 lessons: the arbiter corrected BOTH authors'
+central cost claim (2 queries → verified 5) and caught author A teaching a
+labelled anti-example as doctrine — but it also once misdescribed a call site
+("never rethrows" at BrandService:109; it cleanup-then-wraps) — diff every
+factual claim you can check yourself.
 
 ## READING DISCIPLINE
 
 I name the exemplars at session start — ask me for the list before reading
-anything in `reference/projects/`; never select them yourself. Widening = targeted
-lookup, announced (what/why). No bulk scans. Bash find/ls/grep, never Glob, inside
-`reference/projects/`. R7: one canonical source per area, I designate. R8:
-anti-examples are code I point at; ask before labelling. Sanitize: no project
-names, no business-domain names (S8 used an `Order` domain — continue it for
-cross-skill sample continuity), no real paths, no secrets.
+anything in `reference/projects/`; never select them yourself. Widening =
+targeted lookup, announced (what/why). No bulk scans. Bash find/ls/grep, never
+Glob, inside `reference/projects/`. R7: one canonical source per area, I
+designate; never average. R8: anti-examples are code I point at; ask before
+labelling — BUT the philosophy ruled in S9 binds: canonical code is the
+strongest truth EXCEPT where it is a bug — then the skill teaches the correct
+form and the bug gets labelled for the future review rubrics. Sanitize: no
+project names, no business-domain names (Order/OrderLine/Customer +
+FulfilmentStatus is the established sample vocabulary), no real paths, no
+secrets. **Standing delegation (S13b, reaffirmed S9):** when you present a
+decision WITH a clear recommendation, execute it and report; ask only when
+genuinely undecidable. R8 labelling and piece approval stay with the user.
 
 ## SETTLED — DO NOT RELITIGATE
 
-- Everything shipped in `facade-module-architecture` v0.3.0+, `api-surface`
-  v0.3.2, and **`module-feature` v0.3.3** (read all installed bodies + references
-  as baseline; your skill must not contradict them). Key S8 rulings that touch
-  data access: ct mandatory on every service operation (`= default` last param);
-  handlers/services return responses never entities; `IsExist…` predicate naming;
-  `Find(…).FirstOrDefaultAsync(ct)` over `GetByIdAsync` when a token matters;
-  Expressions/ owns business-computed values.
-- Description law (§5): third person `This skill should be used when…`, <100
-  words by wc -w (measure it — S8's author A self-counted 97 and was actually
-  111), pushy nouns, `Not for:` naming every owning sibling.
-- The `references/` mechanism: body ≤~300 lines decision layer; depth in
-  references with conditional "Read X when" pointers; the split itself goes
-  through the three-way loop.
-- My stack: Controllers not Minimal API, Swashbuckle, no API versioning,
-  FluentValidation + AutoMapper, Redis, Elasticsearch, Hangfire, PostgreSQL
-  primary (MySQL migrator exists).
+- Everything in all NINE shipped skills (read installed bodies + references as
+  baseline; `claude plugin details` shows the inventory). Key S9 rulings that
+  touch this skill: entity files are entity + configuration + enums ONLY;
+  fluent setters `return this` are the entity-behaviour ceiling in
+  ef-core-data-access — the decision-making layer routes HERE; ICode/HasCode
+  ruled out of the corpus ("treat as nonexistent"); collection navigations
+  non-nullable `= default!`, reference navigations nullable; opener
+  `HasBaseEntity().UnderscoreTable()` single-style; sequential-GUID identity
+  assigned in the BaseEntity constructor; entity-static Expression members are
+  anti-example (module-feature's Expressions/ owns computed values).
+- Description law (`02-repo-structure.md` §5): third person `This skill should
+  be used when…`, <100 words by wc -w (measure it), trigger-noun pushy,
+  `Not for:` naming every owning sibling (now nine + future names; forward
+  references to unshipped skills are precedented).
+- The `references/` mechanism: decision-layer body ≤~300 lines, depth in
+  references with conditional "Read X when" pointers; the split goes through
+  the loop.
+- My stack: Controllers not Minimal API, Swashbuckle, NO API versioning,
+  FluentValidation + AutoMapper, PostgreSQL primary (MySql migrator exists).
 
 ## HARD CONSTRAINTS
 
-1. One session, one deliverable: `ef-core-data-access` only. Extra requests → log
-   under `## Lane log` below and refuse.
-2. Prove it: validate + reinstall + `claude plugin details` shows the new skill;
-   report failures honestly. Merge/version protocol: patch bump (0.3.3 is taken;
-   check `plugin.json` AND the marketplace entry — both must match), CHANGELOG at
-   top, one install at a time (S8 hit a stray local-scope install; check scope).
+1. One session, one deliverable. Extra requests → log under `## Lane log` and
+   refuse.
+2. Prove it: `claude plugin validate .` + reinstall + `claude plugin details`
+   shows the new skill count; report failures honestly. Version = patch bump
+   +1 relative to whatever `main` carries at merge time (S9 entered aiming
+   0.3.7 and shipped 0.3.9 — check `plugin.json` AND `marketplace.json`, both
+   must match; CHANGELOG entry at top). One install at a time; check
+   `installed_plugins.json` before touching ANY cache dir; after reinstall
+   delete `reference/` from the new cache copy. **Machine note:** the user
+   moves between home and company machines — verify install state and paths
+   at session start instead of trusting the previous session's notes.
 3. Artifact language English; talk to me in Vietnamese.
-4. End: commit per protocol (stage only your paths), then rewrite THIS file so it
-   opens Lane A's next session (S10+ per roadmap — after S9 the lane's remaining
-   queue is set at consolidation), carrying the Lane log forward.
+4. End: commit per protocol (lane branch `lane-a/domain-modeling`, feat
+   commit, merge into main per the conflict rule), then rewrite THIS file so
+   it opens Lane A's following session, carrying the Lane log forward.
 
 ## Lane log
 
-- **S8 — cross-lane alignment + one OPEN conflict (for the consolidation
-  session and S13b `message-keys`):** `api-surface` v0.3.2 shipped mid-S8 and
-  owns the DTO chain law (base request `Profile` only when customized, ending
-  `IncludeAllDerived()`; plain base = no profile; abstract base requests;
-  response rungs always carry the profile). `module-feature`'s request/response
-  piece was amended to match before shipping — shipped siblings win. **OPEN:**
-  api-surface's base-request `[MessageDisplay(nameof(Entity))]` law sits
-  uneasily beside S8's user ruling R-s8 (strongly-typed
-  `Messages<T>.Required(x => x.Prop)` is THE validator-message standard).
-  `module-feature` ships the R-s8 form and stays silent on `[MessageDisplay]`;
-  the `message-keys` skill (S13b) must reconcile the two into one law.
-  (api-surface's own `request-response-dtos.md` already acknowledges both forms
-  exist and defers — the reconciliation has a landing place.)
-- **S8 (2026-07-26) — user orders two new catalog skills, not built:**
-  (1) a standalone **AutoMapper/mapping skill** (`automapper-mapping`,
-  provisional name) — sources: be-booking's `ca-automapper` plugin skill as
-  *untrusted* reference, verified against real apsp-backend code (CouponResponse
-  + Expressions/, DeviceRequest base-class `IncludeAllDerived` inheritance,
-  Devices complex responses); (2) a standalone **MediatR skill**
-  (`mediatr-messaging`, provisional) — in-process messaging only, no behaviors,
-  no CQRS (exemplar: apsp Vouchers). `module-feature`,
-  `facade-module-architecture` and `api-surface` route to them by these names —
-  renaming them later means a ripple. Catalog placement/session numbers to be
-  consolidated into the roadmap at a solo session.
-- **S8 — rename executed:** `cqrs-feature-slice` → `module-feature` (user
-  ruling). Ripple applied to `facade-module-architecture` (2 sites) and
-  `api-surface` (5 sites incl. its reference; the "validation rules" hand-back
-  phrase preserved). Historical docs (TRIAGE, roadmap) intentionally untouched.
-- **S8 — "Services/ is not a dumping ground" repetition ruling:** carried at
-  every stage that creates or reviews files in `Services/` — architecture
-  (shipped), `module-feature` (shipped, with both authorized inventories), and
-  the future review rubrics (`dotnet-code-review`, `dotnet-architecture-review`)
-  must include it as a checklist item so the user never re-flags it. Carry this
-  note until the rubric sessions consume it.
-- **S8 — session ruling ledger** lives in the S8 conversation's scratchpad
-  (`piece0-settled.md`, R-s1…R-s23); the durable subset is restated in
-  `module-feature`'s CHANGELOG entry (0.3.3). If S9 needs a ruling's exact
-  wording, the CHANGELOG entry is the surviving record.
-- **S8 — anti-example candidates surfaced but NOT taken** (available if ever
-  wanted): second bypass query (search variant, repo+mapper in handler);
-  `CancellationToken.None` at 3 dispatch sites in one foreign service;
-  `EInvoices/Constants/EInvoiceValidation.cs` (validation file outside
-  `Validations/`); triple-negative `!= true` guard condition; dead ternary in
-  the conflict predicate; response member existing only for sorting; Vietnamese
-  XML summaries + TODO in doc comments.
+- **S9 (ef-core-data-access, 2026-07-27, company machine) — shipped v0.3.9.**
+  Verdicts: P1 NEITHER→merge (arbitrated TWICE — first pass provenance-tainted
+  because skill-creator was installed mid-session and invisible to subagents;
+  user ordered a session restart and a cold re-arbitration, which converged on
+  the same verdict with better trigger nouns), P2 MERGE, P3 MERGE, P4 MERGE
+  (user then ruled ICode out — applied post-verdict), P5 MERGE. User
+  adjudicated every piece; standing delegation used for: Include-free
+  get-shape, 5-round-trip number kept, malformed-filter clause kept,
+  PopulateKeys out, distributed-lock Not-for entry added at ship time (its own
+  session shipped mid-S9, activating the S9-P1 deferred ruling).
+- S9 exemplars (user-named): BE-Ops-Service `Facades/Persistence/**` (canonical
+  repository/DbContext — R7: ops is source of truth for repo shape; apsp's
+  `GetByIdAsync(params object[])` erased from the skill's world); apsp entity
+  files (Devices, DeviceGroups, RewardPointSetting, Vehicles — canonical
+  entities/configurations); apsp `RoleService.SearchAsync/GetAsync` + 
+  `PaginationExtension.cs` + `QueryExpressionExtension.cs` (query patterns).
+  Migration workflow ruled: prod `UseAutoMigration`; dev
+  `dotnet ef migrations add <Name> -p src/Migrators/Migrators.PostgreSql
+  -s src/<Web> -c ApplicationDbContext` (+ `database update`).
+- S9 census/factual corrections recorded in CHANGELOG 0.3.9: catch form
+  `catch (Exception)` 22/22; DeleteBehavior Cascade 27 / Restrict 14 / SetNull
+  3; opener 7:4; zero non-Guid `BaseEntity<TId>` usages; zero `CreatedAt`
+  overrides; seeding = bail-out OR reconcile (5 real seeders); search chain =
+  5 round trips (3 `entities.Any()` probes + page + count); `$null` no
+  trailing colon; `$not:$eq:x` real; first-colon-only value split; repeated
+  filter keys AND, `$in` OR; `ApplySort` auto-appends `Id descending`.
+- S9 anti-examples LABELLED (user-confirmed; real paths; the skill teaches the
+  correct form — labels are feed for the future review rubrics):
+  (1) 12/29 `BeginTransactionAsync` call sites drop the ct (all apsp);
+  (2) apsp `Brands/Services/BrandService.cs:109` — rollback → file-cleanup
+  interleaved → wrap-throw with raw `ex.Message`;
+  (3) sync `Any()` inside async `SeedAsync` (GeographiesSeeder, AdminUserSeeder);
+  (4) three `entities.Any()` probes (QueryExpressionExtension:33/92/163);
+  (5) `ApplyFilter` silent catch + `Console.WriteLine` both paths;
+  (6) `ToPagedListAsync` sync `Count()` dropping its ct;
+  (7) `QueryContainer.Validate` blames PageSize for a bad Current;
+  (8) apsp `RoleService.GetAsync:90-91` dead Include chain before ProjectTo;
+  (9) response DTOs inheriting `BaseEntity<Guid>` (UserResponse, RoleResponse,
+  NotificationResponse, GeographyBaseResponse — BOTH projects; api-surface
+  boundary).
+  NOT labelled (user ruled allowed/superseded): hand-rolled citext-unique
+  without ICode; two validation idioms in DatabaseSettings; DbInitializer
+  silent no-op on unreachable DB; unconditional `HasPostgresExtension`;
+  ICode drift (moot — ICode ruled out).
+- S9 cross-lane events: `message-keys` v0.3.7 (Lane B S13b) AND
+  `distributed-lock` v0.3.8 (Lane C S14) both merged into `main` mid-session;
+  S9 renumbered to 0.3.9 and added the `distributed-lock` routing entry to its
+  own description per the deferred ruling. CLAUDE.md in the tree currently
+  belongs to Lane B (B4 opener) — Lane A's file is THIS one. The S13b lane
+  file describes S9's scaffold from its own vantage; harmless.
+- S9 environment lessons: company machine had NO dotnet-standards install at
+  session start (home-machine notes were stale) — S13b later installed
+  0.3.7→0.3.8 user-scope from marketplace `dotnet-standards-dev`; S9 updated
+  it to 0.3.9 and stripped `reference/` from the cache copy; caches
+  0.3.7/0.3.8 left unreferenced in place (S13 precedent). Plugin skills
+  installed mid-session are invisible to the running session AND its
+  subagents until restart (proven twice).
+- Queued for a consolidation/solo session: pagination depth beyond
+  query-conventions (none left — shipped in S9); `automapper-mapping` +
+  `mediatr-messaging` catalog placement (S8 order, still unbuilt); the
+  two-error-shapes divergence (S13, unruled); review-rubric feed = the
+  labelled anti-example ledger above + S13's list in its lane file.
+- **Carried from S8:** "Services/ is not a dumping ground" must appear in the
+  future review rubrics as a checklist item (carry until the rubric sessions
+  consume it). S8 anti-example candidates not taken remain listed in the S8
+  section of the superseded lane file (git history of this file @ commit
+  4fb954d and earlier) and in `module-feature`'s CHANGELOG 0.3.3.
