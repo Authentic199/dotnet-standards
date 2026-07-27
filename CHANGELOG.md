@@ -8,6 +8,43 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.8] — S14 (Lane C), 2026-07-27
+
+### Added
+- **`distributed-lock`** — Lane C's third deliverable, built under the three-way
+  authoring process (A/B independent drafts per piece; `skill-arbiter` invoked
+  the installed `skill-creator` live after a parent-session restart; verdicts:
+  P1 MERGE, P2–P4 MERGE B-dominant; user adjudicated through P3, standing
+  delegation applied from P4). Owns distributed mutual exclusion: the
+  `ConcurrencyHandlers` capability (`IConcurrencyHandler`, two `LockedAsync`
+  overloads, `ConcurrencyHandlerOptions`, `ConcurrencySettings`), provider
+  choice (SemaphoreSlim honestly framed single-instance-only vs RedLock — every
+  production call site passes RedLock explicitly), lock-key discipline
+  (`{Noun}:{id}`, private static helpers, no central factory, no CachePrefix),
+  the ExpiryTime/WaitTime/RetryTime doctrine, and `LockedException` (423) as the
+  cited contract routed to `error-handling`. Decision-layer body plus two
+  references (`implementation.md` with the full scaffold bodies;
+  `usage-patterns.md` with the three production patterns).
+- **Rulings recorded for reuse:** the third in-memory provider option is
+  scrubbed entirely (enum member, dispatch branch, package — no mention
+  anywhere); the scaffold reads the EXTRACTED `RedisSettings` section owned by
+  `distributed-caching` (deviation from the canonical `DatabaseSettings`
+  nesting; that section + `Required()` + the `LockedException` family are STOP
+  prerequisites); `ConcurrencySettings.Provider` is dead config — honest note,
+  no normalization, no invented fallback; the semaphore-registry cleanup race
+  (`TryRemove`/`GetOrAdd`) is an honest note, canonical code kept, not a
+  BAD/GOOD pair; authorized normalizations: settings filename typo, Vietnamese →
+  English XML docs, single-key `RedLock` → `RedLockAsync` rename, and — in
+  usage-patterns only — the Pattern 3 catch filter gains
+  `and not LockedException` (the canonical filter compensates work that never
+  started and downgrades a retryable 423 to a 500); the ExpiryTime mid-work
+  release is taught as the canonical's documented intent with an explicit
+  non-assertion about client auto-renewal (unverified for the pinned version);
+  placement asymmetry named once (lock at `Common/Services/`, cache at
+  `Common/` — both canonical, don't move existing folders); lock keys may carry
+  two ids when the guarded resource is the pair; drift noted once (one canonical
+  call site passes a bare Guid key).
+
 ## [0.3.7] — S13b (Lane B), 2026-07-27
 
 ### Added
