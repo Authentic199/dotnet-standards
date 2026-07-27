@@ -8,6 +8,50 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.11] — S15 (Lane B), 2026-07-27
+
+### Added
+- **`dotnet-testing`** — Lane B's B4 deliverable under the reprioritized queue
+  (research variant: no living exemplar — both projects' test projects are dead
+  scaffolding per S7b; distilled from the kit's testing/tdd skills + web
+  research, adapted to the stack). Three-way process verdicts: P1 MERGE,
+  P2 MERGE, P3 MERGE, P3b MERGE (user-directed flow-test addition), P4 MERGE;
+  final consistency pass PASS (3 optional notes: note 2 applied — package-table
+  row alignment; notes 1, 3 recorded, no action). Body + two references
+  (`unit-testing.md`, `integration-testing.md`) — the split the references
+  mechanism prescribes, decided at P4. Session rulings:
+  - Toolchain settled: xUnit v3 (net8.0 in support; AOT-assert caveat waived),
+    Shouldly (FluentAssertions v8+ commercial — banned), NSubstitute (Moq not
+    chosen, not banned — modality preserved), Testcontainers + Respawn,
+    `UseInMemoryDatabase` banned, Verify snapshots OUT, WireMock declined
+    (fake `HttpMessageHandler` instead), MockQueryable considered-and-declined
+    (projecting reads route to the integration tier).
+  - Fixture points the host at the container via THREE CONFIG KEYS, never
+    re-registration (pooled context; `UseDatabase`/`DbProviderKeys` must stay
+    the shipped path). Kit's own fixture uses the rejected shape — anti-example
+    candidate bank.
+  - Test auth: handler mechanism verified against the real middleware (reads
+    the established principal; DB re-check means a JWT-user principal needs its
+    seeded row). Internals routed to `auth-and-security`.
+  - Validator test assertions are REQUEST-TYPED (`Messages<TRequest>`) per
+    message-keys v0.3.7 — both authors initially wrote the superseded
+    entity-typed form (S13b mirror); root cause: cross-skill drift in
+    `module-feature/references/validation-rules.md:322` (stale "T is the
+    entity" for rules) — flagged to Lane A, not corrected here.
+  - `Received/DidNotReceive` sanctioned in exactly two shapes (guard-rejects,
+    catch-must-rollback); banned on happy paths.
+  - Unruled candidates banked for the rubrics: message-keys "Which form where"
+    table lacks a row for selector-bearing entity-typed service throws;
+    validation-rules drift above.
+- **Process (user-directed, mid-S15):** Author A drafting delegated from the
+  main session to the new `skill-writer-a` agent (`.claude/agents/`); the
+  three-way loop codified as project skill `three-way-skill-loop`
+  (`.claude/skills/`). Main session is coordinator-only from S15 on.
+- **Roadmap row added:** `dotnet-test-report` hook (Group B, post-rubrics) —
+  PostToolUse on `dotnet test`, TRX/console parse, auto-report of cases
+  run/passed; precedent: kit's `post-test-analyze.sh`; needs the Windows
+  polyglot wrapper (02-repo-structure §6).
+
 ## [0.3.10] — S15 (Lane C), 2026-07-27
 
 ### Added
