@@ -7,7 +7,8 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.13 (13 skills)** as of 2026-07-27:
+Shipped through **v0.3.14 (13 skills; 0.3.14 = router-alignment hotfix for
+auth-and-security)** as of 2026-07-28:
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
@@ -50,6 +51,25 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   user-PENDING since S14 — unblocked only by user direction.
 - [roadmap, 2026-07-27] `dotnet-test-report` hook (Group B, post-rubrics) and
   the architecture-tests roadmap row — detail in `docs/03-session-roadmap.md`.
+- [C, 2026-07-28] `api-surface` reciprocal `Not for:` route to
+  `automapper-mapping` (its description claims "colocated validator and
+  mapping profile" but routes nothing back) — detail in CHANGELOG 0.3.12
+  "Known seams" — needs an api-surface-owning session; NOT Lane C's.
+- [C, 2026-07-28] Mechanism E: UserPromptSubmit hook pointing at the router
+  (`choosing-a-dotnet-skill` was written hook-friendly) — endorsed by the
+  user at S15 — small solo follow-up session; unblocked any time.
+- [C, 2026-07-28] Lane-log consolidation: fold lane logs into
+  `docs/03-session-roadmap.md`; roadmap/index still carry stale references
+  ("Facades/Cache in one or both projects", reference-project list) —
+  solo chore session, best after the rubrics harvest the logs.
+- [C, 2026-07-28] S11 `CompileQueryAsync(...)` pagination extension — needs
+  the USER to name its source file (R7) — then belongs to
+  `elasticsearch-search` or a rubric; blocked on user.
+- [C, 2026-07-28] Small notes bank: automapper `references/` future
+  candidates (troubleshooting catalogue; IncludeMembers precedence;
+  value/type-converters — CHANGELOG 0.3.12) and `dotnet-testing`'s untouched
+  `IMapper` substitutability note — nothing to do until a session touches
+  those skills.
 
 ## Standing rules (unchanged, summarized)
 
