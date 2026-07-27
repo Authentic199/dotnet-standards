@@ -144,13 +144,14 @@ rejected in S16).
   PLUGIN first — the copy may be a move. NOT the same thing:
   `apsp-backend/skills/` (user's own pre-plugin skills, dated 2026-07-07 —
   leave alone).
-- **S16 post-close audit finding (open, Lane A's to fix):** the 0.3.13
-  auth-and-security ship SKIPPED the router merge-time edits — the
-  `Permission and identity` row still sits in `## Not yet covered` pointing
-  at a skill that now loads, the `401/403` row's third arm still says *not
-  yet covered*, and no base-map row exists. Violates the alignment rule
-  (CHANGELOG 0.3.10). Logged here because Lane C found it; the fix belongs to
-  an auth-owning or hotfix session unless the user directs otherwise.
+- **S16 post-close audit finding (RESOLVED 2026-07-28 by Lane A's 0.3.14
+  router-alignment hotfix, arbiter-reviewed):** the 0.3.13 auth-and-security
+  ship SKIPPED the router merge-time edits. Fixed in the same Lane A session:
+  base-map row added (capabilities group), `401/403` third arm routed,
+  reservation row deleted, `SecuritySettings`/`JwtSettings` settings arm, plus
+  a new "a cache that went stale" disambiguation row (arbiter addition). See
+  CHANGELOG 0.3.14. The alignment rule now sits in HARD CONSTRAINTS of the
+  Lane A file and the LANE BOARD (`docs/next-session-prompt.md`).
 - **S16 (automapper-mapping, 2026-07-27) — shipped v0.3.12.** Verdicts: P1
   MERGE, P2 MERGE (arbiter-corrected P4: IncludeAllDerived at every level
   with config to hand down — shared author blind spot, corpus four-level

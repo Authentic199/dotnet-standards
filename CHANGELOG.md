@@ -8,6 +8,32 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.14] — S9b hotfix (Lane A), 2026-07-28
+
+### Fixed
+- **Router alignment for `auth-and-security`** — the 0.3.13 ship skipped the
+  mandatory router merge-time edits (alignment rule, CHANGELOG 0.3.10); found
+  by Lane C's post-close audit, fixed by the same Lane A session. Five edits,
+  arbiter-reviewed per the S16 precedent:
+  - Base map: new row "Authentication and authorization: schemes and tokens,
+    permission grants and checks, the current principal, API keys, auth
+    secrets" (capabilities group; order-note unchanged).
+  - `401 / 403` disambiguation: third arm now routes to `auth-and-security`
+    (was *not yet covered*).
+  - `## Not yet covered`: the "Permission and identity" reservation row
+    deleted.
+  - "a Settings class": `SecuritySettings`, `JwtSettings` arm added.
+  - NEW disambiguation row "a cache that went stale" (arbiter addition):
+    a Redis value not invalidated — `distributed-caching`; a permission check
+    still passing after a grant changed — `auth-and-security` — routes the
+    revoke-no-evict hazard away from the Redis-flavoured cache row.
+  - Recorded non-edits: `ApiKeySettings` arm and "a middleware" token row
+    considered and declined (brevity; description matching resolves them).
+- Lane-A lane file and the LANE BOARD now carry the alignment rule so no
+  future lane ship skips it.
+
+---
+
 ## [0.3.13] — S9b (Lane A), 2026-07-27
 
 ### Added

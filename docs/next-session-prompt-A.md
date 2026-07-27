@@ -98,7 +98,12 @@ Customer are ruled generic-enough for auth contexts.
 
 ## HARD CONSTRAINTS
 
-1. One session, one deliverable. Extra requests → log under `## Lane log`,
+1. One session, one deliverable — **plus the mandatory router merge-time
+   edits, same session** (alignment rule, CHANGELOG 0.3.10: the router covers
+   every skill on `main` at merge — new base-map row, fix any *not yet
+   covered* arms, delete the reservation row; through the loop or
+   arbiter-reviewed per the S16 precedent). S9b SKIPPED this and needed a
+   0.3.14 hotfix — do not repeat. Extra requests → log under `## Lane log`,
    refuse.
 2. Prove it: `claude plugin validate .` + `claude plugin update
    dotnet-standards@dotnet-standards-dev` (NOT install — reports "already

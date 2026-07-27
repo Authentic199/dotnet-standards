@@ -44,6 +44,7 @@ failure → text → capabilities → tests.
 | Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
+| Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
 | Caching data in Redis: the cache facade, keys, TTL, invalidation | `distributed-caching` |
 | Keeping two requests from processing one resource at once: locks, `LockedException` | `distributed-lock` |
 | Full-text search: the search facade, documents, indexing, reindexing | `elasticsearch-search` |
@@ -56,16 +57,17 @@ alone picks wrong. Match the question, not the word.
 
 | The shared token | The split |
 |---|---|
-| 401 / 403 | thrown as `UnAuthorizedException` / `ForbiddenException` — `error-handling`; putting `[HasPermission]` on an action — `api-surface`; schemes, policies, what that attribute enforces — *not yet covered* |
+| 401 / 403 | thrown as `UnAuthorizedException` / `ForbiddenException` — `error-handling`; putting `[HasPermission]` on an action — `api-surface`; schemes, policies, what that attribute enforces — `auth-and-security` |
 | a controller | which folder its file goes in — `facade-module-architecture`; the route, action body and attributes — `api-surface`; `try`/`catch` and building an error inside one — `error-handling` |
 | an exception | which to throw and how it becomes a response — `error-handling`; the text it carries — `message-keys`; one raised because a resource was already being processed — `distributed-lock`; where the class itself lives — `facade-module-architecture` |
 | mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — `automapper-mapping` |
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature` |
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
+| a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
 | a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature` |
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
 | `Repository<T>()` / "repository" | through the data-access wrapper — `ef-core-data-access`; through the search wrapper — `elasticsearch-search`; a brand-new source repository to bootstrap — *not yet covered* |
-| a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock` |
+| a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 
 ## Not yet covered
@@ -87,7 +89,6 @@ about that skill's area, not about this one.
 | HTTP calls to another service: retry, timeout, circuit breaker, client setup | — |
 | Messaging pipeline: dispatch, behaviours, handler registration — the thin envelope itself belongs to `module-feature` | `mediatr-messaging` |
 | Observability: logging, tracing, health checks | `observability` |
-| Permission and identity: JWT schemes, policies, what `[HasPermission]` enforces, secret handling | `auth-and-security` |
 | Repository bootstrapping: starting a new solution from nothing — once the projects exist, placement belongs to `facade-module-architecture` | `project-scaffolding` |
 
 ## When the work is being planned, not yet written

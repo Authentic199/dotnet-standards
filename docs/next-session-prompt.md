@@ -53,7 +53,9 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
 
 ## Standing rules (unchanged, summarized)
 
-- One session, one deliverable; lanes share one working tree — stage only your
+- One session, one deliverable **+ the mandatory router merge-time edits in
+  the same session** (alignment rule, CHANGELOG 0.3.10 — S9b skipped this and
+  needed the 0.3.14 hotfix); lanes share one working tree — stage only your
   own paths; expect mid-session `main` movement (conflict rule: keep both
   CHANGELOG entries, renumber yours above theirs).
 - The three-way loop (`three-way-skill-loop` skill) is mandatory for any skill
