@@ -8,6 +8,55 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.9] — S9 (Lane A), 2026-07-27
+
+### Added
+- **`ef-core-data-access`** — Lane A's second deliverable, built under the
+  three-way authoring process (verdicts: P1 NEITHER→merge twice — re-arbitrated
+  cold after a parent-session restart so `skill-creator` could be invoked live;
+  P2–P5 MERGE). The data-access gateway: repository-over-EF-Core with the
+  wrapper as the law (`IRepositoryWrapper.Repository<T>()`, scoped, the kit's
+  no-wrapper stance overruled by the codebase), save-per-operation with wrapper
+  transactions (`catch (Exception)` + rollback + rethrow — 22/22 real sites),
+  `Find(isAsNoTracking:)` as the query gate, thin `ApplicationDbContext`
+  (no DbSets, citext extension, global DateTimeOffset→UTC converter),
+  options-first `DatabaseSettings` (SqlSettings only; Redis/ES routed to
+  Lane C), provider switch with `MigrationsAssembly($"Migrators.{provider}")`,
+  the migrations workflow (dev: `dotnet ef` with `-p`/`-s`/`-c`; prod:
+  `UseAutoMigration` at boot), seeding (`IDataSeedContributor` as the only
+  public seam; bail-out and reconcile idempotency strategies, order between
+  contributors not guaranteed), entities & configurations (sequential-GUID
+  `BaseEntity`, one-file co-location, `HasBaseEntity().UnderscoreTable()`
+  opener, explicit FK pairs, `OnDelete` as a decision question with census
+  Cascade 27 / Restrict 14 / SetNull 3), and
+  `references/query-conventions.md` (the QueryContainer search shape,
+  operator grammar verified against the parser, the get shape, and the honest
+  five-round-trip cost of the canonical search chain).
+
+### Rulings recorded for reuse
+- `ICode`/`HasCode` ruled OUT of the skill entirely — citext taught via
+  `HasCitextUnique` directly; hand-rolled citext-unique without the interface
+  is explicitly allowed.
+- Collection navigations: non-nullable `ICollection<X> Xs { get; set; } =
+  default!`; reference navigations stay nullable.
+- Single-style opener: `HasBaseEntity().UnderscoreTable()` (7:4 census, the
+  minority order confined to one module).
+- `GetByIdAsync(params object[])` does not exist in this skill's world
+  (ops-service repository shape is the source of truth).
+- Entity-static `Expression` members and entity-file AutoMapper Profiles are
+  omitted entirely (module-feature's Expressions/ and the future
+  automapper-mapping own them).
+- Get-single is taught without `Include` — `ProjectTo` ignores it; the real
+  call site's Include chain is a labelled anti-example.
+- Anti-examples labelled for future review rubrics (real paths in the lane
+  log): transaction-ct drops (12/29 sites), BrandService rollback-cleanup-wrap,
+  sync `Any()` in async seeders, the three `entities.Any()` probes in the
+  query helpers, ApplyFilter's silent catch + Console.WriteLine, sync
+  `Count()` dropping its ct in ToPagedListAsync, QueryContainer.Validate
+  blaming PageSize for Current, response DTOs inheriting `BaseEntity<Guid>`.
+
+---
+
 ## [0.3.8] — S14 (Lane C), 2026-07-27
 
 ### Added
