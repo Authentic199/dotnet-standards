@@ -1,219 +1,154 @@
-> **PRIORITY OVERRIDE — 2026-07-27, S14 close, explicit user direction (recorded
-> in the Lane C log; ship-the-lean-plugin-first reorder, see
-> `docs/next-session-prompt.md` and `docs/03-session-roadmap.md`).** Lane B's B4
-> deliverable is now **`dotnet-testing`**, not `auth-and-security` — own
-> `skills/dotnet-testing/` instead. It is the research-variant row: no exemplar
-> exists (both projects' test projects are dead/empty scaffolding per S7b);
-> distil from the kit's testing skills + research, adapted to the stack; confirm
-> specifics with the user at session start. The process, description law,
-> standing delegation and SETTLED sections below still bind. `auth-and-security`
-> is PENDING with its JwtSettings divergence still queued; the four review
-> rubrics run after the promoted pair (`dotnet-testing` here,
-> `choosing-a-dotnet-skill` in Lane C) ships. The auth brief below is kept
-> intact for when it resumes.
+> **LANE B STATUS — 2026-07-27, S15 close: QUEUE COMPLETE, NO BUILD DELIVERABLE
+> OPEN.** `dotnet-testing` shipped v0.3.11 (Lane B's promoted B4). Lane B's
+> former pending deliverable **`auth-and-security` was REASSIGNED to Lane A by
+> explicit user direction** (commit `f2d60c0`, Lane A S9 close) — if a Lane B
+> session appears to be building it, STOP and surface the collision.
+> `observability` stays PENDING per the S14 reprioritization. What runs next is
+> the **four review rubrics, solo sequential sessions** per the rubric-phase
+> prompt (commit `268aeec`) — they are NOT Lane B sessions and do not use this
+> file as their opener. This file now exists to (a) hold the Lane B log for
+> rubric harvesting, (b) bind any future reopened Lane B session to the process
+> below.
 
 ## CONTEXT
 
 I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET
-knowledge, alongside Superpowers (process layer). **No Superpowers file may ever be
-modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
+knowledge, alongside Superpowers (process layer). **No Superpowers file may ever
+be modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
 `cd83d315986c27621da178dad73bd95d503c1540`); `reference/projects/` holds my real
-projects (gitignored): `ops-service` (reusable base), `apsp-backend` (production,
-canonical), `be-booking` (anti-example quarry), `digitalcity-backend` (older
-project, introduced by the user in S13b — call-site quarry only, usable to extend
-where apsp lacks a pattern). Triage (`docs/TRIAGE.md`) is closed input.
+projects (gitignored): `ops-service`/`BE-Ops-Service` (reusable base),
+`apsp-backend` (production, canonical), `be-booking` (anti-example quarry),
+`digitalcity-backend` (older quarry, extension-only). Triage (`docs/TRIAGE.md`)
+is closed input.
 
-**This is Lane B of three parallel lanes.** You own ONLY
-`skills/auth-and-security/` and this file. Lane A owns `module-feature` (shipped
-v0.3.3), `ef-core-data-access` (in flight at S13b's close — untracked scaffold
-WITH a SKILL.md sat in the shared checkout), `domain-modeling`, `modern-csharp`.
-Lane C owns `distributed-caching` (v0.3.1→0.3.6), `elasticsearch-search`
-(v0.3.5), `background-worker`, `http-resilience`. The router, testing,
-scaffolding and review rubrics are excluded from all lanes. Refuse and log
-anything outside your ownership.
+**Lane B has shipped:** `api-surface` v0.3.2, `error-handling` v0.3.4,
+`message-keys` v0.3.7, `dotnet-testing` v0.3.11. Lane A owns `module-feature`
+(v0.3.3), `ef-core-data-access` (v0.3.9), and now `auth-and-security` (+
+`domain-modeling`, `modern-csharp` queued behind it). Lane C shipped
+`distributed-caching` v0.3.6, `elasticsearch-search` v0.3.5,
+`choosing-a-dotnet-skill` v0.3.10; `automapper-mapping` + `mediatr-messaging`
+queued post-S15. Lane D (process integration) runs after the rubrics.
 
-## THE DELIVERABLE — `auth-and-security` (B4)
+## THE THREE-WAY PROCESS — MANDATORY FOR ANY SKILL PIECE
 
-**What this skill owns:** JWT schemes and their settings (the `JwtScheme` family
-— Device/User/Customer observed in apsp — and how a scheme binds to its
-settings); the **JwtSettings divergence decision** queued in the roadmap
-(ops-service `double` expirations + helpers vs apsp `string` expirations + extra
-schemes — the user must adjudicate; do NOT average, R7); policies and the
-permission handler internals behind `[HasPermission]`; secrets handling.
-
-**Boundary facts already settled elsewhere (do not re-derive, do not contradict):**
-`[HasPermission]` has a single ctor `(string[] schemes = default!, params
-string[] permissions)` with three call shapes and a positional trap — the *usage*
-side shipped in `api-surface` v0.3.2; this skill owns the *internals* (the
-attribute's handler, policy wiring, grant-permission plumbing). UnAuthorized
-throw sites census (S13): 3 in `VerifyJwtUserMiddleware` + 2 current-principal.
-Exception SHAPES and middleware belong to `error-handling`; message wording
-belongs to `message-keys` (v0.3.7 — route ALL key composition there).
-
-**Not this skill:** message keys (`message-keys`); exception flow / middleware
-envelope (`error-handling`); endpoints, wrappers, `[HasPermission]` usage shapes
-(`api-surface`); validator/service internals (`module-feature`, Lane A);
-anything Lane C.
-
-## THE THREE-WAY PROCESS — MANDATORY
-
-Per piece, not per skill: (1) you explain first in Vietnamese, I comment; (2) you
-(author A: loads `docs/02-repo-structure.md` §5 + `docs/00-brainstorm.md` §3 + the
-kit's skill format — NOT superpowers:writing-skills) and `skill-writer-sp` (author
-B) draft independently, neither writes files; (3) `skill-arbiter` verdicts
-A/B/MERGE/NEITHER with file-verified reasons; (4) I approve; only then write.
-Both agents exist in `.claude/agents/` and are dispatchable — verify with a ping
-before relying on them; the ping doubles as the context-package load, and the
-same agents continue across pieces via SendMessage. Agent prompts must carry:
-the exemplar list I name, all relevant settled rulings, and equal-source-access
-discipline. Announce every agent use; relay milestones; agents end with
-`## QUESTIONS`. Run agents in the current working directory — no worktree.
-**S12 lesson:** the arbiter can introduce errors while reformulating a ruling —
-diff every rephrasing against the original before writing. **S13 lesson:** the
-arbiter also CATCHES author errors. **S13b lessons:** (a) the arbiter caught
-BOTH authors agreeing on a false rule at the doctrine's center (request-typed
-success keys — corpus said entity-typed, 0 vs 130/109) — independent drafts can
-share a blind spot, so the arbiter must verify the *shared* claims, not just the
-disagreements; (b) the arbiter corrected a modality drift where author A turned
-the user's *permission* into an *obligation* — diff modality, not just facts;
-(c) the arbiter itself may add content (the resource/value enum reading) — it
-must self-declare, and you verify it like any author claim. **skill-creator is
-now INSTALLED (user scope)** and the arbiter MUST invoke it live — the user
-rejected disk-read provenance. A subagent's skill roster is snapshotted from the
-parent session's startup state: a plugin installed mid-session is INVISIBLE to
-all subagents until the parent Claude Code session restarts (proven twice in
-S13b). If the arbiter reports `Unknown skill`, restart the parent session; do
-not accept fallbacks.
+Codified as of S15 (user direction) in **`.claude/skills/three-way-skill-loop/`**
+— load it; it binds. Summary: the main session is COORDINATOR ONLY and never
+drafts. Author A = `skill-writer-a` agent (house methodology), Author B =
+`skill-writer-sp` (Superpowers writing-skills), arbiter = `skill-arbiter`
+(invokes `skill-creator` LIVE — if `Unknown skill`, restart the parent session).
+Per piece: explain in Vietnamese → parallel independent drafts → arbiter verdict
+A/B/MERGE/NEITHER with file-verified reasons → user approval → only then write.
+Forward drafts to the arbiter VERBATIM, never summarized. Verify the arbiter's
+self-declared additions; diff rephrasings against originals (S12); expect shared
+blind spots in convergent drafts (S13b: request-typed success keys; S15: the
+mirror — entity-typed validator assertions); diff modality (S13b: permission→
+obligation; S15: not-chosen→"banned"). Standing delegation
+(`delegate-on-recommendation` memory): execute clear recommendations, ask only
+the genuinely undecidable, record each use in the Lane log. Agent-type
+definitions in `.claude/agents/` hot-load mid-session (S15, observed); PLUGIN
+skill rosters inside subagents still snapshot at parent startup (S13b).
 
 ## READING DISCIPLINE
 
-I name the exemplars at session start — ask me for the list before reading
-anything in `reference/projects/`; never select them yourself. Likely starting
-points I may name: `apsp-backend/src/Infrastructure/Facades/Auth/` (JwtScheme,
-HasPermission attribute), `Facades/Identity/` (token generation, grant
-permission, ICurrentUser), both projects' JwtSettings + `security.json`
-configs, `VerifyJwtUserMiddleware` — but WAIT for my list. Widening = targeted
-lookup, announced. No bulk scans. Bash find/ls/grep, never Glob, inside
-`reference/projects/`. R7: one canonical source per area, I designate; never
-average — the JwtSettings divergence is exactly such a designation, pending.
-R8: anti-examples are code I point at; ask before labelling. Sanitize: no
-project names, no business-domain names, no real paths, no secrets — secrets
-handling content makes this rule LOAD-BEARING this session: never quote real
-key material, connection strings, or issuer/audience values from configs.
+The user names exemplars at session start — ask before reading anything in
+`reference/projects/`; never self-select. Widening = targeted lookup, announced
+(S15 precedent: the `VerifyJwtUserMiddleware` read that settled the test-auth
+mechanism, and the AutoMapper-version grep). No bulk scans. Bash
+find/ls/grep, never Glob, inside `reference/projects/`. R7: one canonical
+source per area, user-designated; never average. R8: anti-examples are code the
+user points at; ask before labelling. Sanitize: no project names, no
+business-domain names, no real paths, no secrets.
 
 ## SETTLED — DO NOT RELITIGATE
 
-- Everything in `facade-module-architecture` v0.3.0, `api-surface` v0.3.2,
-  `module-feature` v0.3.3, `error-handling` v0.3.4 AND `message-keys` v0.3.7
-  (read the installed bodies + references as baseline; do not contradict:
-  BaseController-only base, wrappers-only success path, thin expression-bodied
-  endpoints, four sealed exceptions + growth-by-leaf, middleware-shapes-failures,
-  not-found=400, bubble-by-default, the invalid-model-state `{ message }`
-  carve-out, and message-keys' full ruling set in CHANGELOG 0.3.7 — notably:
-  requests type validator messages / entities type outcome messages; the
-  `MessagesType` enum closed at 15; action-family growth-by-reuse
-  permitted-not-required).
+- Everything in the shipped bodies: `facade-module-architecture` v0.3.0,
+  `api-surface` v0.3.2, `module-feature` v0.3.3, `error-handling` v0.3.4,
+  `message-keys` v0.3.7, `ef-core-data-access` v0.3.9,
+  `choosing-a-dotnet-skill` v0.3.10, `dotnet-testing` v0.3.11 (and Lane C's
+  caching/search bodies). Notably from S15: requests type validator messages /
+  entities type outcome messages; the dotnet-testing toolchain (xUnit v3,
+  Shouldly, NSubstitute, Testcontainers + Respawn; FluentAssertions v8+ banned,
+  Verify/WireMock/MockQueryable declined); fixture-by-config-override;
+  `Received/DidNotReceive` in exactly two shapes.
 - Description law (`02-repo-structure.md` §5): third person `This skill should
-  be used when…`, <100 words, trigger-noun pushy, `Not for:` routing list naming
-  every sibling that owns an excluded area.
+  be used when…`, <100 words, trigger-noun pushy, `Not for:` naming every
+  owning sibling. No H1 in skill bodies (S15 grep: majority convention;
+  `message-keys` is the recorded outlier).
 - The `references/` mechanism: decision-layer body, depth in references with
-  conditional pointers; the split goes through the loop.
-- My stack: Controllers not Minimal API, Swashbuckle not Scalar, NO API
-  versioning, FluentValidation + AutoMapper.
-- **Standing delegation (S13b, saved to memory as `delegate-on-recommendation`):**
-  when you present a decision WITH a clear recommendation, execute the
-  recommendation and report it done; ask only when genuinely undecidable.
-  Record each use in the Lane log.
+  conditional pointers; splits go through the loop.
+- Stack: .NET 8, Controllers not Minimal API, Swashbuckle not Scalar, NO API
+  versioning, FluentValidation + AutoMapper (v12 — single-arg
+  `MapperConfiguration`).
 
-## HARD CONSTRAINTS
+## HARD CONSTRAINTS (for any reopened Lane B build session)
 
-1. One session, one deliverable: `auth-and-security` only. Extra requests → log
-   under `## Lane log` and refuse.
+1. One session, one deliverable. Extra requests → log under `## Lane log` and
+   refuse.
 2. Prove it: validate + reinstall + `claude plugin details` shows the new skill
-   count; report failures honestly. Follow the index's merge/version protocol
-   (patch bump +1 relative to whatever `main` then carries, CHANGELOG at top,
-   one install at a time). **Install-state note from S13b's close:** the active
-   install is USER-scope `dotnet-standards 0.3.7` from marketplace
-   `dotnet-standards-dev` (cache
-   `~/.claude/plugins/cache/dotnet-standards-dev/dotnet-standards/0.3.7`,
-   `reference/` deleted from it). Details reports **Skills (8)** — Lane A's
-   untracked `ef-core-data-access` was swept in by the directory-copying
-   installer (S13 precedent, harmless). Mid-session in S13b the previous
-   user-scope install AND the `dotnet-standards-dev` marketplace registration
-   vanished from the user registry (other-lane movement); if that recurs:
-   `claude plugin marketplace add ./` (bare `.` is rejected), then install.
-   Check `installed_plugins.json` before deleting ANY cached version dir (S12
-   incident); ops-service's local-scope pin is not visible from this project's
-   registry — assume it still exists.
-3. Artifact language English; talk to me in Vietnamese.
-4. End: commit per protocol (lane branch `lane-b/auth-and-security`, feat
-   commit, merge into main — expect mid-session `main` movement from other
-   lanes; conflict rule: keep both CHANGELOG entries, renumber yours above
-   theirs, align cross-skill names that changed under you). Then rewrite THIS
-   file AND `docs/next-session-prompt-B.md` so they open Lane B's next session
-   (per the roadmap; consult it at close — B5 was provisionally the review
-   rubric handoff, but roadmap rows added by other lanes may resequence),
-   carrying the Lane log forward.
+   count; report failures honestly. Patch bump +1 relative to whatever `main`
+   then carries, CHANGELOG at top, one install at a time. **Install state at
+   S15 close:** USER-scope `dotnet-standards 0.3.11` from marketplace
+   `dotnet-standards-dev` (directory source = this checkout), Skills (11),
+   registry healthy (no S13b-style vanishing this session). Check
+   `installed_plugins.json` before deleting ANY cached version dir.
+3. Artifact language English; talk to the user in Vietnamese.
+4. End: commit per protocol (lane branch, feat commit, merge into main — expect
+   mid-session `main` movement; conflict rule: keep both CHANGELOG entries,
+   renumber yours above theirs). Rewrite THIS file and
+   `docs/next-session-prompt-B.md`, carrying the Lane log.
 
 ## Lane log
 
-- **S13b (message-keys, 2026-07-27) — shipped v0.3.7.** Verdicts: P1 MERGE,
-  P2 NEITHER (arbiter-corrected doctrine), P3 MERGE (two verdict rounds — the
-  second, issued after author B's verbatim text arrived, superseded the first;
-  differences reconciled by main session before write). User adjudicated
-  through P3, then granted the standing delegation (see SETTLED). Rulings in
-  CHANGELOG 0.3.7.
-- S13b exemplars (user-named): `be-booking/CONVENTION.md` "Message Keys"
-  (canonical WRITTEN); `apsp-backend/.../Facades/Definitions/Messages.cs`
-  (canonical IMPLEMENTATION); call sites `apsp .../Modules/Customers/Request/`
-  + `digitalcity .../ObjectRetrievals/Requests/` + `.../TrackCommands/Requests/`;
-  late-named `be-booking .../Controllers/Creatives/CreativesController.cs`
-  (Approve/Reject via `Action("X", true)`). `digitalcity-backend` introduced
-  this session: older quarry, extension-only where apsp lacks a pattern.
-- S13b R7 outcome: CONVENTION.md's own worked example
-  (`Messages<CreateUserRequest>.Create()`) ruled DRIFT against its own repo's
-  code (0 request-typed success calls in be-booking AND apsp; 109/130
-  entity-typed) — precedent: a written convention's example can lose to the
-  corpus, matching S7b's "its own frontmatter breaks the rule" treatment.
-- S13b anti-example labelled (user-confirmed, real path for reviewer use):
-  `apsp .../Modules/Customers/Request/*.cs` — all four request classes lack
-  `[MessageDisplay]`, leaking request type names into keys (only outlier among
-  57 attribute-carrying request files). NOT labelled and NEVER to be mentioned
-  in artifacts (user ruled): the wrong-`T` copy-paste
-  (`Messages<ObjectRetrievalVehicleImageRequest>` inside the Analyze validator,
-  `AnalyzeRetrievalImageRequest.cs:79`) and the pseudo-segment string keys
-  (`Required("AtLeastPersonValue")`, `AlreadyExist("InHandleIncident")`).
-- S13b unruled candidates for a future review rubric: the non-generic facade's
-  hardcoded const key (`Messages.Middleware.IPAddressForbidden` =
-  literal `"Mes.Middleware.IPAddress.Forbidden"`) — a third key mechanism no
-  ruling covers; the `Action(MessagesType.X)` bypass (compiles, zero call
-  sites, deliberately excluded from artifacts); validator dual-form census
-  detail (apsp 194 constants vs 135 lambda, digitalcity 142 vs 245 — the newer
-  project flipped toward the lambda before the doctrine existed).
-- S13b process events: skill-creator plugin installed mid-session
-  (user-scope) after the user rejected disk-read provenance; two arbiter
-  spawns failed on stale skill rosters before a parent-session restart fixed
-  it — subagent rosters snapshot at parent startup, mid-session installs are
-  invisible to them. The restarted session resumed cleanly; SendMessage
-  continuation of pre-restart agents (author B) worked.
-- S13b install events: at close, the prior user-scope install and the
-  `dotnet-standards-dev` marketplace registration were both GONE from the user
-  registry; re-added marketplace (`claude plugin marketplace add ./`) and
-  installed 0.3.7 fresh. `reference/` deleted from the 0.3.7 cache. No cached
-  version dirs deleted. Cosmetic: arbiter's final consistency pass PASSed with
-  two optional notes; note 2 applied (`Create("part")` casing), note 1 declined
-  (placeholder-notation alignment across the three pieces).
-- **Carried from S13** (still relevant): R7 split precedent (ops-service
-  canonical for SHAPE, apsp for THROW PATTERNS); UnAuthorized census (3
-  VerifyJwtUserMiddleware + 2 current-principal) — directly relevant to B4;
-  error-handling's unruled candidates list (CHANGELOG 0.3.4 + superseded lane
-  file @ 5d7ac3c); `distributed-lock` roadmap row (S16+, owns
-  ConcurrencyHandlers + LockedException 423).
-- **Carried from S12:** single `[HasPermission]` ctor
-  `(string[] schemes = default!, params string[] permissions)` — B4's boundary
-  with api-surface; services-only constructor injection 2–3 interfaces
-  canonical; `GenerateDocumentationFile` in root `Directory.Build.props`.
-  S12 anti-example list: superseded lane file @ 6848e17 + CHANGELOG 0.3.2.
-- **Queued for THIS session (B4):** the JwtSettings divergence (ops `double`
-  expirations + helpers vs apsp `string` expirations + extra schemes) — user
-  adjudicates under R7; do not average.
+- **S15 (dotnet-testing, 2026-07-27) — shipped v0.3.11.** Verdicts: P1 MERGE,
+  P2 MERGE, P3 MERGE, P3b MERGE (user-directed flow-test addition), P4 MERGE;
+  final consistency pass PASS (note 2 applied — package-table row alignment;
+  notes 1 & 3 recorded). Research variant: NO exemplars named; the
+  `BE-Ops-Service/tests` scaffold contributed exactly two facts (naming layout,
+  coverlet). User-approved stack table at session start (delegation), then ~20
+  recorded delegation calls through the pieces (sentinel `partial Program`,
+  Verify OUT, `tests/<X>.{Unit,Integration}Tests` law, HttpMessageHandler-only,
+  H1 drop, IMapper substitutable, description trigger trim, MockQueryable
+  routed-not-adopted, single-failing-rule carve-out example, UseEnvironment
+  kept, TestUsers constant kept, ReadAsync beside SeedAsync, background-worker
+  carve-out, transition-route grammar, inline request swap, TOCs added, AP2
+  real-keys reversal, package-table split, Overview added / Not-this-skill
+  skipped).
+- S15 arbiter catches (the loop worked): BOTH authors wrote the superseded
+  entity-typed validator assertion — mirror of S13b's error, root cause the
+  STALE line `module-feature/references/validation-rules.md:322` ("every
+  message… `T` is the entity") — **flagged to Lane A, not fixed here**; both
+  authors omitted `auth-and-security` from `Not for:` while triggering on
+  "test authentication handler"; author B promoted Moq from not-chosen to
+  "banned" (modality); author A's flow example drifted `OrderStatus` against
+  P2's `FulfilmentStatus`; author A's AP5 GOOD block was a unit test that
+  cannot run under P2's own projecting-read ruling.
+- S15 verified mechanism facts (targeted lookups, announced):
+  `VerifyJwtUserMiddleware` reads the ESTABLISHED principal (test auth handler
+  viable) and re-checks the user row in the DB (NotFound/Blocked/ApplicationId
+  — the S13 census, so JWT-user tests must seed their row); AutoMapper pin is
+  12.0.1 (single-arg `MapperConfiguration`); Respawn excludes nothing by
+  default (`TablesToIgnore` for `__EFMigrationsHistory` is mandatory).
+- S15 unruled candidates banked for the rubrics: message-keys' "Which form
+  where" table has no row for a selector-bearing entity-typed service throw
+  (`Messages<Order>.AlreadyExist(x => x.Code)` — corpus shape, table gap); the
+  `validation-rules.md:322` drift above; kit anti-example bank (fixture
+  `RemoveAll`+`AddDbContext` shape; kit's own `CreateInMemoryDb()` against its
+  own ban; Moq-syntax anti-pattern illustration; Verify snapshot section;
+  WireMock decision-guide row).
+- S15 process events: user directive mid-session — main session stops drafting;
+  `skill-writer-a` agent + `three-way-skill-loop` skill created and BOTH
+  hot-loaded without restart (corrects the scope of the S13b restart lesson:
+  it applies to plugin skill rosters in subagents, not agent-type definitions).
+  Memory updated (`author-a-delegated`). Roadmap row added by user direction:
+  `dotnet-test-report` hook (Group B, post-rubrics). Mid-session `main`
+  movement absorbed twice (router v0.3.10; `f2d60c0` auth→Lane A reassignment —
+  collision with the stale B4 opener averted because this session built
+  `dotnet-testing`).
+- **Carried forward for the rubrics** (from earlier sessions): S13's four
+  unruled error-handling candidates (CHANGELOG 0.3.4); S13b's message-keys
+  candidates (hardcoded const key third mechanism; `Action(MessagesType.X)`
+  bypass; validator dual-form census); S12 anti-example list (superseded lane
+  file @ 6848e17 + CHANGELOG 0.3.2); `distributed-lock` roadmap row (S16+).
+- **S13b (message-keys) — shipped v0.3.7.** Full entry preserved in
+  `docs/next-session-prompt-B.md` @ commit `77ed0a3` and CHANGELOG 0.3.7;
+  headline rulings live in SETTLED above.
