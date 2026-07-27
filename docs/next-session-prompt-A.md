@@ -1,3 +1,13 @@
+> **PRIORITY OVERRIDE — 2026-07-27, S14 close, explicit user direction (recorded
+> in the Lane C log; ship-the-lean-plugin-first reorder, see
+> `docs/next-session-prompt.md` and `docs/03-session-roadmap.md`).**
+> `domain-modeling` and `modern-csharp` are **PENDING** — with
+> `ef-core-data-access` v0.3.9 shipped, **Lane A's queue is frozen and the lane
+> STOPS**. Do not open the session this file describes. The promoted pair runs
+> instead (`dotnet-testing` in Lane B, `choosing-a-dotnet-skill` in Lane C),
+> then the four review rubrics. The brief below is kept intact for when the
+> user unfreezes the queue.
+
 ## CONTEXT
 
 I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET
