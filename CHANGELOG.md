@@ -8,6 +8,57 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.13] — S9b (Lane A), 2026-07-27
+
+### Added
+- **`auth-and-security`** — Lane A's deliverable (reassigned from Lane B's queue
+  at S9 close), built under the three-way loop, coordinator-only main session
+  (verdicts: P1 MERGE, P2 MERGE, P3 MERGE + five-patch delta, P4 MERGE,
+  P5 MERGE). Body: Overview + 7 Core Principles + Decision Guide (13 rows) +
+  4 user-labelled Anti-patterns; three references
+  (`jwt-and-tokens`, `permission-internals`, `principal-and-secrets`), all with
+  TOCs (580/391/344 lines).
+  Session rulings:
+  - **JwtSettings divergence (user decree, R7):** canonical settings-class
+    shape = ops (`double` expirations + the four `Get*` helpers, UTF-8);
+    options multiplicity = apsp (`Default` + one property per client scheme).
+    String expirations are the superseded form. Scheme family taught FROM CODE
+    (no `User` scheme exists in code despite stale project docs).
+  - `Required(params ignoreProperties)` semantics verified: arguments are
+    EXCLUSIONS — Issuer/IsAudience are optional; they are stamped into tokens
+    (iss/aud) but never validated; the per-scheme signing key is the boundary.
+  - `ValidateDataAnnotationsRecursively` provenance: NuGet
+    `ReHackt.Extensions.Options.Validation` 7.0.1.
+  - Authorization is a DB read: handler takes only the principal id; grant
+    tables + IMemoryCache (sliding, per-key eviction on sync verbs only).
+    Permission catalogue: code = Resource+Action; implication one level deep,
+    expanded after the cache; Guards = single-family seeding presets.
+  - Verify middleware reads the established principal, re-checks the row
+    per request (not-found/blocked/installation), runs after
+    UseCurrentUser and before UseAuthorization
+    (order verified at Infrastructure/Startup.cs:103-110).
+  - Taught-form departures from canonical code, all declared in honesty notes:
+    shared `Configure(JwtBearerOptions, JwtSettings)` extension; generator
+    keys via settings helpers; inert `ValidIssuer`/`ValidAudience` and
+    `RequireExpirationTime = false` dropped; catalogue lookup dictionary as
+    `static readonly` (corpus: computed property rebuilt per access);
+    `DefaulTokenGenerate`/`isUser` renamed; neutral catalogue names
+    (`AppPermissions`/`PermissionDefinition`/`AppResource`/`AppAction`).
+  - Anti-example ledger: 37 candidates recorded in the Lane A log; user
+    labelled FOUR for embedding (type-name-as-data with fail-open
+    verification; call-site key encoding; revoked-grant-never-lapses;
+    committed key material). Security findings held for the rubrics:
+    username enumeration at login; `userPermissions` dead const;
+    `PermissionsValue` hot-path rebuild; sync-over-async in the auth path.
+  - Process: the three-way loop ran with hot-loaded agents; arbiter message
+    races produced overlapping verdict outputs (S13b-class lesson recorded:
+    quote held text to agents, never cite prior verdicts); one author draft
+    reproduced real committed key values from memory — caught by the
+    coordinator, contaminated block withheld from the arbiter, final grep
+    verified zero real-key matches.
+
+---
+
 ## [0.3.12] — S16 (Lane C), 2026-07-27
 
 ### Added
