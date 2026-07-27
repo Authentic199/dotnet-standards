@@ -217,3 +217,13 @@ into a draft — the rule is always load-bearing).
   "Facades/Cache in one or both projects" for S10 and list ops-service/apsp as
   the only reference projects — superseded by S10/S11 designations; consolidate
   when the lane logs fold into `03-session-roadmap.md`.
+- **S15 mid-session user direction (2026-07-27): the user wants
+  `automapper-mapping` and `mediatr-messaging` built after this session.** Both
+  were dangled by shipped `Not for:` lists with no roadmap row until now; queue
+  them into the post-S15 prioritization next to the review rubrics (user to
+  order at S15 close). The router still ships them as *not yet covered* rows —
+  the artifact draws no pending-vs-unplanned distinction by ruling.
+- S15 mechanism E note: the user endorsed reviving the `UserPromptSubmit`
+  router-pointer hook (mechanism E, deferred Group B) as a follow-up after the
+  router ships; small session (a hooks/hooks.json entry + one inject line).
+  The router is written hook-friendly by design.
