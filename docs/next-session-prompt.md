@@ -26,9 +26,17 @@ lane (see below). Open exactly one of these prompts per session:
 | **C — Infrastructure Services** | `next-session-prompt-C.md` | `distributed-caching` (S10) → `elasticsearch-search` (S11) → `distributed-lock` (S14) → **`choosing-a-dotnet-skill` (S15, promoted router)** → ~~`background-worker` → `http-resilience`~~ (pending) |
 
 **Excluded from every lane — run solo, never in parallel:** `project-scaffolding`
-(pending), the four review rubrics (NEXT after the two promoted skills — one per
-session), and the process layer (P4). A lane that finishes its queue STOPS and says
-so; it does not pull from this list.
+(pending) and the four review rubrics (NEXT after the two promoted skills — one per
+session). A lane that finishes its queue STOPS and says so; it does not pull
+from this list.
+
+**Lane D — Process Integration (NEW, designed 2026-07-27 in S14):**
+`next-session-prompt-D.md`. Closed-loop workflows (feature + review, bugfix
+v1.5) + specialist agents + the Superpowers dependency check, per the approved
+spec `docs/superpowers/specs/2026-07-27-process-integration-design.md`.
+**Runs ONLY after the four rubrics AND `dotnet-testing` ship** — its agents bind
+to them. Full order from here: promoted pair (`dotnet-testing` in B ∥ router in
+C) → four rubrics (solo, sequential) → Lane D.
 
 **Parallel-run caveat for the promoted pair:** the router ships a decision-table
 row for `dotnet-testing`; if the two run concurrently, the router lane aligns that

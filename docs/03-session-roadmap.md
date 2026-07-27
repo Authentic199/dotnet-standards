@@ -148,6 +148,19 @@ One skill per session, in priority order.
 > (Pattern-3 catch filter rule "a filter that converts status must exclude
 > exceptions that already carry one"; the semaphore-registry cleanup race) —
 > harvest the lane logs + CHANGELOG before re-mining source.
+>
+> **Lane D added (2026-07-27, S14): Process Integration.** After the rubrics, a
+> new lane builds the closed-loop workflows (one command → brainstorm → plan →
+> implement → test-loop → review-loop → git, Superpowers called for process,
+> this plugin's skills for content), six specialist subagents (4 read-only
+> rubric reviewers + testers mirroring `dotnet-testing`'s taxonomy) and the
+> SessionStart Superpowers-dependency check. Approved spec:
+> `docs/superpowers/specs/2026-07-27-process-integration-design.md`; lane file:
+> `next-session-prompt-D.md`. This supersedes the old "process layer (P4) —
+> excluded" placeholder: P4 is now a designed lane with a hard sequencing
+> constraint (after rubrics + `dotnet-testing`). The "Knowledge only" promise in
+> the plugin description is deliberately retired when Lane D ships (user
+> ruling).
 
 ### The five-step adapt session — standard structure
 
