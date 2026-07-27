@@ -134,6 +134,23 @@ rejected in S16).
 
 ## Lane log
 
+- **S16 post-close incident (2026-07-27 night, resolved):** after Lane A's
+  0.3.13 ship, the plugin's ENTIRE `skills/` tree was found MOVED (not copied)
+  to `reference/projects/digitalcity-backend/skills/` — untracked there,
+  content == HEAD modulo CRLF, mover unknown (a digitalcity-side session is
+  suspected; not Lane C, which closed at ~19:43). Fixed: `git restore skills/`
+  in the plugin (lossless), stray copy deleted on user order. Lesson: if
+  `reference/projects/*/skills/` ever appears, check `git status` of the
+  PLUGIN first — the copy may be a move. NOT the same thing:
+  `apsp-backend/skills/` (user's own pre-plugin skills, dated 2026-07-07 —
+  leave alone).
+- **S16 post-close audit finding (open, Lane A's to fix):** the 0.3.13
+  auth-and-security ship SKIPPED the router merge-time edits — the
+  `Permission and identity` row still sits in `## Not yet covered` pointing
+  at a skill that now loads, the `401/403` row's third arm still says *not
+  yet covered*, and no base-map row exists. Violates the alignment rule
+  (CHANGELOG 0.3.10). Logged here because Lane C found it; the fix belongs to
+  an auth-owning or hotfix session unless the user directs otherwise.
 - **S16 (automapper-mapping, 2026-07-27) — shipped v0.3.12.** Verdicts: P1
   MERGE, P2 MERGE (arbiter-corrected P4: IncludeAllDerived at every level
   with config to hand down — shared author blind spot, corpus four-level
