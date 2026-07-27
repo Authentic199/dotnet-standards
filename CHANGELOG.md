@@ -8,6 +8,54 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.10] — S15 (Lane C), 2026-07-27
+
+### Added
+- **`choosing-a-dotnet-skill`** — the ROUTER (mechanism D from brainstorm §3),
+  Lane C's deliverable under the three-way authoring process (verdicts: P1
+  MERGE, P2 MERGE, P3 MERGE; arbiter final consistency pass PASS — one defect
+  fixed: a falsely-justified H1 removed, 8/9 siblings open at `##`). A single
+  decision-table SKILL.md, no `references/`. Session rulings:
+  - Two-user goal: sibling disambiguation AND process-phase coverage — the
+    router fires when Superpowers brainstorming/plan-writing/subagent-dispatch
+    runs on a generic .NET task whose trigger nouns have not surfaced yet.
+  - Description uses meta-shaped triggers (uncertainty situations, plan/spec/
+    subagent-prompt authoring), not domain nouns — deliberate §5-letter
+    tension, spirit-compliant, so the router never competes with the nine
+    siblings it routes to. Collapsed two-entry `Not for:` (process layer →
+    Superpowers; confidently matched → load directly) — vacuously satisfies
+    "name every excluded sibling" since the router owns no content area.
+  - Routes ONLY to skills existing on `main` (nine at ship time). One
+    `## Not yet covered` section, ten uniform topic-noun rows, two populations
+    undistinguished in the artifact: six names dangled by shipped `Not for:`
+    lists printed as reservations (`auth-and-security`, `observability`,
+    `background-worker`, `automapper-mapping`, `mediatr-messaging`,
+    `project-scaffolding` — "nothing to load"), four name-less roadmap areas
+    (testing, HTTP resilience, domain modelling, modern C#).
+  - The body-scoped obligation (user-approved "must"): each spec/plan/subagent
+    step touching an area a SHIPPED skill owns must name that skill inside the
+    step; uncovered areas have nothing to name (permission clause: say so in
+    the step if it helps the plan). Deliberately absent from the description —
+    unscopable at that tier.
+  - Single entry-point per row, never sequences; whole-feature conditional:
+    `facade-module-architecture` if the module does not exist yet, else
+    `module-feature` (corrected against fma's literal description).
+  - Disambiguation table may source tokens from skill BODIES
+    (`ConcurrencySettings`, `Repository<T>()`) — it exists for tokens
+    description-matching cannot resolve; base-map rows stay strictly sparser
+    than their target descriptions (compose, never amplify).
+  - No section-heading pointers into targets (headings drift). Disclaimer
+    principle: a `Not for:` entry is a disclaimer, not an ownership assignment;
+    when two shipped pointers differ in grain, the finer one from the area's
+    owner governs (`[HasPermission]` usage → `api-surface`, internals →
+    not yet covered).
+  - `dotnet-testing` merge-time swap pre-written: delete the Testing row from
+    Not yet covered; append base-map row "Writing or changing tests: unit,
+    integration, fixtures, test doubles → dotnet-testing"; extend the order
+    note to "… → capabilities → tests". Three mechanical edits.
+
+---
+
 ## [0.3.9] — S9 (Lane A), 2026-07-27
 
 ### Added

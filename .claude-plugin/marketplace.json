@@ -9,7 +9,7 @@
     {
       "name": "dotnet-standards",
       "source": "./",
-      "version": "0.3.9",
+      "version": "0.3.10",
       "description": "Personal .NET knowledge layer for Claude Code.",
       "author": {
         "name": "Authentic199"
