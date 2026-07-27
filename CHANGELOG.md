@@ -8,6 +8,65 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.12] — S16 (Lane C), 2026-07-27
+
+### Added
+- **`automapper-mapping`** — Lane C's S16 deliverable, built under the three-way
+  authoring process, coordinator-only main session per `three-way-skill-loop`
+  (verdicts: P1 MERGE, P2 MERGE, P3 MERGE, P4 MERGE). Single SKILL.md, no
+  `references/` (both authors and the arbiter independently concluded the
+  depth is unconditional; future candidates recorded in the Lane C log).
+  Session rulings:
+  - Placement law (user doctrine, generalized): a profile lives in the file
+    that declares the map's SOURCE type; exception — entity→response maps live
+    in the response file; never a mapping folder (the facade's empty
+    `MappingProfile` is an assembly-scan anchor only). The generalized form
+    also covers maps whose source is a type (e.g. an enum) declared inside a
+    request file.
+  - Naming: `<DtoTypeName>Mapping` (corpus 13 conforming vs 2 abbreviated +
+    1 mismatched; the DTO is the source for request maps — Author B drifted
+    this three times, arbiter-corrected each time).
+  - Projection safety (user doctrine, confirmed BROAD): a map REACHABLE from a
+    query projection — transitively via `IncludeAllDerived`/`IncludeMembers` —
+    must not use `AfterMap`/`ConvertUsing`; a never-reached map MAY (bare
+    permission; two dilution attempts and one widening to `PreCondition` cut).
+  - Inheritance (arbiter-corrected shared blind spot): `IncludeAllDerived` at
+    EVERY level with configuration to hand down, not only the root; leaf maps
+    omit it (four-level corpus chain, two `IncludeAllDerived` sites).
+  - Static shared computation: `internal static readonly Expression<Func<T,R>>`
+    FIELD on the entity (both authors taught a public expression-bodied
+    property — corrected against six corpus declarations).
+  - `ConvertUsing` teaches the clean `(src, dest) => src switch` form; the
+    corpus's `dest = src switch` assignment is a verified no-op quirk, shipped
+    as an anti-pattern.
+  - `ReverseMap`: no house ruling (1 canonical site; Author A's
+    placement-collision argument disproved at that site) — one Decision Guide
+    line, no Patterns section.
+  - `PreCondition`: extension-project-only (0 canonical sites) — mentioned,
+    downgraded, never prohibited.
+  - Anti-examples user-confirmed: profile name pointing at a different type /
+    abbreviating the DTO suffix; `ForMember` on a computed get-only property.
+  - references/ NOT needed; recorded future candidates: troubleshooting
+    catalogue, `IncludeMembers` precedence semantics (deliberately not
+    asserted — unverifiable offline), value/type-converter material.
+
+### Changed
+- **`choosing-a-dotnet-skill`** (router alignment, same commit): mapping
+  disambiguation third arm now routes `automapper-mapping`; `Mapping
+  mechanics` row removed from *Not yet covered*; base-map row added for
+  `automapper-mapping`; performed Lane B's pre-written testing swap (Testing
+  row removed from *Not yet covered*, base-map row added for `dotnet-testing`,
+  order note extended `… → mapping → … → capabilities → tests`).
+- **`.claude-plugin/marketplace.json`** version aligned (was left at 0.3.10 by
+  the 0.3.11 ship — "both manifests agree" rule).
+
+### Known seams (queued, not fixed here — outside Lane C ownership)
+- `api-surface`'s description claims "colocated validator and mapping profile"
+  but its `Not for:` does not route `automapper-mapping`; reciprocal edit
+  queued for an api-surface-owning session.
+
+---
+
 ## [0.3.11] — S15 (Lane B), 2026-07-27
 
 ### Added

@@ -32,8 +32,8 @@ Rows marked *not yet covered* mean no skill here owns that area yet — see
 
 ## Base map — one area, one skill
 
-Ordered by build sequence: placement → behaviour → data → HTTP → failure → text
-→ capabilities.
+Ordered by build sequence: placement → behaviour → data → HTTP → mapping →
+failure → text → capabilities → tests.
 
 | The question in hand | Load |
 |---|---|
@@ -41,11 +41,13 @@ Ordered by build sequence: placement → behaviour → data → HTTP → failure
 | A service and its validation inside a module: rules, `IsExist`/`ThrowIf` guards, MediatR envelopes | `module-feature` |
 | Repositories and queries, entities and their configurations, migrations, transactions, seeding | `ef-core-data-access` |
 | A route, controller action, request or response DTO chain, pagination or search contract, or OpenAPI setup | `api-surface` |
+| Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Caching data in Redis: the cache facade, keys, TTL, invalidation | `distributed-caching` |
 | Keeping two requests from processing one resource at once: locks, `LockedException` | `distributed-lock` |
 | Full-text search: the search facade, documents, indexing, reindexing | `elasticsearch-search` |
+| Writing or changing tests: unit, integration, fixtures, test doubles | `dotnet-testing` |
 
 ## When two skills both look right
 
@@ -57,7 +59,7 @@ alone picks wrong. Match the question, not the word.
 | 401 / 403 | thrown as `UnAuthorizedException` / `ForbiddenException` — `error-handling`; putting `[HasPermission]` on an action — `api-surface`; schemes, policies, what that attribute enforces — *not yet covered* |
 | a controller | which folder its file goes in — `facade-module-architecture`; the route, action body and attributes — `api-surface`; `try`/`catch` and building an error inside one — `error-handling` |
 | an exception | which to throw and how it becomes a response — `error-handling`; the text it carries — `message-keys`; one raised because a resource was already being processed — `distributed-lock`; where the class itself lives — `facade-module-architecture` |
-| mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — *not yet covered* |
+| mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — `automapper-mapping` |
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature` |
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
 | a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature` |
@@ -83,12 +85,10 @@ about that skill's area, not about this one.
 | C# idiom in general: language features, nullability, analyzer settings | — |
 | Domain modelling: aggregates, value objects, domain events, invariants | — |
 | HTTP calls to another service: retry, timeout, circuit breaker, client setup | — |
-| Mapping mechanics: writing a profile and its conventions | `automapper-mapping` |
 | Messaging pipeline: dispatch, behaviours, handler registration — the thin envelope itself belongs to `module-feature` | `mediatr-messaging` |
 | Observability: logging, tracing, health checks | `observability` |
 | Permission and identity: JWT schemes, policies, what `[HasPermission]` enforces, secret handling | `auth-and-security` |
 | Repository bootstrapping: starting a new solution from nothing — once the projects exist, placement belongs to `facade-module-architecture` | `project-scaffolding` |
-| Testing: unit and integration tests, fixtures, test doubles | — |
 
 ## When the work is being planned, not yet written
 
