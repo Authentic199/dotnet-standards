@@ -1,233 +1,184 @@
-> **PRIORITY OVERRIDE — 2026-07-27, S14 close, explicit user direction (recorded
-> in the Lane C log; ship-the-lean-plugin-first reorder, see
-> `docs/next-session-prompt.md` and `docs/03-session-roadmap.md`).**
-> `domain-modeling` and `modern-csharp` are **PENDING** — with
-> `ef-core-data-access` v0.3.9 shipped, **Lane A's queue is frozen and the lane
-> STOPS**. Do not open the session this file describes. The promoted pair runs
-> instead (`dotnet-testing` in Lane B, `choosing-a-dotnet-skill` in Lane C),
-> then the four review rubrics. The brief below is kept intact for when the
-> user unfreezes the queue.
+> **OPENER — 2026-07-27, S9b close (Lane A).** This file opens **Lane A's next
+> session**. Queue: `domain-modeling`, then `modern-csharp` — **confirm the
+> choice and order with the user at session start** (the S14 freeze was lifted
+> for `auth-and-security` by explicit reassignment; whether the rest of the
+> queue is unfrozen is the user's call). `auth-and-security` SHIPPED v0.3.13
+> this session — it is no longer pending anywhere. If the tree's CLAUDE.md
+> names another lane's deliverable, that file belongs to that lane; Lane A's
+> brief is THIS file.
 
 ## CONTEXT
 
 I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET
-knowledge, alongside Superpowers (process layer). **No Superpowers file may ever be
-modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
+knowledge, alongside Superpowers (process layer). **No Superpowers file may ever
+be modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
 `cd83d315986c27621da178dad73bd95d503c1540`); `reference/projects/` holds my real
-projects (gitignored): `BE-Ops-Service` (reusable base), `apsp-backend`
-(production, canonical), `BE-service-booking` (anti-example quarry),
-`digitalcity-backend` (older project — call-site quarry only). Triage
-(`docs/TRIAGE.md`) is closed input.
+projects (gitignored): `apsp-backend` (production, canonical), `BE-Ops-Service`
+(reusable base), `BE-service-booking` (anti-example quarry),
+`digitalcity-backend` (older quarry, extension-only). Triage (`docs/TRIAGE.md`)
+is closed input.
 
-**This is Lane A of three parallel lanes.** You own ONLY
-`skills/auth-and-security/` and this file. Lane A has shipped `module-feature`
-(v0.3.3) and `ef-core-data-access` (v0.3.9). Lane B owns `api-surface`
-(v0.3.2), `error-handling` (v0.3.4), `message-keys` (v0.3.7),
-`auth-and-security` (B4, may be in flight), `observability`. Lane C owns
-`distributed-caching` (v0.3.6), `elasticsearch-search` (v0.3.5),
-`distributed-lock` (v0.3.8), `background-worker` (S15, may be in flight),
-`http-resilience`. The router, testing, scaffolding and review rubrics are
-excluded from all lanes. Refuse and log anything outside your ownership.
-**Lanes share one working tree: before every commit run `git status` and stage
-ONLY your own paths.** Expect mid-session `main` movement (S9 absorbed two
-merges mid-flight); conflict rule: keep both CHANGELOG entries, renumber yours
-above theirs, align any cross-skill names that changed under you.
+**This is Lane A.** Shipped: `module-feature` (v0.3.3), `ef-core-data-access`
+(v0.3.9), `auth-and-security` (v0.3.13, S9b). You own ONLY the next queued
+deliverable's directory and this file. Main carries **v0.3.13 (13 skills)** at
+S9b close; Lane C is running S17 (`mediatr-messaging`) and may move `main`
+mid-session — conflict rule: keep both CHANGELOG entries, renumber yours above
+theirs, align cross-skill names. **Lanes share one working tree: before every
+commit run `git status` and stage ONLY your own paths.** (S9b ran directly in
+the shared checkout on a lane branch; Lane C uses worktrees — either works, but
+verify `git branch --show-current` before writing.)
 
-## THE DELIVERABLE — `auth-and-security` (next Lane A session)
+## THE THREE-WAY PROCESS — MANDATORY, SKILL-DRIVEN
 
-**Reassigned to Lane A by explicit user direction at S9's close (2026-07-27)**
-— this deliverable previously sat in Lane B's queue, and the CLAUDE.md written
-at S13b's close still opens it as Lane B's B4: that opener is STALE. If a Lane
-B session appears to be building `auth-and-security`, stop and surface the
-collision to the user immediately.
+**Invoke `three-way-skill-loop` at session start** — the main session
+COORDINATES ONLY (memory `author-a-delegated`). Author A = `skill-writer-a`,
+Author B = `skill-writer-sp`, arbiter = `skill-arbiter` (invokes
+`skill-creator:skill-creator` LIVE; `Unknown skill` → restart parent session).
+Ping all three first; the ping doubles as the context-package load. Drafts to
+the arbiter **VERBATIM — never summarized, never bracket-condensed** (S16 AND
+S9b both slipped here; S9b needed supplements and produced racing verdicts).
 
-**What this skill owns:** JWT schemes and their settings (the `JwtScheme`
-family — Device/User/Customer observed in apsp — and how a scheme binds to its
-settings); the **JwtSettings divergence decision** queued in the roadmap
-(BE-Ops-Service `double` expirations + helpers vs apsp `string` expirations +
-extra schemes — the user must adjudicate; do NOT average, R7); policies and
-the permission handler internals behind `[HasPermission]`; secrets handling.
+**S9b process lessons (new, binding):**
+- **Agent message races are real.** Queued SendMessages to one agent can spawn
+  overlapping runs with partial transcripts, producing multiple verdict-shaped
+  outputs that contradict each other. Treat only the latest self-consistent
+  ruling as real; on any confusion, ask the agent to restate what it can see.
+- **Quote held text to agents; never cite "your earlier ruling"** — an agent
+  may not be able to see its own prior outputs (arbiter's explicit request).
+- **Sanitize is a coordinator duty, not just an author duty:** an author
+  reproduced REAL committed key values from memory believing them invented.
+  Grep every final text against the real secrets you have seen before ship.
+- Coordinator verification duties held: diff rephrasings (S12), verify shared
+  claims (S13b/S15/S9b: both authors' revocation story was wrong the same way),
+  diff modality, verify self-declared additions, and **diff successive verdict
+  versions against each other** (S9b: a later pass regressed a corrected
+  bullet; the coordinator caught it).
 
-**Boundary facts already settled elsewhere (do not re-derive, do not
-contradict):** `[HasPermission]` has a single ctor `(string[] schemes =
-default!, params string[] permissions)` with three call shapes and a
-positional trap — the *usage* side shipped in `api-surface` v0.3.2; this skill
-owns the *internals* (the attribute's handler, policy wiring, grant-permission
-plumbing). UnAuthorized throw-site census (S13): 3 in `VerifyJwtUserMiddleware`
-+ 2 current-principal. Exception SHAPES and middleware belong to
-`error-handling`; message wording to `message-keys` (route ALL key composition
-there).
-
-**Not this skill:** message keys (`message-keys`); exception flow / middleware
-envelope (`error-handling`); endpoints, wrappers, `[HasPermission]` usage
-shapes (`api-surface`); validator/service internals (`module-feature`);
-persistence (`ef-core-data-access`); anything Lane C. Sanitize is LOAD-BEARING
-here: never quote real key material, connection strings, or issuer/audience
-values from configs.
-
-**Likely exemplar starting points the user may name (WAIT for the list):**
-`apsp-backend/src/Infrastructure/Facades/Auth/` (JwtScheme, HasPermission),
-`Facades/Identity/` (token generation, grant permission, ICurrentUser), both
-projects' JwtSettings + `security.json` configs, `VerifyJwtUserMiddleware`.
-
-`domain-modeling` and `modern-csharp` remain in Lane A's queue after this,
-order to be confirmed at consolidation.
-
-## THE THREE-WAY PROCESS — MANDATORY
-
-Per piece, not per skill: (1) you explain first in Vietnamese, I comment; (2) you
-(author A: loads `docs/02-repo-structure.md` §5 + `docs/00-brainstorm.md` §3 + the
-kit's skill format — NOT superpowers:writing-skills) and `skill-writer-sp` (author
-B) draft independently, neither writes files; (3) `skill-arbiter` verdicts
-A/B/MERGE/NEITHER with file-verified reasons; (4) I approve; only then write.
-Both agents exist in `.claude/agents/` and are dispatchable — verify with a ping
-before relying on them; the ping doubles as the context-package load; continue
-the same agents across pieces via SendMessage. Agent prompts must carry: the
-exemplar list I name, all relevant settled rulings, and equal-source-access
-discipline. Announce every agent use; relay milestones; agents end with
-`## QUESTIONS`. Run agents in the current working directory — no worktree.
-**skill-creator is INSTALLED (user scope) and the arbiter MUST invoke it live
-(`skill-creator:skill-creator`).** A subagent's skill roster is snapshotted
-from the parent session's startup state — a plugin installed mid-session is
-invisible to all subagents until the parent session restarts (proven in S13b
-AND S9). If the arbiter reports `Unknown skill`, restart the parent session;
-do not accept fallbacks. S9 lessons: the arbiter corrected BOTH authors'
-central cost claim (2 queries → verified 5) and caught author A teaching a
-labelled anti-example as doctrine — but it also once misdescribed a call site
-("never rethrows" at BrandService:109; it cleanup-then-wraps) — diff every
-factual claim you can check yourself.
+**STANDING DELEGATION (LAW):** execute clear recommendations, report them with
+brief confirmations so vetoes stay cheap, log each use; ask only the genuinely
+undecidable. Carve-outs remain the user's alone: naming canonical
+sources/exemplars (R7), labelling anti-examples (R8 — S9b: the user granted
+labels for exactly four embeds; everything else stays ledger).
 
 ## READING DISCIPLINE
 
-I name the exemplars at session start — ask me for the list before reading
-anything in `reference/projects/`; never select them yourself. Widening =
-targeted lookup, announced (what/why). No bulk scans. Bash find/ls/grep, never
-Glob, inside `reference/projects/`. R7: one canonical source per area, I
-designate; never average. R8: anti-examples are code I point at; ask before
-labelling — BUT the philosophy ruled in S9 binds: canonical code is the
-strongest truth EXCEPT where it is a bug — then the skill teaches the correct
-form and the bug gets labelled for the future review rubrics. Sanitize: no
-project names, no business-domain names (Order/OrderLine/Customer +
-FulfilmentStatus is the established sample vocabulary), no real paths, no
-secrets. **Standing delegation (S13b, reaffirmed S9):** when you present a
-decision WITH a clear recommendation, execute it and report; ask only when
-genuinely undecidable. R8 labelling and piece approval stay with the user.
+Ask the user for the exemplar list at session start — never select exemplars
+yourself (S9b variant: the user may delegate the scan-and-propose, then
+approve). Widening = announced targeted lookup (S9b ran ~10, all logged). Bash
+find/ls/grep, never Glob, inside `reference/projects/`. **Exclude
+`apsp-backend/.claude/worktrees/` from any census** (S16: ~5× inflation). R7:
+one canonical source per area, never average — but a user DECREE composing
+shapes across projects is a ruling, not an average (S9b JwtSettings). R8:
+anti-examples are code the user points at. Sanitize: no project names, no
+business-domain nouns, no real paths, **no real key material** (S9b: grep
+finals against every real secret read during the session). Sample vocabulary:
+Order/OrderLine/Customer + FulfilmentStatus; principal families User/Device/
+Customer are ruled generic-enough for auth contexts.
 
 ## SETTLED — DO NOT RELITIGATE
 
-- Everything in all NINE shipped skills (read installed bodies + references as
-  baseline; `claude plugin details` shows the inventory). Key S9 rulings that
-  touch this skill: entity files are entity + configuration + enums ONLY;
-  fluent setters `return this` are the entity-behaviour ceiling in
-  ef-core-data-access — the decision-making layer routes HERE; ICode/HasCode
-  ruled out of the corpus ("treat as nonexistent"); collection navigations
-  non-nullable `= default!`, reference navigations nullable; opener
-  `HasBaseEntity().UnderscoreTable()` single-style; sequential-GUID identity
-  assigned in the BaseEntity constructor; entity-static Expression members are
-  anti-example (module-feature's Expressions/ owns computed values).
-- Description law (`02-repo-structure.md` §5): third person `This skill should
-  be used when…`, <100 words by wc -w (measure it), trigger-noun pushy,
-  `Not for:` naming every owning sibling (now nine + future names; forward
-  references to unshipped skills are precedented).
-- The `references/` mechanism: decision-layer body ≤~300 lines, depth in
-  references with conditional "Read X when" pointers; the split goes through
-  the loop.
-- My stack: Controllers not Minimal API, Swashbuckle, NO API versioning,
-  FluentValidation + AutoMapper, PostgreSQL primary (MySql migrator exists).
+- Everything in shipped bodies through **v0.3.13** (read installed bodies as
+  baseline; `claude plugin details` shows 13 skills). Headline S9b rulings now
+  settled in `auth-and-security` + CHANGELOG 0.3.13: the JwtSettings decree
+  (double + four Get* helpers, UTF-8, multiplicity per client scheme);
+  Required(params) = exclusions; issuer/audience stamped-not-verified; signing
+  key = family boundary; authorization = DB read (id only from principal);
+  sliding cache + sync-verbs-evict; verify middleware order
+  (Routing → ExceptionHandler → Authentication → CurrentUser →
+  VerifyJwtUser → Authorization); secrets = shape committed, keys
+  per-environment, no vault convention prescribed.
+- Description law (`02-repo-structure.md` §5): third person, <100 words by
+  wc -w (measure it), trigger-noun pushy, `Not for:` naming every owning
+  sibling. No H1 in skill bodies (references files DO carry H1 + TOC when
+  >300 lines).
+- The `references/` mechanism: splits go through the loop.
+- Stack: .NET 8, Controllers, Swashbuckle, NO API versioning, FluentValidation
+  + AutoMapper v12 (single-arg MapperConfiguration), PostgreSQL primary;
+  MediatR = in-process messaging, not CQRS.
 
 ## HARD CONSTRAINTS
 
-1. One session, one deliverable. Extra requests → log under `## Lane log` and
+1. One session, one deliverable — **plus the mandatory router merge-time
+   edits, same session** (alignment rule, CHANGELOG 0.3.10: the router covers
+   every skill on `main` at merge — new base-map row, fix any *not yet
+   covered* arms, delete the reservation row; through the loop or
+   arbiter-reviewed per the S16 precedent). S9b SKIPPED this and needed a
+   0.3.14 hotfix — do not repeat. Extra requests → log under `## Lane log`,
    refuse.
-2. Prove it: `claude plugin validate .` + reinstall + `claude plugin details`
-   shows the new skill count; report failures honestly. Version = patch bump
-   +1 relative to whatever `main` carries at merge time (S9 entered aiming
-   0.3.7 and shipped 0.3.9 — check `plugin.json` AND `marketplace.json`, both
-   must match; CHANGELOG entry at top). One install at a time; check
-   `installed_plugins.json` before touching ANY cache dir; after reinstall
-   delete `reference/` from the new cache copy. **Machine note:** the user
-   moves between home and company machines — verify install state and paths
-   at session start instead of trusting the previous session's notes.
-3. Artifact language English; talk to me in Vietnamese.
-4. End: commit per protocol (lane branch `lane-a/auth-and-security`, feat
-   commit, merge into main per the conflict rule), then rewrite THIS file so
-   it opens Lane A's following session, carrying the Lane log forward.
+2. Prove it: `claude plugin validate .` + `claude plugin update
+   dotnet-standards@dotnet-standards-dev` (NOT install — reports "already
+   installed" without refreshing; short name fails) + `claude plugin details`
+   shows the new skill count + **verify `installed_plugins.json` points at the
+   new cache** + delete `reference/` from the new cache dir (S9b: installer
+   did NOT sweep it; manual delete was needed). Version = patch bump +1
+   relative to whatever `main` carries at merge; BOTH manifests
+   (`.claude-plugin/plugin.json` AND `.claude-plugin/marketplace.json`) must
+   agree. Caches 0.3.7–0.3.12 left unreferenced in place.
+3. Artifact language English; talk to the user in Vietnamese.
+4. End: commit per protocol (lane branch `lane-a/<skill>`, feat commit, merge
+   into main; expect mid-session `main` movement), then rewrite THIS file
+   carrying the Lane log. Do NOT touch the tree's CLAUDE.md if it belongs to
+   another lane.
 
 ## Lane log
 
-- **Post-S9 reassignment (2026-07-27, user direction):** Lane A's next
-  deliverable changed from `domain-modeling` to `auth-and-security` (pulled
-  from Lane B's queue). Lane B's B4 opener in the tree's CLAUDE.md is stale as
-  a result; only the user resolves what Lane B runs next. `domain-modeling`
-  and `modern-csharp` stay queued behind this in Lane A. Also noted at the
-  same close: `.claude/agents/skill-writer-a.md` and a `three-way-skill-loop`
-  skill appeared in the checkout (Author A is now a dispatchable agent and the
-  loop is codified as a skill) — the next session should ping THREE agents and
-  follow the skill's coordinator role where it applies.
-- **S9 (ef-core-data-access, 2026-07-27, company machine) — shipped v0.3.9.**
-  Verdicts: P1 NEITHER→merge (arbitrated TWICE — first pass provenance-tainted
-  because skill-creator was installed mid-session and invisible to subagents;
-  user ordered a session restart and a cold re-arbitration, which converged on
-  the same verdict with better trigger nouns), P2 MERGE, P3 MERGE, P4 MERGE
-  (user then ruled ICode out — applied post-verdict), P5 MERGE. User
-  adjudicated every piece; standing delegation used for: Include-free
-  get-shape, 5-round-trip number kept, malformed-filter clause kept,
-  PopulateKeys out, distributed-lock Not-for entry added at ship time (its own
-  session shipped mid-S9, activating the S9-P1 deferred ruling).
-- S9 exemplars (user-named): BE-Ops-Service `Facades/Persistence/**` (canonical
-  repository/DbContext — R7: ops is source of truth for repo shape; apsp's
-  `GetByIdAsync(params object[])` erased from the skill's world); apsp entity
-  files (Devices, DeviceGroups, RewardPointSetting, Vehicles — canonical
-  entities/configurations); apsp `RoleService.SearchAsync/GetAsync` + 
-  `PaginationExtension.cs` + `QueryExpressionExtension.cs` (query patterns).
-  Migration workflow ruled: prod `UseAutoMigration`; dev
-  `dotnet ef migrations add <Name> -p src/Migrators/Migrators.PostgreSql
-  -s src/<Web> -c ApplicationDbContext` (+ `database update`).
-- S9 census/factual corrections recorded in CHANGELOG 0.3.9: catch form
-  `catch (Exception)` 22/22; DeleteBehavior Cascade 27 / Restrict 14 / SetNull
-  3; opener 7:4; zero non-Guid `BaseEntity<TId>` usages; zero `CreatedAt`
-  overrides; seeding = bail-out OR reconcile (5 real seeders); search chain =
-  5 round trips (3 `entities.Any()` probes + page + count); `$null` no
-  trailing colon; `$not:$eq:x` real; first-colon-only value split; repeated
-  filter keys AND, `$in` OR; `ApplySort` auto-appends `Id descending`.
-- S9 anti-examples LABELLED (user-confirmed; real paths; the skill teaches the
-  correct form — labels are feed for the future review rubrics):
-  (1) 12/29 `BeginTransactionAsync` call sites drop the ct (all apsp);
-  (2) apsp `Brands/Services/BrandService.cs:109` — rollback → file-cleanup
-  interleaved → wrap-throw with raw `ex.Message`;
-  (3) sync `Any()` inside async `SeedAsync` (GeographiesSeeder, AdminUserSeeder);
-  (4) three `entities.Any()` probes (QueryExpressionExtension:33/92/163);
-  (5) `ApplyFilter` silent catch + `Console.WriteLine` both paths;
-  (6) `ToPagedListAsync` sync `Count()` dropping its ct;
-  (7) `QueryContainer.Validate` blames PageSize for a bad Current;
-  (8) apsp `RoleService.GetAsync:90-91` dead Include chain before ProjectTo;
-  (9) response DTOs inheriting `BaseEntity<Guid>` (UserResponse, RoleResponse,
-  NotificationResponse, GeographyBaseResponse — BOTH projects; api-surface
-  boundary).
-  NOT labelled (user ruled allowed/superseded): hand-rolled citext-unique
-  without ICode; two validation idioms in DatabaseSettings; DbInitializer
-  silent no-op on unreachable DB; unconditional `HasPostgresExtension`;
-  ICode drift (moot — ICode ruled out).
-- S9 cross-lane events: `message-keys` v0.3.7 (Lane B S13b) AND
-  `distributed-lock` v0.3.8 (Lane C S14) both merged into `main` mid-session;
-  S9 renumbered to 0.3.9 and added the `distributed-lock` routing entry to its
-  own description per the deferred ruling. CLAUDE.md in the tree currently
-  belongs to Lane B (B4 opener) — Lane A's file is THIS one. The S13b lane
-  file describes S9's scaffold from its own vantage; harmless.
-- S9 environment lessons: company machine had NO dotnet-standards install at
-  session start (home-machine notes were stale) — S13b later installed
-  0.3.7→0.3.8 user-scope from marketplace `dotnet-standards-dev`; S9 updated
-  it to 0.3.9 and stripped `reference/` from the cache copy; caches
-  0.3.7/0.3.8 left unreferenced in place (S13 precedent). Plugin skills
-  installed mid-session are invisible to the running session AND its
-  subagents until restart (proven twice).
-- Queued for a consolidation/solo session: pagination depth beyond
-  query-conventions (none left — shipped in S9); `automapper-mapping` +
-  `mediatr-messaging` catalog placement (S8 order, still unbuilt); the
-  two-error-shapes divergence (S13, unruled); review-rubric feed = the
-  labelled anti-example ledger above + S13's list in its lane file.
-- **Carried from S8:** "Services/ is not a dumping ground" must appear in the
-  future review rubrics as a checklist item (carry until the rubric sessions
-  consume it). S8 anti-example candidates not taken remain listed in the S8
-  section of the superseded lane file (git history of this file @ commit
-  4fb954d and earlier) and in `module-feature`'s CHANGELOG 0.3.3.
+- **S9b (auth-and-security, 2026-07-27) — shipped v0.3.13.** Verdicts: P1
+  MERGE, P2 MERGE, P3 MERGE (+ five-patch delta on Draft A's late-arriving
+  prose), P4 MERGE, P5 MERGE. Exemplars user-approved from coordinator
+  proposal (delegated scan): apsp Facades/Auth/** + Identity (JwtToken,
+  GrantPermission, Base) + Middleware/VerifyJwtUserMiddleware + Definitions
+  (JwtTokenPayload, MXMPermissions) + security configs; ops comparator for the
+  JwtSettings divergence only. User rulings: divergence decree (ops shape +
+  apsp multiplicity, UTF-8); Zalo handler OUT; ApiKey IN (secondary);
+  Password/** + CleanRefreshTokenWorker OUT; scheme family taught from code
+  (no `User` scheme exists — project docs stale); FOUR anti-patterns labelled
+  for embedding (type-name-as-data/fail-open; call-site key encoding;
+  revoked-grant-never-lapses; committed key material).
+- S9b delegated calls (recorded): test-auth content excluded (dotnet-testing
+  owns); secrets scope = binding + non-commitment only; references split fixed
+  pre-P1 (3 files); encoding ruling UTF-8; Required-semantics verified fact
+  overrode Draft A; RequireExpirationTime drop accepted after arbiter
+  verification; IDeviceJwtUser carve-out omitted; ValidateRefreshToken taught
+  corrected + real call site (request validators); UseClaims override =
+  taught mechanism (one corpus override, drift noted); hardcoded <User>
+  handler taught neutrally; AppPermissions/PermissionDefinition/AppResource/
+  AppAction naming; fallback-null taught with fails-open clause;
+  PermissionsValue static-readonly correction approved; one body principle per
+  P3/P4; numbering unified; "blocked" vocabulary; "logout" dropped;
+  AP1 retrofit-guard sentence added.
+- S9b verified mechanism facts (targeted lookups, all announced): config
+  layering (base mandatory + env optional, reloadOnChange); MultipleScheme
+  ForwardDefaultSelector routes on modelType claim by typeof FullName;
+  ValidateDataAnnotationsRecursively = ReHackt.Extensions.Options.Validation
+  7.0.1; JwtTokenPayload.ModelType = "modelType"; ValidateRefreshToken called
+  from 3 refresh-request validators (scheme-typed); one UseClaims override
+  (Device.cs:88, re-lists by hand); no lazy proxies; CacheKeys.GetKeyByModel =
+  typeof(T).Name + id; Give/Revoke never evict (only syncs do); userPermissions
+  const dead; Guards = seeding/equality only (AdminUserSeeder:38); pipeline
+  order at Infrastructure/Startup.cs:103-110; ApiKeySettings binds from
+  appsettings.json:109; ICurrentUser.Name has zero readers.
+- **S9b anti-example ledger — 37 candidates, FOUR labelled/embedded; the rest
+  are RUBRIC FEED** (full lists live in the P1–P4 sections of CHANGELOG 0.3.13
+  and the session scratchpad). Security findings held for the rubrics:
+  username enumeration at login (NotFound vs Invalid(Password) texts);
+  PermissionsValue hot-path dictionary rebuild; sync-over-async in handler and
+  cache reads; catch(Exception)→null; Replace-based prefix strip; count-guard
+  duplicate defeat; FixedTimeEquals over MemoryMarshal.Cast; Permission value
+  equality while EF-tracked; dead members (userPermissions, ICurrentUser.Name,
+  GetApplicationId nullability, serviceProvider param); ApiKey namespace drift
+  (→ facade-module-architecture); bare UnauthorizedResult (→ error-handling);
+  Messages<T> reflection (→ message-keys); Identity facade hosting a worker
+  (→ background-worker); design forks banked: fallback null vs deny-by-default,
+  hardcoded <User> handler vs polymorphic schema, sliding vs absolute expiry.
+- S9b cross-lane events: opened with CLAUDE.md as Lane B's stale B4 opener
+  (collision averted — the reassignment held); mid-session `main` moved
+  (Lane C shipped automapper-mapping v0.3.12 + rewrote CLAUDE.md as Lane C
+  S17 opener). This session did not touch CLAUDE.md.
+- S9b environment: install was 0.3.11 user-scope at start → 0.3.13 at close;
+  `claude plugin update` refreshed correctly; reference/ manually deleted from
+  the 0.3.13 cache.
+- **Carried forward:** `domain-modeling` then `modern-csharp` (order TBC);
+  the rubric sessions consume the ledger above plus the S13/S13b/S12/S8/S9
+  lists; "Services/ is not a dumping ground" rubric item still carried; the
+  `validation-rules.md:322` stale-line fix (flagged S15; Lane A owns
+  module-feature) remains OPEN — a good warm-up task for the next session.

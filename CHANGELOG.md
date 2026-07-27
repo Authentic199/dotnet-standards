@@ -49,6 +49,141 @@ components change materially — not only on releases.
   and its validator examples (lines 165–172) still carry the superseded
   entity-typed `Messages<T>` form — second instance of the
   `validation-rules.md:322` drift family flagged at S15.
+---
+
+## [0.3.14] — S9b hotfix (Lane A), 2026-07-28
+
+### Fixed
+- **Router alignment for `auth-and-security`** — the 0.3.13 ship skipped the
+  mandatory router merge-time edits (alignment rule, CHANGELOG 0.3.10); found
+  by Lane C's post-close audit, fixed by the same Lane A session. Five edits,
+  arbiter-reviewed per the S16 precedent:
+  - Base map: new row "Authentication and authorization: schemes and tokens,
+    permission grants and checks, the current principal, API keys, auth
+    secrets" (capabilities group; order-note unchanged).
+  - `401 / 403` disambiguation: third arm now routes to `auth-and-security`
+    (was *not yet covered*).
+  - `## Not yet covered`: the "Permission and identity" reservation row
+    deleted.
+  - "a Settings class": `SecuritySettings`, `JwtSettings` arm added.
+  - NEW disambiguation row "a cache that went stale" (arbiter addition):
+    a Redis value not invalidated — `distributed-caching`; a permission check
+    still passing after a grant changed — `auth-and-security` — routes the
+    revoke-no-evict hazard away from the Redis-flavoured cache row.
+  - Recorded non-edits: `ApiKeySettings` arm and "a middleware" token row
+    considered and declined (brevity; description matching resolves them).
+- Lane-A lane file and the LANE BOARD now carry the alignment rule so no
+  future lane ship skips it.
+
+---
+
+## [0.3.13] — S9b (Lane A), 2026-07-27
+
+### Added
+- **`auth-and-security`** — Lane A's deliverable (reassigned from Lane B's queue
+  at S9 close), built under the three-way loop, coordinator-only main session
+  (verdicts: P1 MERGE, P2 MERGE, P3 MERGE + five-patch delta, P4 MERGE,
+  P5 MERGE). Body: Overview + 7 Core Principles + Decision Guide (13 rows) +
+  4 user-labelled Anti-patterns; three references
+  (`jwt-and-tokens`, `permission-internals`, `principal-and-secrets`), all with
+  TOCs (580/391/344 lines).
+  Session rulings:
+  - **JwtSettings divergence (user decree, R7):** canonical settings-class
+    shape = ops (`double` expirations + the four `Get*` helpers, UTF-8);
+    options multiplicity = apsp (`Default` + one property per client scheme).
+    String expirations are the superseded form. Scheme family taught FROM CODE
+    (no `User` scheme exists in code despite stale project docs).
+  - `Required(params ignoreProperties)` semantics verified: arguments are
+    EXCLUSIONS — Issuer/IsAudience are optional; they are stamped into tokens
+    (iss/aud) but never validated; the per-scheme signing key is the boundary.
+  - `ValidateDataAnnotationsRecursively` provenance: NuGet
+    `ReHackt.Extensions.Options.Validation` 7.0.1.
+  - Authorization is a DB read: handler takes only the principal id; grant
+    tables + IMemoryCache (sliding, per-key eviction on sync verbs only).
+    Permission catalogue: code = Resource+Action; implication one level deep,
+    expanded after the cache; Guards = single-family seeding presets.
+  - Verify middleware reads the established principal, re-checks the row
+    per request (not-found/blocked/installation), runs after
+    UseCurrentUser and before UseAuthorization
+    (order verified at Infrastructure/Startup.cs:103-110).
+  - Taught-form departures from canonical code, all declared in honesty notes:
+    shared `Configure(JwtBearerOptions, JwtSettings)` extension; generator
+    keys via settings helpers; inert `ValidIssuer`/`ValidAudience` and
+    `RequireExpirationTime = false` dropped; catalogue lookup dictionary as
+    `static readonly` (corpus: computed property rebuilt per access);
+    `DefaulTokenGenerate`/`isUser` renamed; neutral catalogue names
+    (`AppPermissions`/`PermissionDefinition`/`AppResource`/`AppAction`).
+  - Anti-example ledger: 37 candidates recorded in the Lane A log; user
+    labelled FOUR for embedding (type-name-as-data with fail-open
+    verification; call-site key encoding; revoked-grant-never-lapses;
+    committed key material). Security findings held for the rubrics:
+    username enumeration at login; `userPermissions` dead const;
+    `PermissionsValue` hot-path rebuild; sync-over-async in the auth path.
+  - Process: the three-way loop ran with hot-loaded agents; arbiter message
+    races produced overlapping verdict outputs (S13b-class lesson recorded:
+    quote held text to agents, never cite prior verdicts); one author draft
+    reproduced real committed key values from memory — caught by the
+    coordinator, contaminated block withheld from the arbiter, final grep
+    verified zero real-key matches.
+
+---
+
+## [0.3.12] — S16 (Lane C), 2026-07-27
+
+### Added
+- **`automapper-mapping`** — Lane C's S16 deliverable, built under the three-way
+  authoring process, coordinator-only main session per `three-way-skill-loop`
+  (verdicts: P1 MERGE, P2 MERGE, P3 MERGE, P4 MERGE). Single SKILL.md, no
+  `references/` (both authors and the arbiter independently concluded the
+  depth is unconditional; future candidates recorded in the Lane C log).
+  Session rulings:
+  - Placement law (user doctrine, generalized): a profile lives in the file
+    that declares the map's SOURCE type; exception — entity→response maps live
+    in the response file; never a mapping folder (the facade's empty
+    `MappingProfile` is an assembly-scan anchor only). The generalized form
+    also covers maps whose source is a type (e.g. an enum) declared inside a
+    request file.
+  - Naming: `<DtoTypeName>Mapping` (corpus 13 conforming vs 2 abbreviated +
+    1 mismatched; the DTO is the source for request maps — Author B drifted
+    this three times, arbiter-corrected each time).
+  - Projection safety (user doctrine, confirmed BROAD): a map REACHABLE from a
+    query projection — transitively via `IncludeAllDerived`/`IncludeMembers` —
+    must not use `AfterMap`/`ConvertUsing`; a never-reached map MAY (bare
+    permission; two dilution attempts and one widening to `PreCondition` cut).
+  - Inheritance (arbiter-corrected shared blind spot): `IncludeAllDerived` at
+    EVERY level with configuration to hand down, not only the root; leaf maps
+    omit it (four-level corpus chain, two `IncludeAllDerived` sites).
+  - Static shared computation: `internal static readonly Expression<Func<T,R>>`
+    FIELD on the entity (both authors taught a public expression-bodied
+    property — corrected against six corpus declarations).
+  - `ConvertUsing` teaches the clean `(src, dest) => src switch` form; the
+    corpus's `dest = src switch` assignment is a verified no-op quirk, shipped
+    as an anti-pattern.
+  - `ReverseMap`: no house ruling (1 canonical site; Author A's
+    placement-collision argument disproved at that site) — one Decision Guide
+    line, no Patterns section.
+  - `PreCondition`: extension-project-only (0 canonical sites) — mentioned,
+    downgraded, never prohibited.
+  - Anti-examples user-confirmed: profile name pointing at a different type /
+    abbreviating the DTO suffix; `ForMember` on a computed get-only property.
+  - references/ NOT needed; recorded future candidates: troubleshooting
+    catalogue, `IncludeMembers` precedence semantics (deliberately not
+    asserted — unverifiable offline), value/type-converter material.
+
+### Changed
+- **`choosing-a-dotnet-skill`** (router alignment, same commit): mapping
+  disambiguation third arm now routes `automapper-mapping`; `Mapping
+  mechanics` row removed from *Not yet covered*; base-map row added for
+  `automapper-mapping`; performed Lane B's pre-written testing swap (Testing
+  row removed from *Not yet covered*, base-map row added for `dotnet-testing`,
+  order note extended `… → mapping → … → capabilities → tests`).
+- **`.claude-plugin/marketplace.json`** version aligned (was left at 0.3.10 by
+  the 0.3.11 ship — "both manifests agree" rule).
+
+### Known seams (queued, not fixed here — outside Lane C ownership)
+- `api-surface`'s description claims "colocated validator and mapping profile"
+  but its `Not for:` does not route `automapper-mapping`; reciprocal edit
+  queued for an api-surface-owning session.
 
 ---
 
