@@ -14,7 +14,7 @@
 
 | # | Rubric | Status |
 |---|---|---|
-| 1 | `dotnet-code-review` | ☐ |
+| 1 | `dotnet-code-review` | ☑ v0.3.15, 2026-07-28 |
 | 2 | `dotnet-architecture-review` | ☐ |
 | 3 | `dotnet-security-review` | ☐ |
 | 4 | `dotnet-performance-review` | ☐ |
@@ -139,4 +139,58 @@ Superpowers for the review process itself.
 
 ## Rubric log
 
-(empty — first rubric session starts it)
+- **Rubric #1 (`dotnet-code-review`, 2026-07-27/28) — shipped v0.3.15.**
+  Verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency pass PASS (3
+  defects fixed, incl. new P2 check 5.13 closing a dangling nullability
+  cross-reference). Full ruling list in CHANGELOG 0.3.15.
+- **SEVERITY LADDER SET — rubrics #2–#4 REUSE IT, do not re-derive:**
+  CRITICAL / HIGH / MEDIUM / INFO, consequence-based; dropped
+  `CancellationToken` = HIGH default, CRITICAL only when corrupting/exposing;
+  every check a manual instruction (grep / open file / build-and-read-
+  diagnostics); report shape = every section always appears, `None.` when
+  empty; checks trace to a shipped body or are universal defects — nothing
+  else qualifies; cross-references cite number AND name.
+- **User rulings this session:** conformance surface = ALL skills on `main` at
+  merge time (13 at our merge; count before trusting any list); "seal
+  non-inherited classes" is KIT doctrine, not house law — excluded everywhere,
+  standing note in cleanup-checklist.md; previously labelled anti-example
+  ledgers reused sanitized, no new exemplars named, `reference/projects/`
+  untouched all session.
+- **Shared-blind-spot catches (the loop worked — 3rd+4th instances of the
+  S13b/S15 series):** both authors imported kit sealing doctrine as house law;
+  Author B twice wrote plausible .NET instinct as house law (`= default` on
+  action token param; `request.X!` nullable-by-convention) — cut, banked as
+  anti-example candidates. The arbiter's own P2 briefly carried the dangling
+  5.13 target — caught in its consistency pass.
+- **Flagged to Lane A (NOT fixed here — ownership):** `module-feature/
+  SKILL.md:187` + validator examples at lines 165–172 carry the superseded
+  entity-typed `Messages<T>` form — second instance of the
+  `validation-rules.md:322` drift family (S15). Lane A owns both fixes.
+- **Banked for rubric #2 (`dotnet-architecture-review`):** P2 checks 5.8
+  (`Services/` contents) and 5.9 (base list on non-core part) are structural —
+  rubric #2's session may claim them and slim P2; "Not this skill" convention
+  is 7/11 shipped bodies (this skill omitted it — Routing does the job);
+  description-headroom decision banked: if a future entry is needed at
+  97/100 words, drop `facade-module-architecture` from the trailing
+  conventions list (its nouns are covered by the dotnet-architecture-review
+  entry).
+- **Banked for rubric #4 (`dotnet-performance-review`):** all
+  performance-shaped S9 ledger items deliberately excluded from #1 (dead-
+  Include cost side, sync Count, the 3 `entities.Any()` probes,
+  five-round-trip search chain, N+1/projection/index checklists).
+- **Mid-session main movement absorbed THREE times:** automapper-mapping
+  v0.3.12 (S16) → P1 description re-trimmed to 97 words + routing row;
+  auth-and-security v0.3.13 + router hotfix v0.3.14 (S9b) → P2 2.1 gained
+  `[ApiKey]` as the third explicit access decision; router alignment row +
+  order-note extension ("… → tests → review") shipped in the 0.3.15 commit
+  per the alignment rule (S9b hotfix precedent; arbiter-reviewed).
+- **Delegation calls recorded (standing delegation; blanket grant
+  mid-session, each call still reported for cheap veto):** severity ladder
+  adopted from brief; 11-not-9 conformance correction; description
+  NEITHER-trim protocol; no "Not this skill" section; ct = HIGH; Cleanup
+  candidates section kept (always-appears semantics); 5.8/5.9 stay in P2;
+  at-a-glance severity table cut; tool = grep -rn; message-keys governs where
+  older material disagrees (no sibling named defective in the artifact);
+  diff-scope stated once; volume cap added; inline `4/4 clear` marker kept;
+  P1 Principle 2 five-word amendment ("build and read the diagnostics")
+  approved; 53 checks kept uncut.

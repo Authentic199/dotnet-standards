@@ -8,6 +8,50 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.15] — Rubric session #1 (solo), 2026-07-28
+
+### Added
+- **`dotnet-code-review`** — review rubric #1 of four, built under the
+  three-way process (verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency
+  pass PASS — three defects fixed: dangling nullability cross-reference closed
+  by new check 5.13, tool-path inconsistency, build-diagnostics clarification).
+  A rubric, not a workflow: Superpowers owns the review process, `/simplify`
+  owns cleanup execution; this skill supplies the .NET-specific review
+  knowledge both consume. Decision-layer body + `references/review-rubric.md`
+  (53 per-area checks: data access, security posture, concurrency,
+  integration, correctness, tests) + `references/cleanup-checklist.md`
+  (five-category slop taxonomy + the four safe-delete checks).
+- **Severity ladder set for all four rubrics** (first rubric session sets it,
+  the next three reuse it): CRITICAL / HIGH / MEDIUM / INFO, consequence-based,
+  with the calibration "a dropped `CancellationToken` is HIGH by default,
+  CRITICAL only when the un-cancelled work corrupts or exposes".
+- Session rulings recorded:
+  - **"Seal non-inherited classes" is kit doctrine, NOT house law** (user
+    ruling) — excluded from the slop taxonomy with a standing note; both
+    authors independently imported it from de-sloppify Step 6, the third
+    shared-blind-spot catch in the S13b/S15 series.
+  - Every check is a manual instruction — "grep X under Y", "open file Z", or
+    "build and read the diagnostics"; no analysis server assumed (C01
+    degradation stated in Principle 2 and honored in both references).
+  - Report shape: every section always appears, `None.` when empty; blast
+    radius sets depth; style last or never.
+  - Checks cut as unverifiable against any shipped body: `= default` on a
+    controller-action token parameter; `request.X!` nullable-by-convention.
+    Both banked as anti-example candidates ("plausible .NET instinct dressed
+    as house law").
+  - Cross-references cite number **and** name so stale numbers self-correct.
+- **Router alignment** (mandatory per CHANGELOG 0.3.10; S9b hotfix precedent):
+  base-map row for `dotnet-code-review` added to `choosing-a-dotnet-skill`.
+- **P2 check 2.1 aligned with the just-shipped `auth-and-security` v0.3.13**:
+  `[ApiKey]` recognized as the third explicit access decision so machine-caller
+  actions are not false-flagged.
+- Flagged to Lane A (not fixed here — ownership): `module-feature/SKILL.md:187`
+  and its validator examples (lines 165–172) still carry the superseded
+  entity-typed `Messages<T>` form — second instance of the
+  `validation-rules.md:322` drift family flagged at S15.
+
+---
+
 ## [0.3.11] — S15 (Lane B), 2026-07-27
 
 ### Added
