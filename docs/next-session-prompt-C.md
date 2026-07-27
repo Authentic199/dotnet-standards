@@ -1,14 +1,9 @@
-# Lane C — Infrastructure Services · Session C5: `automapper-mapping` (S16)
-
-> Copy everything below the line into a fresh Claude Code session in
-> `D:\agentic-plugin\dotnet-standards`. Lane C runs in parallel with other
-> lanes — read `next-session-prompt.md` (the index) for the parallel protocol,
-> which binds this session. Written at the close of S15, 2026-07-27, after the
-> router shipped (v0.3.10) and the user assigned `automapper-mapping` to Lane C
-> by explicit choice (the rubric phase runs as four SOLO sessions per
-> `next-session-prompt-rubrics.md`, no longer lane-assigned).
-
----
+> **OPENER — 2026-07-27, S16 close (Lane C).** This file opens **Lane C's S17:
+> `mediatr-messaging`** — the second of the two names the user queued post-S15
+> (confirm the choice with the user at session start; the rubric phase is the
+> standing alternative — its own prompt file is `docs/next-session-prompt-rubrics.md`
+> and Lane B's closed status lives in `docs/next-session-prompt-B.md`). Lane C's
+> lane file `docs/next-session-prompt-C.md` mirrors this brief.
 
 ## CONTEXT
 
@@ -16,195 +11,204 @@ I am building `dotnet-standards`, a personal Claude Code plugin holding my .NET
 knowledge, alongside Superpowers (process layer). **No Superpowers file may ever
 be modified.** `reference/dotnet-claude-kit` is read-only (pinned SHA
 `cd83d315986c27621da178dad73bd95d503c1540`); `reference/projects/` holds my real
-projects (gitignored): `ops-service`, `apsp-backend` (canonical),
-`be-booking` (anti-example quarry), `digitalcity-backend` (older, call-site
-quarry / extension-only). Triage (`docs/TRIAGE.md`) is closed input.
+projects (gitignored): `apsp-backend` (production, canonical), `ops-service`
+(reusable base), `be-booking` (anti-example quarry), `digitalcity-backend`
+(older quarry, extension-only). Triage (`docs/TRIAGE.md`) is closed input.
 
-**This is Lane C.** You own ONLY `skills/automapper-mapping/` , the router's
-merge-time edits listed below, and this file. Lane B's `dotnet-testing` may
-still be in flight; Lane D (process integration) exists (docs-only so far);
-Lane A stopped. PENDING by user direction: `auth-and-security`,
-`observability`, `background-worker`, `http-resilience`, `domain-modeling`,
-`modern-csharp`, `project-scaffolding`, and now-queued `mediatr-messaging`
-(user direction 2026-07-27, after this skill). The four review rubrics run as
-solo sessions per their own prompt file. Refuse and log anything outside your
+**This is Lane C.** You own ONLY `skills/mediatr-messaging/`, the router's
+merge-time edits listed below, and this file. Shipped through **v0.3.12**
+(12 skills — `automapper-mapping` landed at S16). PENDING by user direction:
+`auth-and-security` (Lane A's), `observability`, `background-worker`,
+`http-resilience`, `domain-modeling`, `modern-csharp`, `project-scaffolding`.
+The four review rubrics run as solo sessions per
+`docs/next-session-prompt-rubrics.md`. Refuse and log anything outside your
 ownership.
 
-**START IN YOUR OWN WORKTREE.** Proven S14/S15:
-`git worktree add ../dotnet-standards-lanec-s16 -b lane-c/automapper-mapping main`
-and work there. The worktree has no `reference/` (gitignored) — read
-`reference/projects/` through the shared checkout path
-`D:\agentic-plugin\dotnet-standards\reference\` when the user names exemplars.
+**START IN YOUR OWN WORKTREE** (proven S14/S15/S16):
+`git worktree add ../dotnet-standards-lanec-s17 -b lane-c/mediatr-messaging main`.
+The worktree has no `reference/` — read exemplars through the shared checkout
+path `D:\agentic-plugin\dotnet-standards\reference\`.
 
-## THE DELIVERABLE — `automapper-mapping`
+## THE DELIVERABLE — `mediatr-messaging`
 
-**What this skill owns:** mapping mechanics — writing an AutoMapper profile and
-its conventions, profile registration/discovery, mapping configuration. It is
-one of the two names the user queued post-S15 (with `mediatr-messaging`); until
-S15 it was dangled by shipped `Not for:` lists with no roadmap row.
+**What this skill owns:** the messaging pipeline — dispatch, pipeline
+behaviours, handler registration/discovery, notification vs request semantics.
+Stack fact (SETTLED): MediatR is **in-process messaging, not CQRS**.
 
-**Boundary facts already settled elsewhere (do not re-derive, do not
-contradict):** `ef-core-data-access` owns *projecting inside a query*
-(`ProjectTo`) — its `Not for:` disclaims "mapping profiles — automapper-mapping".
-`api-surface` owns *where the profile file sits beside its DTO* (colocated
-validator and mapping profile). `module-feature`'s `Not for:` disclaims
-"mapping mechanics — automapper-mapping". The router (`choosing-a-dotnet-skill`
-v0.3.10) encodes all three in its `mapping / ProjectTo` disambiguation row and
-its `Mapping mechanics` uncovered row.
+**Boundary facts settled elsewhere (do not re-derive, do not contradict):**
+`module-feature` owns the THIN ENVELOPE itself (its `Not for:` routes
+"messaging pipeline — mediatr-messaging"; the router's uncovered row repeats
+"the thin envelope itself belongs to `module-feature`"). `module-feature` also
+owns the service-call-vs-message decision. Exception flow — `error-handling`;
+validation rules — `module-feature`; message text — `message-keys`.
 
-**ROUTER MERGE-TIME EDITS — mandatory, same session, same commit** (the
-alignment rule: the router must cover every skill on `main` at merge time; the
-maintenance duty is recorded in CHANGELOG 0.3.10):
-1. Delete the `Mapping mechanics: …` row from the router's `## Not yet covered`
-   table.
-2. In the router's `mapping / ProjectTo` disambiguation row, change the third
-   arm `how to write the mapping itself — *not yet covered*` to
-   `how to write the mapping itself — automapper-mapping`.
-3. Decide (through the loop) whether a base-map row is warranted; if added,
-   extend the build-sequence order note accordingly.
-4. If Lane B merged `dotnet-testing` by then, also perform the pre-written
-   testing swap (CHANGELOG 0.3.10 lists the three edits) unless Lane B already
-   did it — check first.
+**ROUTER MERGE-TIME EDITS — mandatory, same session, same commit** (alignment
+rule, CHANGELOG 0.3.10): delete the `Messaging pipeline: …` row from
+`## Not yet covered`; decide (through the loop) the base-map row and whether
+the `"message"` disambiguation row needs a third arm for the pipeline; extend
+the order-note only if a row is added (S16 precedent: coordinator additions
+are reviewed by the arbiter in the final pass as author content).
 
-## THE THREE-WAY PROCESS — MANDATORY, NOW SKILL-DRIVEN
+## THE THREE-WAY PROCESS — MANDATORY, SKILL-DRIVEN
 
-**Invoke the `three-way-skill-loop` skill at session start and follow it** — it
-now defines the loop. Division of labour changed at S15's close (memory
-`author-a-delegated`): the main session COORDINATES ONLY; **`skill-writer-a`**
-(new agent in `.claude/agents/`) drafts side A, `skill-writer-sp` drafts side B,
-`skill-arbiter` verdicts A/B/MERGE/NEITHER with file-verified reasons and MUST
-invoke `skill-creator:skill-creator` live (if it reports `Unknown skill`,
-restart the parent session — subagent rosters snapshot at parent start; the
-user rejects disk-read fallbacks). Ping all three agents with the context
-package first; batch authors' `## QUESTIONS` and resolve before dispatching the
-arbiter; drafts live in the session scratchpad; announce every agent use; run
-agents in the lane worktree (no nested worktrees). Diff every arbiter
-rephrasing against the original (S12), verify shared claims (S13b), diff
-modality both directions (S13b/S15), and verify the arbiter's self-declared
-additions like any author claim — in S15 the arbiter caught the main session's
-own falsely-justified H1, so the duty is symmetric.
+**Invoke `three-way-skill-loop` at session start** — it defines the loop; the
+main session COORDINATES ONLY (memory `author-a-delegated`). Author A =
+`skill-writer-a`, Author B = `skill-writer-sp`, arbiter = `skill-arbiter`
+(invokes `skill-creator:skill-creator` LIVE; `Unknown skill` → restart parent
+session). Ping all three with the context package first; batch authors'
+`## QUESTIONS`; drafts to the arbiter **VERBATIM — never summarized, not even
+partially bracket-condensed (S16: the coordinator itself slipped here and had
+to resend full texts before the verdict)**. Verify arbiter self-declared
+additions; diff rephrasings (S12); verify SHARED claims (S13b; S16 caught two
+shared errors: the two-level IncludeAllDerived model and the wrong
+static-expression declaration shape); diff modality both directions (S13b/S15;
+S16 cut two dilutions and one scope-widening). Run agents in the lane worktree.
 
-**STANDING DELEGATION (LAW — memory `delegate-on-recommendation`):** present a
-decision WITH a clear recommendation → execute it and report; ask only when
-genuinely undecidable. Carve-out: naming canonical sources/exemplars remains
-the user's alone (R7). Record each use in the Lane log.
+**STANDING DELEGATION (LAW):** execute clear recommendations, report them, log
+each use; ask only the genuinely undecidable. Carve-outs remain the user's
+alone: naming canonical sources/exemplars (R7), labelling anti-examples (R8).
+S16 refinement: when the user grants blanket delegation mid-session, brief
+confirmations still accompany every executed call in the report so vetoes stay
+cheap.
 
 ## READING DISCIPLINE
 
 Ask the user for the exemplar list at session start — never select exemplars
-yourself. Likely candidates the user may name (do NOT open until named): apsp
-mapping profiles, ops-service profiles, be-booking as anti-example quarry.
-Widening = announced targeted lookup. Bash find/ls/grep, never Glob, inside
-`reference/projects/`. R7: one canonical source per area, user designates,
-never average. R8: anti-examples are code the user points at; ask before
-labelling. Sanitize: no project names, no business-domain nouns, no real
-paths, no secrets in artifacts (S14 caught business nouns slipping into a
-draft; always load-bearing).
+yourself. Likely candidates (do NOT open until named): apsp/digitalcity
+MediatR handlers, pipeline behaviours, `AddMediatR` wiring, notification
+publishers. Widening = announced targeted lookup. Bash find/ls/grep, never
+Glob, inside `reference/projects/`. **S16 caveat: `apsp-backend/.claude/worktrees/`
+holds four duplicate checkouts — exclude them or every census is inflated ~5×
+(the arbiter nearly hit this).** R7: one canonical source per area, never
+average. R8: anti-examples are code the user points at; ask before labelling.
+Sanitize: no project names, no business-domain nouns, no real paths, no
+secrets. Neutral placeholder set: `Entity`/`EntityBaseResponse`/
+`CreateEntityRequest`/`Wrapper` (near-domain nouns like `Item`/`Lines` were
+rejected in S16).
 
 ## SETTLED — DO NOT RELITIGATE
 
-- Everything shipped through **v0.3.10** (read the installed bodies): all
-  rulings in CHANGELOG 0.3.7–0.3.10, notably the router's full ruling set —
-  route-don't-teach, single entry-point, compose-never-amplify,
-  disclaimer-not-ownership principle, body-sourced tokens allowed in
-  disambiguation, no section-heading pointers.
-- Description law (`02-repo-structure.md` §5): third person `This skill should
-  be used when…`, <100 words, trigger-noun pushy, `Not for:` naming every
-  sibling that owns an excluded area. This skill's `Not for:` must at minimum
-  route: ProjectTo-in-query — ef-core-data-access; profile placement —
-  api-surface; feature internals — module-feature; and the router.
-- The `references/` mechanism: decision-layer body, depth in references with
-  conditional pointers; whether this skill needs references/ goes through the
-  loop.
-- Stack: Controllers not Minimal API, Swashbuckle not Scalar, NO API
-  versioning, FluentValidation + AutoMapper, Redis, Elasticsearch, Hangfire;
-  MediatR is in-process messaging, not CQRS.
+- Everything in shipped bodies through **v0.3.12** (read them as baseline),
+  incl. `automapper-mapping`'s full ruling set in CHANGELOG 0.3.12 (placement
+  law generalized to declaring-file-of-source; `<DtoTypeName>Mapping`;
+  projection-reachability prohibition broad/transitive with bare permission
+  for non-query maps; IncludeAllDerived at every level with config to hand
+  down; static shared computation = `internal static readonly Expression`
+  FIELD; clean ConvertUsing form; ReverseMap unruled; PreCondition
+  extension-only).
+- Router rulings (CHANGELOG 0.3.10) + S16 alignment precedent: router covers
+  every skill on `main` at merge time; testing swap done at S16.
+- Description law (`02-repo-structure.md` §5): third person, <100 words,
+  trigger-noun pushy, `Not for:` naming every owning sibling. No H1 in skill
+  bodies.
+- The `references/` mechanism: splits go through the loop; S16 shipped a
+  single SKILL.md with recorded future candidates.
+- Stack: .NET 8, Controllers not Minimal API, Swashbuckle not Scalar, NO API
+  versioning, FluentValidation + AutoMapper v12 (single-arg
+  `MapperConfiguration`), Redis, Elasticsearch, Hangfire; MediatR =
+  in-process messaging, not CQRS.
 
 ## HARD CONSTRAINTS
 
-1. One session, one deliverable: `automapper-mapping` (+ the mandatory router
-   merge-time edits above, which ship in the same feat commit). Extra requests
-   → log under `## Lane log` and refuse.
-2. Prove it: validate + reinstall + `claude plugin details` shows the new
-   skill count (11 if dotnet-testing has not merged; 12 if it has); report
-   failures honestly. Merge/version protocol: patch bump +1 vs whatever `main`
-   carries at merge time, both manifests agree, CHANGELOG at top, one install
-   at a time; conflict rule: keep both entries, renumber yours above theirs.
-   **Install-state at S15's close:** USER-scope `dotnet-standards 0.3.10`
-   from marketplace `dotnet-standards-dev` (source = shared checkout dir);
-   `reference/` deleted from the 0.3.10 cache; caches 0.3.7–0.3.9 left
-   unreferenced — check `installed_plugins.json` before deleting ANY cached
-   version dir (S12 incident); ops-service's local-scope pin assumed alive.
-   If the marketplace registration vanishes (S13b incident):
-   `claude plugin marketplace add ./` then install.
+1. One session, one deliverable: `mediatr-messaging` (+ mandatory router
+   edits, same feat commit). Extra requests → log under `## Lane log`, refuse.
+2. Prove it: validate + REAL reinstall + `claude plugin details` shows 13
+   skills. **S16 install lessons:** `claude plugin install` on an installed
+   plugin reports "already installed" and does NOT refresh — verify
+   `installed_plugins.json`, then `claude plugin update
+   dotnet-standards@dotnet-standards-dev` (short name fails); `claude plugin
+   details` can read the SOURCE manifest and show the new version while the
+   registry still points at the old cache — never accept it alone as proof.
+   Delete `reference/` from the new cache dir (installer sweeps it; S16
+   confirmed). Both manifests must agree — Lane B left `marketplace.json` at
+   0.3.10 in the 0.3.11 ship; S16 fixed and aligned both at 0.3.12. Check
+   `installed_plugins.json` before deleting ANY cached version dir; caches
+   0.3.7–0.3.11 left unreferenced.
 3. Artifact language English; talk to the user in Vietnamese.
-4. End: commit per protocol (lane branch `lane-c/automapper-mapping`, feat
-   commit, merge into main — expect mid-session `main` movement). Then rewrite
-   THIS file so it opens Lane C's next session (likely `mediatr-messaging` —
-   confirm with the user at close), carrying the Lane log forward.
+4. End: commit per protocol (lane branch, feat commit, merge into main —
+   expect mid-session `main` movement; S16 saw two moves including Lane B's
+   close OVERWRITING this opener mid-session; conflict rule: keep both
+   CHANGELOG entries, renumber yours above theirs). Rewrite THIS file and
+   `docs/next-session-prompt-C.md` for Lane C's next session, carrying the
+   Lane log.
 
 ## Lane log
 
-- **S15 (choosing-a-dotnet-skill, 2026-07-27) — shipped v0.3.10.** Verdicts:
-  P1 MERGE, P2 MERGE, P3 MERGE; final consistency pass PASS with one defect
-  (the main session's own falsely-justified H1 — deleted; 8/9 siblings open at
-  `##`, only message-keys carries an H1) + note 1 applied (`## How to use
-  these tables`), note 2 declined (kept the `—` empty-name cells), note 3
-  no-op. Full ruling list in CHANGELOG 0.3.10.
-- S15 goal amendment (user): the router serves TWO users — sibling
-  disambiguation AND the process-phase gap (generic prompts like "implement
-  feature A" surface trigger nouns only inside specs/plans/subagent prompts,
-  where no skill is looking; the router carries the body-scoped obligation:
-  steps touching a shipped skill's area MUST name that skill).
-- S15 delegation uses (standing delegation, recorded): pending-row treatment
-  (topic-noun rows, dangled names printed as reservations-not-loadable, both
-  populations, ~10 rows uniform); process-phase = pattern with 3 Superpowers
-  phases as e.g.; obligation modality body-scoped (must for shipped-owned,
-  relief for uncovered + permission clause "say so in the step if it helps
-  the plan"); no section pointers; single SKILL.md no references/; single
-  entry-point per row; ConcurrencySettings body-sourcing precedent; ASP.NET
-  Core anchor kept; P2 preamble amendment accepted; domain-modelling and
-  observability nearest-help pointers dropped (over-read risk); rubric-worthy
-  arbiter principles adopted: "a Not for: entry is a disclaimer, not an
-  ownership assignment" and "a pointer earns its place only when it restates
-  a boundary a shipped Not for: itself draws".
-- S15 errors caught by the loop (all fixed pre-write): author A's
-  whole-feature row contradicted facade-module-architecture's literal
-  description (B's conditional adopted); author B's P1 dropped brainstorming
-  from the three ruled phases; B's Repository<T>() evidence misattributed
-  (descriptions → bodies; collision real); B's "record that in the step"
-  modality drift cut, offered back and adopted as permission; arbiter
-  self-corrected its own Redis prep (live ambiguity is cache vs RedLock);
-  main session's H1 provenance claim false (caught in final pass).
-- S15 census work now in the artifact: six names dangled by shipped `Not for:`
-  lists (auth-and-security, observability, background-worker,
-  automapper-mapping, mediatr-messaging, project-scaffolding) + four name-less
-  pending areas (testing, HTTP resilience, domain modelling, modern C#).
-- S15 process events: pings doubled as context-package loads; skill-creator
-  invoked live by the arbiter on first try (no restart needed this session);
-  mid-session the user created the `three-way-skill-loop` skill and
-  `skill-writer-a` agent and saved memory `author-a-delegated` — S16 onward
-  the main session coordinates only. Cross-lane: Lane D (process integration)
-  opened mid-session; rubric phase re-planned as four solo sessions
-  (`next-session-prompt-rubrics.md`); ef-core-data-access v0.3.9 had landed
-  before S15 opened (base map built against nine skills).
-- S15 user directions logged mid-session: `automapper-mapping` and
-  `mediatr-messaging` wanted post-S15 (automapper → this session, S16, by
-  user choice at close; mediatr queued); mechanism E (UserPromptSubmit hook
-  pointing at the router) endorsed as a small follow-up session — the router
-  is written hook-friendly.
-- **Carried from S14:** rulings in CHANGELOG 0.3.8 (KeyedLocker scrubbed, two
-  providers, RedisSettings connection deviation, ExpiryTime honestly-scoped
-  unknown, etc.); anti-example candidates banked for the rubrics (Pattern-3
-  catch filter compensating unstarted work + downgrading 423→500; semaphore
-  cleanup race); S13's four unruled candidates live in Lane B's log /
-  CHANGELOG 0.3.4; harvest lane logs + CHANGELOG before re-mining source when
-  the rubrics start.
-- **Carried, PENDING-flavored:** S11 deferred `CompileQueryAsync(...)`
-  pagination extension (needs the user to name its file; belongs to
-  `elasticsearch-search` or a rubric). `background-worker`/`http-resilience`
-  briefs live in git history @ the S14 lane-file-rewrite commit.
-- Deferred to a solo session (not Lane C's to fix): roadmap/index still say
-  "Facades/Cache in one or both projects" for S10 and list ops-service/apsp
-  as the only reference projects — superseded; consolidate when lane logs
-  fold into `03-session-roadmap.md`.
+- **S16 (automapper-mapping, 2026-07-27) — shipped v0.3.12.** Verdicts: P1
+  MERGE, P2 MERGE (arbiter-corrected P4: IncludeAllDerived at every level
+  with config to hand down — shared author blind spot, corpus four-level
+  chain), P3 MERGE (arbiter-corrected static-expression FIELD shape — second
+  shared blind spot; ReverseMap omitted, A's placement argument disproved at
+  the only canonical site), P4 MERGE (two anti-patterns cut for budget,
+  recovered as DG rows). Final pass PASS + 1 defect (arbiter's own `dest`/`des`
+  normalization miss — fixed). No `references/`. Full rulings in CHANGELOG
+  0.3.12.
+- S16 exemplars (user-named): apsp `Modules/Customers/Responses/
+  CustomerBaseResponse.cs` + `CustomerDetailResponse.cs`, all of
+  `Modules/Devices/Requests/Devices/` + `Modules/Devices/Responses/Devices/`;
+  digitalcity `DetectHistories/Requests/HandleIncidentRequest.cs`,
+  `PutDetectHistoryRequest.cs`, `Response/DetailRecognitionOutcomeResponse.cs`,
+  `Response/Core/ElkObjectDectectBaseResponse.cs`. Registration lookup
+  (announced): `Facades/Mapping/MappingProfile.cs` (empty marker) +
+  `Infrastructure/Startup.cs:52`.
+- S16 user rules (verbatim doctrine): profile never in a separate folder;
+  source-file placement with entity→response exception (later generalized,
+  user-approved, to "file where the source type is declared" — covers the
+  enum-in-request-file case); IncludeAllDerived/IncludeMembers/ProjectTo the
+  common tools; maps used in ProjectTo must not use AfterMap/ConvertUsing,
+  non-query maps may. User confirmed the BROAD "reachable from" reading after
+  the coordinator flagged it as a scope-widening of the original wording.
+- S16 anti-examples user-confirmed: profile name mismatch
+  (`CustomerDefaultResponseMapping` in `CustomerDetailResponse.cs:19`; second
+  family instance `DeviceBaseMapping` dropping "Response"); ForMember on
+  computed get-only (`DeviceResponse.cs:19` `CurrentTransfer` + `:33`
+  ForMember — coordinator-verified after arbiter greps missed the
+  expression-bodied form). Shipped as anti-patterns: those two + the
+  `dest = src switch` ConvertUsing no-op (verified quirk,
+  `HandleIncidentRequest.cs:50`) + delegate-on-projection-reachable.
+- S16 delegation uses (recorded): Not-for roster shipped-only (no
+  mediatr dangle); `<DtoTypeName>Mapping` canonical (13 vs 3);
+  api-surface split wording (THAT-beside-DTO theirs / WHICH-file ours);
+  IncludeMembers grounded by coordinator grep (14 sites, shape-only use);
+  rule-1 generalization; inline routing pointers kept; MappingProfile name
+  kept; version note in Patterns only; prohibition NOT extended to
+  Condition/PreCondition (delegates too, but user doctrine names two — a
+  future-session candidate if the user wants it); ConvertUsing two-param kept
+  for corpus fidelity; 17th DG row dropped; references/ not needed;
+  base-map row + order-note "mapping" insertion added by coordinator,
+  arbiter-reviewed in final pass.
+- S16 loop catches: three B naming drifts (`<DestinationTypeName>`, ×3,
+  arbiter-corrected each); B re-imported its own P2-cut dilution sentence in
+  P3 (coordinator caught pre-verdict); A's AddCollectionMappers "every
+  collection map" overreach (verified: 9 opt-in `EqualityComparison` sites);
+  A's single-param ConvertUsing inconsistency; both authors' two-level
+  IncludeAllDerived model and wrong static-expression shape (shared blind
+  spots, corpus-corrected); arbiter's moot enum-placement flag (coordinator
+  corrected — generalized rule covers it); IncludeMembers ordering semantics
+  asserted by both from API memory — refused into the artifact, recorded as
+  the strongest references/ candidate.
+- S16 process events: coordinator VIOLATED the forward-verbatim rule at P4
+  (bracket-condensed sections), self-caught, resent full texts before the
+  verdict — rule now hardened above. User granted blanket delegation
+  mid-session ("làm theo khuyến nghị, chỉ hỏi khi thật sự cần") — R7/R8
+  carve-outs held. All three agents pinged once and continued across all four
+  pieces via SendMessage without respawn.
+- S16 queued/unresolved: api-surface reciprocal `Not for:` route to
+  automapper-mapping (its description claims "colocated validator and mapping
+  profile" — outside Lane C ownership, needs an api-surface-owning session);
+  references/ future candidates (troubleshooting catalogue; IncludeMembers
+  precedence semantics; value/type-converter material); `dotnet-testing`'s
+  `IMapper` substitutability note untouched.
+- **Carried from S15:** router serves sibling disambiguation AND the
+  process-phase gap; rubric-worthy principles ("a Not for: entry is a
+  disclaimer, not an ownership assignment"; "a pointer earns its place only
+  when it restates a boundary a shipped Not for: itself draws"); mechanism E
+  (UserPromptSubmit hook → router) endorsed as small follow-up session.
+- **Carried from S14:** CHANGELOG 0.3.8 rulings; anti-example candidates
+  banked for rubrics (Pattern-3 catch filter; semaphore cleanup race);
+  harvest lane logs + CHANGELOG before re-mining source when rubrics start.
+- **Carried, PENDING-flavored:** S11 `CompileQueryAsync(...)` pagination
+  extension (needs user to name its file); `background-worker`/
+  `http-resilience` briefs @ the S14 lane-file-rewrite commit; roadmap/index
+  stale references to "Facades/Cache in one or both projects" — consolidate
+  when lane logs fold into `03-session-roadmap.md`.
