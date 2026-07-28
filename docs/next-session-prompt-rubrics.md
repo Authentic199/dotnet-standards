@@ -16,7 +16,7 @@
 |---|---|---|
 | 1 | `dotnet-code-review` | ☑ v0.3.15, 2026-07-28 |
 | 2 | `dotnet-architecture-review` | ☑ v0.3.17, 2026-07-28 |
-| 3 | `dotnet-security-review` | ☐ |
+| 3 | `dotnet-security-review` | ☑ v0.3.18, 2026-07-28 |
 | 4 | `dotnet-performance-review` | ☐ |
 
 ## CONTEXT
@@ -138,6 +138,55 @@ Superpowers for the review process itself.
    After rubric #4: state explicitly that Lane D is UNLOCKED.
 
 ## Rubric log
+
+- **Rubric #3 (`dotnet-security-review`, 2026-07-28) — shipped v0.3.18.**
+  Verdicts: P1 MERGE, P2 MERGE, P3 MERGE, P4 (router) MERGE; final whole-skill
+  consistency pass FAIL→PASS (D1 honesty-rule wording drift between Principle 1
+  and the template — blocking, canonicalised; D2/D3 body foreclosing its own
+  references tail in layers 1 and 5 — softened). Ran in worktree
+  `../dotnet-standards-rubric-3`, branch `rubric/dotnet-security-review`,
+  merged fast-forward at `2eb6150`; install proof: 17 skills,
+  `installed_plugins.json` at the 0.3.18 cache (gitCommitSha = merge commit),
+  `reference/` (2.4G) deleted from the cache copy, both manifests at 0.3.18.
+  Full ruling list in CHANGELOG 0.3.18.
+- **Rubric #3 rulings the next session inherits:** severity calibration
+  precedents — refresh-replay response = HIGH not CRITICAL (first mechanical
+  application of the ladder's precondition test to overrule an author);
+  fail-closed defects de-escalate and SAY SO in the check (3.6, 5.4);
+  availability defects on the key path are MEDIUM and say what they are (2.6).
+  In-file `Refused — and why` table + report-level `Suppressions applied`
+  section are first-class (shared inventions by both authors, upheld). First
+  C# BAD/GOOD block in a rubric body (the R8 comment-hidden-property
+  anti-example under 6.2) — recorded divergence. The `dotnet-performance-review`
+  reservation row now sits in the router's *Not yet covered* — **rubric #4
+  deletes it as part of its own alignment.**
+- **Rubric #3 coordinator catches (the loop worked — 5th+ instances of the
+  shared-blind-spot series):** arbiter's cut of the shipped "two independent
+  gates" sentence reversed on file evidence (jwt-and-tokens.md:452-455);
+  arbiter twice misread `Required(...)` exclusion semantics (called A's
+  optionality clause false, then claimed a false auth-and-security intra-skill
+  contradiction — jwt-and-tokens.md:89-92 documents the semantics; the false
+  Known-seam note was withdrawn before it could defame a healthy skill). Both
+  authors corrupted the shipped five-site principal-type list identically;
+  A fabricated an `[AllowAnonymous]` stale-principal mechanism and miscited
+  four body-check titles; B abridged the pipeline order (dropped APM+CORS) and
+  inverted 5.1's rationale. All caught by file verification, none shipped.
+- **Rubric #3 user rulings:** blanket "làm như bạn khuyến nghị đi" delegation
+  at session start — R7/R8 carve-outs held (`reference/projects/` never
+  opened, no new exemplars; the two user-banked S9b items — username
+  enumeration, and the S12 comment-hidden DTO property — shipped under their
+  existing bank/label authority, sanitized).
+- **Banked for rubric #4 (`dotnet-performance-review`):** everything in the
+  0.3.15 bank (dead-Include cost, sync Count, `entities.Any()` probes,
+  five-round-trip search chain, N+1/projection/index checklists) + from this
+  session: the DoS-shaped `LIKE`-pattern note in 3.1 routes rate-limiting/DoS
+  questions to rubric #4's Deep-dives row; ClockSkew-Zero clock-drift
+  trade-off (no shipped owner — likely refuse-and-bank again).
+- **Banked, needing a future owner:** test-posture security check ("a test
+  scheme reachable from a deployed composition") — refused, no shipped
+  sentence; `[ApiKey]`+`[HasPermission]` BAD/GOOD anti-example candidate (not
+  user-labelled); `GetFallbackPolicyAsync` null as an R8 hazard-label
+  candidate (user's call).
 
 - **Rubric #2 (`dotnet-architecture-review`, 2026-07-28) — shipped v0.3.17.**
   Verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency pass PASS on the

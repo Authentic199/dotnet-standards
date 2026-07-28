@@ -7,14 +7,14 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.17 (16 skills)** as of 2026-07-28:
+Shipped through **v0.3.18 (17 skills)** as of 2026-07-28:
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
 choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
 0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
 dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16 ·
-dotnet-architecture-review 0.3.17.
+dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18.
 
 ## Lane status
 
@@ -23,7 +23,7 @@ dotnet-architecture-review 0.3.17.
 | **A — Data & Feature Spine** | `next-session-prompt-A.md` | S9b closed 2026-07-27: `auth-and-security` v0.3.13 shipped (module-feature, ef-core-data-access before it) | Confirm with the user whether the queue is unfrozen; if yes: `domain-modeling`, then `modern-csharp` (order TBC). Warm-up task carried: fix the stale line `module-feature/references/validation-rules.md:322` (S15 flag) **+ second instance found by rubric #1: `module-feature/SKILL.md:187` and validator examples at lines 165–172 (superseded entity-typed `Messages<T>` form)** |
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
 | **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
-| **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **Rubric #2 `dotnet-architecture-review` shipped v0.3.17, 2026-07-28** (rubric #1 `dotnet-code-review` v0.3.15 before it) — 5.8 claimed as its 4.9, rubric-1 row now a pointer; router base-map row + placement disambiguation arm same commit; full log in the rubrics file | Rubric #3 `dotnet-security-review` next (solo, sequential — never in parallel with a lane); severity ladder + calibration precedent inherited, see the Rubric log |
+| **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **Rubric #3 `dotnet-security-review` shipped v0.3.18, 2026-07-28** (#1 v0.3.15, #2 v0.3.17 before it) — 6 layers, honesty rule verbatim, kit-divergence suppressions first-class; router base-map row + secrets/tokens/gates disambiguation row + a `dotnet-performance-review` reservation row same commit; full log in the rubrics file | Rubric #4 `dotnet-performance-review` next — the LAST rubric (solo, sequential); it deletes the router reservation row as part of its own alignment; after it ships, state explicitly that Lane D is UNLOCKED |
 | **D — Process Integration** | `next-session-prompt-D.md` | Blocked by design: runs ONLY after the four rubrics (dotnet-testing prerequisite already shipped) | Closed-loop workflows + specialist agents per the approved S14 spec |
 
 **Solo-only (never in a lane):** `project-scaffolding` (pending), the four
@@ -92,6 +92,12 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   `mediatr-messaging`'s `DomainEvents/` ruling; rubric #2's catalogue ships an
   explicit precedence note — unblocked by any fma-owning session (pair with the
   Lane A warm-up chore family).
+- [rubric-3, 2026-07-28] Banked at 0.3.18 (detail in CHANGELOG + rubrics-file
+  log): test-posture security check (needs a user-named shipped sentence);
+  `[ApiKey]`+`[HasPermission]` BAD/GOOD anti-example (needs R8 label);
+  `GetFallbackPolicyAsync`-null hazard label (R8, user's call); ClockSkew-Zero
+  clock-drift trade-off (no shipped owner) — first three unblock on user word,
+  the last likely refuses again at rubric #4.
 - [rubric-2, 2026-07-28] `Guid.NewGuid()` sequential-key rule is a VERIFIED
   ORPHAN (`fma/references/core-contracts.md:40` states it; no rubric checks
   it) — detail in CHANGELOG 0.3.17 Known seams — belongs in
