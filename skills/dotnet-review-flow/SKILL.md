@@ -76,8 +76,9 @@ fixing".
 ## PHASE 0 — Preflight, and STOP on any failure
 
 Four checks, in order. Each failure is a **STOP**: report what is missing, give
-the exact remedy, and wait for the user. Do not degrade, do not work around, do
-not install anything.
+the exact remedy, and wait for the user. Do not degrade, do not work around,
+and install nothing to get past a failed check here. Standing up a test
+environment later, under NO-SIGNAL, is a different act with its own rules.
 
 **1 — Superpowers is present and enabled.** Verify by **actually loading a
 Superpowers skill**: invoke the Skill tool on
@@ -186,10 +187,10 @@ Each tester ends on one of six verdict strings. Branch on them:
 | Verdict | Do this |
 |---|---|
 | `GREEN` | This tier is done |
-| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Carry it into the final report under *Not run*. Never scaffold a tier |
+| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Enter **NO-SIGNAL**, then carry the tier into the final report under *Not run* |
 | `RED — tests failed` | Fix and rerun — see who fixes, below |
 | `RED — build failed` | Fix the build; no test result exists to interpret yet |
-| `RED — environment` | **Halt immediately and surface it to the user. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix and another round fails identically. On an artifact lock specifically, re-run the pair **serially** — unit first, then integration — once, and note the serialization in the report before halting |
+| `RED — environment` | **Enter NO-SIGNAL. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
 | `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt |
 
 **Who fixes:** embedded mode, the calling flow's implementer. Standalone mode,
@@ -264,7 +265,9 @@ goes into *Not run* with what was attempted and what the user chose.
 
 ### REVIEW-LOOP
 
-Entered **only with both tiers green** (or absent and recorded).
+Entered **only with both tiers green** — or with a tier that produced no signal,
+once NO-SIGNAL has recorded it. A blocked tier is not a failing tier, and the
+lenses never depended on either.
 
 **Spawn all four reviewers in parallel**, in one message, with the same spawn
 contract:
@@ -446,8 +449,9 @@ never copies. Executing cleanup candidates belongs to `/simplify`.
 | A rubric skill or an agent name is missing from the roster | STOP — the install is stale or partial. Name what is absent, give the update-and-restart remedy |
 | The pre-build gate fails | Report the diagnostics, spawn nobody, hand it back |
 | The gate passes but a tester reports `RED — build failed` | A test project does not compile and sits outside what the solution build covered. Treat it as a build failure for that tier, not a test failure |
-| The repository has no test projects at all | Both tiers absent: record it, report it under *Not run*, go straight to REVIEW-LOOP. Never scaffold a tier |
-| A tester reports `RED — environment` | Halt and surface it. Does not consume a round; on an artifact lock, re-run the pair serially once and note it |
+| The repository has no test projects at all | Both tiers absent. NO-SIGNAL: measure the gap, offer options built from the count, then REVIEW-LOOP either way |
+| A tester reports `RED — environment` | NO-SIGNAL. Does not consume a round, and never halts the run — the report is owed regardless |
+| A repair inside NO-SIGNAL would download something | Ask first. That single question — does this acquire over the network — is the whole classifier |
 | A reviewer's CRITICAL cannot be reproduced at its `file:line` | PLAUSIBLE. Report it with the reason; do not fix and do not delete |
 | A reviewer returns a finding with no `file:line` | PLAUSIBLE by definition — there is nothing to verify against |
 | Two lenses report the same defect | Verify once, fix once, report once naming both lenses. Never carry two severities for one shape |
