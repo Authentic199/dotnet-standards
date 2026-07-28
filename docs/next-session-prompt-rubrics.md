@@ -16,7 +16,7 @@
 |---|---|---|
 | 1 | `dotnet-code-review` | ☑ v0.3.15, 2026-07-28 |
 | 2 | `dotnet-architecture-review` | ☑ v0.3.17, 2026-07-28 |
-| 3 | `dotnet-security-review` | ☑ v0.3.18, 2026-07-28 |
+| 3 | `dotnet-security-review` | ☑ v0.3.18 (+0.3.19 fix), 2026-07-28 |
 | 4 | `dotnet-performance-review` | ☐ |
 
 ## CONTEXT
@@ -139,7 +139,13 @@ Superpowers for the review process itself.
 
 ## Rubric log
 
-- **Rubric #3 (`dotnet-security-review`, 2026-07-28) — shipped v0.3.18.**
+- **Rubric #3 (`dotnet-security-review`, 2026-07-28) — shipped v0.3.18 +
+  v0.3.19 budget fix** (post-assembly coordinator catch: body was 804 lines vs
+  the <500 bar — the final pass had reported "~470" WITHOUT counting; root
+  cause structural, all-prose checks where the sibling convention is table
+  rows; 26 of 29 checks converted, 498 final, nothing dropped, references file
+  untouched. Defect class recorded: "an estimate presented as a count" — line
+  counts only from an actual `wc -l` from now on. Margin warning: 498/500.)
   Verdicts: P1 MERGE, P2 MERGE, P3 MERGE, P4 (router) MERGE; final whole-skill
   consistency pass FAIL→PASS (D1 honesty-rule wording drift between Principle 1
   and the template — blocking, canonicalised; D2/D3 body foreclosing its own

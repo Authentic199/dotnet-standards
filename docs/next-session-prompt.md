@@ -7,14 +7,16 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.18 (17 skills)** as of 2026-07-28:
+Shipped through **v0.3.19 (17 skills)** as of 2026-07-28 (0.3.19 = rubric-3
+budget fix, body 804→498 via table-form conversion):
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
 choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
 0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
 dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16 ·
-dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18.
+dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18 (0.3.19 =
+budget-fix).
 
 ## Lane status
 
