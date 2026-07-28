@@ -7,8 +7,8 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.19 (17 skills)** as of 2026-07-28 (0.3.19 = rubric-3
-budget fix, body 804→498 via table-form conversion):
+Shipped through **v0.3.20 (18 skills)** as of 2026-07-28 (0.3.20 =
+`dotnet-performance-review`, the LAST review rubric — **Lane D is UNLOCKED**):
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
@@ -16,7 +16,7 @@ choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
 0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
 dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16 ·
 dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18 (0.3.19 =
-budget-fix).
+budget-fix) · dotnet-performance-review 0.3.20.
 
 ## Lane status
 
@@ -25,8 +25,8 @@ budget-fix).
 | **A — Data & Feature Spine** | `next-session-prompt-A.md` | S9b closed 2026-07-27: `auth-and-security` v0.3.13 shipped (module-feature, ef-core-data-access before it) | Confirm with the user whether the queue is unfrozen; if yes: `domain-modeling`, then `modern-csharp` (order TBC). Warm-up task carried: fix the stale line `module-feature/references/validation-rules.md:322` (S15 flag) **+ second instance found by rubric #1: `module-feature/SKILL.md:187` and validator examples at lines 165–172 (superseded entity-typed `Messages<T>` form)** |
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
 | **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
-| **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **Rubric #3 `dotnet-security-review` shipped v0.3.18, 2026-07-28** (#1 v0.3.15, #2 v0.3.17 before it) — 6 layers, honesty rule verbatim, kit-divergence suppressions first-class; router base-map row + secrets/tokens/gates disambiguation row + a `dotnet-performance-review` reservation row same commit; full log in the rubrics file | Rubric #4 `dotnet-performance-review` next — the LAST rubric (solo, sequential); it deletes the router reservation row as part of its own alignment; after it ships, state explicitly that Lane D is UNLOCKED |
-| **D — Process Integration** | `next-session-prompt-D.md` | Blocked by design: runs ONLY after the four rubrics (dotnet-testing prerequisite already shipped) | Closed-loop workflows + specialist agents per the approved S14 spec |
+| **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **COMPLETE. Rubric #4 `dotnet-performance-review` shipped v0.3.20, 2026-07-28** (#1 v0.3.15, #2 v0.3.17, #3 v0.3.18/19 before it) — 5 areas, honesty rule verbatim, 15 graded-by rows, 12-row Refused table; router: reservation row deleted + base-map row + slow/cost disambiguation row same commit; six grade-once violations caught pre-ship, durable fix recorded (briefs carry the sibling's full check-title inventory); full log in the rubrics file | Nothing — the rubrics file exists to hold its log. **Lane D is UNLOCKED** |
+| **D — Process Integration** | `next-session-prompt-D.md` | **UNLOCKED 2026-07-28** — all four rubrics shipped (dotnet-testing prerequisite shipped earlier) | Closed-loop workflows + specialist agents per the approved S14 spec |
 
 **Solo-only (never in a lane):** `project-scaffolding` (pending), the four
 rubrics, Lane D.

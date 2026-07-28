@@ -17,7 +17,7 @@
 | 1 | `dotnet-code-review` | ☑ v0.3.15, 2026-07-28 |
 | 2 | `dotnet-architecture-review` | ☑ v0.3.17, 2026-07-28 |
 | 3 | `dotnet-security-review` | ☑ v0.3.18 (+0.3.19 fix), 2026-07-28 |
-| 4 | `dotnet-performance-review` | ☐ |
+| 4 | `dotnet-performance-review` | ☑ v0.3.20, 2026-07-28 — **ALL FOUR SHIPPED; Lane D is UNLOCKED** |
 
 ## CONTEXT
 
@@ -139,6 +139,55 @@ Superpowers for the review process itself.
 
 ## Rubric log
 
+- **Rubric #4 (`dotnet-performance-review`, 2026-07-28) — shipped v0.3.20.
+  THE FOUR RUBRICS ARE COMPLETE; Lane D is UNLOCKED.** Body 499/500 (actual
+  `wc -l`; the arbiter's ~451 projection was again an estimate — caught
+  PRE-ship this time), references 510. Five areas by where-the-money-is;
+  15 graded-by rows; 12-row Refused table; honesty rule verbatim
+  ("static inspection of code shape, not a measurement… cannot tell you which
+  of them your traffic actually reaches"). Verdicts: P1 MERGE (A skeleton +
+  4 B grafts + arbiter's own CRITICAL-cell correction — A had fused the
+  shipped-correct outbound-span lock with the transaction-before-lock pool
+  drain), P2 MERGE 199 lines (cross-area severity rule invented by arbiter as
+  a P1 restatement; 4.1 flat CRITICAL with stated reconciliation), P3 MERGE
+  twice-revised (the full-title-list sweep), P4 MERGE (~128 lines), final
+  consistency pass FAIL→PASS (D1 split-cell rule clause; D2/D3 zero-line seam
+  cites 4.1↔#1-3.6, 4.5↔#1-3.7; D4 duplicate-enumeration; blockquote
+  word-identical — 0.3.18's D1 class did NOT recur). Ran in worktree
+  `../dotnet-standards-rubric-4`, branch `rubric/dotnet-performance-review`,
+  merged fast-forward at `ca06054`; install proof: 18 skills, registry at the
+  0.3.20 cache (gitCommitSha = merge commit), `reference/` (2.4G) deleted from
+  the cache copy, both manifests at 0.3.20. Full ruling list in CHANGELOG
+  0.3.20.
+- **Rubric #4 catches (SIX grade-once violations, none shipped — the densest
+  series of any session):** A's 1.7 (=#1's 1.2), A's 2.5 (=#1's 3.3), 4.6
+  (=#1's 3.8 — both authors AND arbiter missed; coordinator's full-title-list
+  sweep caught), 4.8 (=#1's 3.6 — arbiter's re-sweep), body 4.1 and
+  4.3/4.4/4.5 seams (final pass). **Root cause + durable fix recorded in
+  CHANGELOG: briefs must carry the sibling's COMPLETE check-title inventory,
+  not the handful of numbers the brief happens to need.** Also cut
+  verified-false: B's 5.2 terminateAfter-null grading (S13b
+  permission→obligation mirror), B's AbortOnConnectFail=true library-default
+  (S16 API-recall precedent), B's provenance-bounding disclaimer sentence,
+  A's get-shape=one comparison row. False alarms refuted by file evidence:
+  A's "ToPagedList :328 does not exist" (it lives in api-surface), the
+  arbiter's "security 4.4 does not exist" (layer-4 body checks are SKILL.md
+  table rows).
+- **Rubric #4 process notes:** coordinator committed the S16-class verbatim
+  violation TWICE (P3 & P4 forwarded as indexes); arbiter refused to rule on
+  summaries both times — safeguard held from the reviewer side; full texts
+  re-sent, zero rulings changed on re-review but two errors (A's renumbering,
+  B's AbortOnConnectFail) were only visible at full resolution. Blanket
+  delegation granted at session start; R7/R8 held (`reference/projects/`
+  never opened, no new exemplars, no new labels; area 4 ships with NO
+  BAD/GOOD pair — no labelled lock anti-example exists in any bank, recorded
+  beside the S17 seventh-anti-pattern gap; two shapes recorded as
+  never-labellable without the user: the outbound-spanning lock and the
+  semaphore registry window). Roster rule set: a check target or a
+  suppression creates the `Not for:` obligation; routes and refusals do not.
+  Novel-form rule set: a novel form ships only when the sibling form
+  demonstrably fails. CompileQueryAsync stays banked (user re-confirmed).
+  ClockSkew-Zero refused a second time, as rubric #3 predicted.
 - **Rubric #3 (`dotnet-security-review`, 2026-07-28) — shipped v0.3.18 +
   v0.3.19 budget fix** (post-assembly coordinator catch: body was 804 lines vs
   the <500 bar — the final pass had reported "~470" WITHOUT counting; root
