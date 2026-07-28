@@ -25,6 +25,7 @@ heading is bloat with a title.
 | 5 | Architecture and layering | conditional | 15 | the `ProjectReference` graph shows a real direction to protect |
 | 6 | Conventions — pointers only | conditional | 12 | scan row 12 found convention documents |
 | 7 | Configuration and secrets | conditional | 10 | scan rows 5–6 found a non-obvious config story |
+| 7b | Communication | required | 4 | always |
 | 8 | Rules | required | 55 | always |
 | 9 | Gotchas | conditional | 15 | question 3 answered, or the scan found a trap |
 | 9b | Planned, not yet built | conditional | 10 | greenfield branch only |
@@ -67,6 +68,12 @@ is what pushes a file past 200 lines.
 form wins, and the R12 arm the user selected. Key names only.
 *Never:* a configuration value, of any kind, secret or not.
 
+**7b — Communication.** Static rules R22 and R23: which language the user is
+addressed in, and the brainstorm/plan split. Four lines, near the top of the
+rules rather than buried — it governs every reply, so a reader who stops early
+must still have seen it.
+*Never:* tone or verbosity preferences that no one will check.
+
 **8 — Rules.** The selected static rules plus any project-specific rule the scan
 or the questions produced. One imperative line each, falsifiable, grouped under
 short sub-headings. Put hard constraints — the ones whose violation costs data or
@@ -96,6 +103,12 @@ lines.
 
 ## Formatting rules for the output
 
+- **The generated file is written in Vietnamese.** Headings, prose and rule lines
+  in Vietnamese; commands, paths, identifiers, package names and code always in
+  English. The rules in `static-rules.md` are held in canonical English — restate
+  them in Vietnamese when writing them into the output, and change nothing about
+  what they require. Two of the three reference `CLAUDE.md` files in this
+  plugin's corpus are already written this way.
 - Markdown headings and bullets, no dense paragraphs — structure is what makes
   the file scannable.
 - One rule per line, imperative mood, present tense.
