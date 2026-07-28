@@ -87,6 +87,10 @@ Your final message IS this report, in this shape, every section present:
 ### Build
 PASS / FAIL — <diagnostics on FAIL: code · message · file:line>
 
+### Environment
+<on `RED — environment` only: the blocking message verbatim, and the command
+that produced it. Otherwise `None.`>
+
 ### Results
 | Test project | Passed | Failed | Skipped |
 |---|---|---|---|
@@ -102,6 +106,11 @@ PASS / FAIL — <diagnostics on FAIL: code · message · file:line>
 <one of: GREEN · RED — tests failed · RED — build failed · RED — environment ·
 RED — timed out · tier absent — nothing run> — <one sentence>
 ```
+
+On `RED — environment`, the *Environment* section carries the blocking message
+**verbatim** — a file lock, an access-denied on `obj/` or `bin/`, a policy that
+refused to load a built assembly. Paraphrasing it costs the flow the only
+string it can classify the failure from.
 
 The Verdict words are a closed set — the flow branches on them, so an improvised
 phrase is a branch nobody wrote.

@@ -15,8 +15,9 @@ description: >-
 ## Overview
 
 This skill is an **orchestration graph, not a rubric.** It runs a change through
-two loops — tests, then review — using fresh-context subagents, and it decides
-only *what runs, in what order, who runs it, and when to stop*.
+two loops — tests, then review, with a third named unit for when the tiers
+produce no signal — using fresh-context subagents, and it decides only *what
+runs, in what order, who runs it, and when to stop*.
 
 **It teaches nothing.** Process belongs to Superpowers, which this flow **calls
 and never copies**. What each lens checks belongs to the four rubric skills; what
@@ -76,8 +77,9 @@ fixing".
 ## PHASE 0 — Preflight, and STOP on any failure
 
 Four checks, in order. Each failure is a **STOP**: report what is missing, give
-the exact remedy, and wait for the user. Do not degrade, do not work around, do
-not install anything.
+the exact remedy, and wait for the user. Do not degrade, do not work around,
+and install nothing to get past a failed check here. Standing up a test
+environment later, under NO-SIGNAL, is a different act with its own rules.
 
 **1 — Superpowers is present and enabled.** Verify by **actually loading a
 Superpowers skill**: invoke the Skill tool on
@@ -170,6 +172,11 @@ below into another skill.*
 Run **TEST-LOOP** to green, then **REVIEW-LOOP**. Every fix inside REVIEW-LOOP
 re-enters TEST-LOOP before the next review round.
 
+**Halting means the loop stops. It never means the deliverable stops.** Every
+stop condition below — a cap, a timeout, an unanswered question — ends a loop
+and still owes the final report. Fusing those two decisions together is what
+once let a blocked test tier consume a whole run and produce nothing.
+
 ### TEST-LOOP
 
 **Spawn both testers in parallel**, in one message, each with the spawn contract:
@@ -186,11 +193,11 @@ Each tester ends on one of six verdict strings. Branch on them:
 | Verdict | Do this |
 |---|---|
 | `GREEN` | This tier is done |
-| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Carry it into the final report under *Not run*. Never scaffold a tier |
+| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Enter **NO-SIGNAL**, then carry the tier into the final report under *Not run* |
 | `RED — tests failed` | Fix and rerun — see who fixes, below |
 | `RED — build failed` | Fix the build; no test result exists to interpret yet |
-| `RED — environment` | **Halt immediately and surface it to the user. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix and another round fails identically. On an artifact lock specifically, re-run the pair **serially** — unit first, then integration — once, and note the serialization in the report before halting |
-| `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt |
+| `RED — environment` | **Enter NO-SIGNAL. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
+| `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt the loop — **the report is still owed.** This does not enter NO-SIGNAL: unlike a blocked or absent tier, a timeout can be the code's own fault |
 
 **Who fixes:** embedded mode, the calling flow's implementer. Standalone mode,
 **nobody** — report the failures and stop; fixing is offered after the report,
@@ -200,9 +207,78 @@ never before.
 tests, what changed between rounds, how many rounds ran — and ask the user. Never
 a sixth, and never relax the green bar to escape the cap.
 
+### NO-SIGNAL
+
+Entered when a tester returns `RED — environment` or `tier absent — nothing
+run`. Both mean one thing — **no evidence about the code under review, and
+nothing in the code to fix** — so from here the flow treats them identically.
+Splitting them is what let one of them deliver a report and the other deliver
+nothing.
+
+> **NO-SIGNAL may end in a question. It may never end in nothing delivered.**
+> Whether repair succeeds, fails, or waits on an answer, REVIEW-LOOP still runs
+> and the report is still produced. The lenses never depended on the tiers.
+
+**1 — State it so the user can act on it.** Name what is missing and why, in
+words that support a decision. A verdict string and an error code are a
+symptom, not a diagnosis. A user who cannot tell what is being asked does not
+answer, and an unanswered question is exactly how a run ends with nothing.
+
+**2 — Measure before offering. Numbers, not adjectives.**
+
+| Entry | Measure |
+|---|---|
+| `RED — environment` | What is blocking, taken from the tester's *Environment* section; whether it is repairable here; which rung of the table below it falls on |
+| `tier absent — nothing run` | How many types in scope have no test, which tiers exist versus are empty, and whether the missing tier needs infrastructure stood up — that last one changes the size of the job by an order of magnitude |
+
+"This would be a large job" is unusable. "Module X: 14 types, 0 tests" is a
+decision input.
+
+**3 — Repair, at most twice.** One question classifies every action: **does it
+acquire something over the network?**
+
+| Do it | Ask first | Never |
+|---|---|---|
+| Start containers whose images are already local | **Anything acquired over the network** — a missing package, an image not yet pulled | Anything irreversible on the user's machine |
+| Re-run the pair **serially** — unit first, then integration — on an artifact lock, and note the serialization | Install software on the machine | Anything needing administrator rights |
+| Re-run a diagnostic command, read configuration — never a test suite; the tiers are re-run only by re-spawning the testers | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
+| | | Edit a test to dodge a failure — the testers' ban, and it does not loosen because the coordinator is the one holding the pen |
+
+**Two attempts, then explain and ask.** One attempt is one repair pass
+followed by one re-spawn of the testers, however many individual actions
+that pass contained — the cap governs the reruns, not the actions inside
+them. Every other loop here is capped; an uncapped repair loop spends a
+session invisibly. An ordinary build restoring its own packages is building,
+not repairing, and this table does not govern it — a build that **fails
+because acquisition failed** is what enters here.
+
+**4 — Offer options built from the measurement. Never a bare yes/no.** The list
+is generated from what step 2 counted; it is not written down here, because a
+fixed menu cannot know what was measured. It always includes *do nothing,
+record it in the report*, and it includes a partial option whenever the
+measurement decomposes into parts — one module rather than four, the unit tier
+rather than both. Yes/no forces a user who has an hour to choose between
+nothing and everything.
+
+If the user accepts writing tests, **this session writes them** — the same
+mechanism as the end-of-report offer, on the same authority: the user's answer.
+What a test looks like belongs to `dotnet-testing`; none of it is taught here.
+**This offer is standalone only.** Embedded under `dotnet-feature-flow`, tests
+are written as the feature is built and the calling flow owns that. The repair
+ladder above applies in both modes.
+
+**If NO-SIGNAL changed the tree — tests written, a project file edited — re-enter
+TEST-LOOP and recompute the diff before REVIEW-LOOP.** Reviewers handed a diff
+that predates the tests just written are grading something nobody will ship.
+
+**Then continue to REVIEW-LOOP regardless.** Every tier that produced no signal
+goes into *Not run* with what was attempted and what the user chose.
+
 ### REVIEW-LOOP
 
-Entered **only with both tiers green** (or absent and recorded).
+Entered **only with both tiers green** — or with a tier that produced no signal,
+once NO-SIGNAL has recorded it. A blocked tier is not a failing tier, and the
+lenses never depended on either.
 
 **Spawn all four reviewers in parallel**, in one message, with the same spawn
 contract:
@@ -287,8 +363,11 @@ impression of one.
 
 ## The final report
 
-**Always produced** — in both modes, when everything passed, and when a cap
-halted the run. Every section appears; write `None.` when empty.
+**Always produced** — in both modes, when everything passed, when a cap halted
+the run, and when NO-SIGNAL ended in an unanswered question. **There is no path through the shared block that ends without the report.**
+PHASE 0 and the pre-build gate stop *before* the block and hand back diagnostics
+instead; everything after them owes this report. Every section appears; write
+`None.` when empty.
 
 ```markdown
 ## Review: <scope label>
@@ -309,7 +388,10 @@ Mode: standalone / embedded in dotnet-feature-flow · Base: <ref>
 <counts exactly as the testers reported them, with their verdict strings. A tier
 that reported `tier absent — nothing run` still gets its row here, with the
 verdict spelled out and dashes in the counts — it is never omitted, never merged
-into another row, and never written as green. It appears again under *Not run*.>
+into another row, and never written as green. It appears again under *Not run*.
+A tier that reported `RED — environment` is handled identically — its row
+carries the verdict and dashes, and it appears again under *Not run* with what
+NO-SIGNAL attempted.>
 
 ### CONFIRMED findings
 <per finding: lens · severity · file:line · fixed (what changed) or outstanding (why)>
@@ -325,7 +407,8 @@ in the reviewer's own wording>
 <lenses, tiers, layers, areas or checks that did not run, and why>
 
 ### Run
-TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · <cap hit? say so> · <commands the flow ran>
+TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · NO-SIGNAL <what was attempted, what
+the user chose, or "not entered"> · <cap hit? say so> · <commands the flow ran>
 ```
 
 Three rules for the report:
@@ -384,8 +467,9 @@ never copies. Executing cleanup candidates belongs to `/simplify`.
 | A rubric skill or an agent name is missing from the roster | STOP — the install is stale or partial. Name what is absent, give the update-and-restart remedy |
 | The pre-build gate fails | Report the diagnostics, spawn nobody, hand it back |
 | The gate passes but a tester reports `RED — build failed` | A test project does not compile and sits outside what the solution build covered. Treat it as a build failure for that tier, not a test failure |
-| The repository has no test projects at all | Both tiers absent: record it, report it under *Not run*, go straight to REVIEW-LOOP. Never scaffold a tier |
-| A tester reports `RED — environment` | Halt and surface it. Does not consume a round; on an artifact lock, re-run the pair serially once and note it |
+| The repository has no test projects at all | Both tiers absent. NO-SIGNAL: measure the gap, offer options built from the count, then REVIEW-LOOP either way |
+| A tester reports `RED — environment` | NO-SIGNAL. Does not consume a round, and never halts the run — the report is owed regardless |
+| A repair inside NO-SIGNAL would download something | Ask first. That single question — does this acquire over the network — is the whole classifier |
 | A reviewer's CRITICAL cannot be reproduced at its `file:line` | PLAUSIBLE. Report it with the reason; do not fix and do not delete |
 | A reviewer returns a finding with no `file:line` | PLAUSIBLE by definition — there is nothing to verify against |
 | Two lenses report the same defect | Verify once, fix once, report once naming both lenses. Never carry two severities for one shape |
