@@ -8,6 +8,59 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.24] — `dotnet-review-flow`: the NO-SIGNAL branch, 2026-07-28
+
+A real run of `/dotnet-review` against an external repository produced no
+deliverable at all: both testers hit `RED — environment` (Windows Smart App
+Control blocked the test host from loading locally built assemblies) and the
+flow halted before the four review lenses — which never depended on the test
+tiers — ever spawned. This bugfix closes that gap. Built outside the three-way
+drafting loop, waived by the user for this session.
+
+### Fixed
+
+- **`skills/dotnet-review-flow/SKILL.md` gains a NO-SIGNAL section**, a third
+  named unit between TEST-LOOP and REVIEW-LOOP. It unifies two situations the
+  skill used to treat differently — a tester returning `RED — environment`,
+  and a tier that is absent — because both mean the same thing to a reader:
+  **no evidence about the code under review, and nothing in the code to
+  fix.** Only the absent-tier case used to still deliver a report; the
+  environment case halted before the report was ever produced. The invariant
+  now stated at the top of the section: **NO-SIGNAL may end in a question, it
+  may never end in nothing delivered** — REVIEW-LOOP runs and the report is
+  produced either way. Four steps: state the gap in words the user can act
+  on; measure it in numbers (counts of untested types, which tiers are empty,
+  whether the missing tier needs infrastructure stood up); repair under a
+  capped ladder; then offer options built from the measurement, never a bare
+  yes/no.
+- **The repair ladder's single classifier: does the action acquire something
+  over the network?** If yes, ask the user first; anything irreversible,
+  needing administrator rights, or governed by policy the user does not own
+  is never done unasked. Capped at two attempts, where one attempt is one
+  repair pass plus one re-spawn of the testers — the cap governs the reruns,
+  not the individual actions inside a pass.
+- **`Never scaffold a tier` deleted at both of its sites** (the `tier absent`
+  verdict row and the Decision Guide's "no test projects at all" row) — a
+  user ruling of 2026-07-28, replaced by measure-then-offer: a fabricated test
+  project would make the flow's next round measure something it invented.
+- **PHASE 0's "install nothing" narrowed to the preflight it was written
+  for**, so it no longer contradicts the repair ladder. Standing up a test
+  environment later, under NO-SIGNAL, is a different act with its own rules.
+- **Two report-rule changes, both approved verbatim by the user beforehand.**
+  The "Always produced" clause now names the NO-SIGNAL exit explicitly and
+  carries the closing sentence "There is no path through this flow that ends
+  without the report." The `Run` line now records what NO-SIGNAL attempted
+  and what the user chose. No new report section — a deferred choice goes
+  into the existing *Not run* section with its reason.
+- **`agents/dotnet-unit-tester.md` gains an `### Environment` section**, a
+  reporting slot only, so the unit tier has somewhere to carry a blocking
+  message verbatim — mirroring the integration tester, and matching the tier
+  that actually failed in the originating incident. **Neither tester gained
+  any power to repair anything**; every prohibition on repairing, writing
+  files, or managing containers by hand is unchanged.
+
+---
+
 ## [0.3.23] — `claude-md-builder` speaks Vietnamese, 2026-07-28
 
 Language is now settled at both levels, on user direction.
