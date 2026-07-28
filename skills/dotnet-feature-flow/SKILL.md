@@ -217,7 +217,7 @@ Then, from that skill and in its order:
 
 | Owned by `dotnet-review-flow` | Owned by this flow |
 |---|---|
-| The two loops, their order, their stop conditions | The repository, the branch, the worktree |
+| The three named units, their order, their stop conditions | The repository, the branch, the worktree |
 | The round caps and what happens when one halts | Being the implementer that applies every fix |
 | The spawn contract's shape and the agent roster | Executing diff preparation and the pre-build gate |
 | CONFIRMED versus PLAUSIBLE verification | Carrying the block's report into the closing summary |
@@ -238,6 +238,12 @@ belongs to the sibling, and never review or test anything yourself.
 **When a cap halts the block, that halt is this flow's halt.** Bring the sibling's
 status summary to the user and wait. Never continue to PHASE 6 with a red suite or
 an outstanding CONFIRMED finding on the strength of "close enough".
+
+**A block that returns with a tier under *Not run* is not a green suite.** The
+sibling's NO-SIGNAL may complete the block with a tier that was blocked or
+absent, and that is neither a cap nor a red suite — nothing stops you
+automatically. Stop anyway: name the tier, say plainly that no test evidence
+exists for what was just built, and ask before PHASE 6.
 
 **Never fork the loops into this body.** One definition, invoked twice; a copy
 diverges on the first edit and nobody notices which one the run used.
@@ -353,6 +359,7 @@ plan names them, and the implementers and agents load them.
 | A CONFIRMED finding needs fixing | Match PHASE 3's route: TDD route fixes here, subagent route dispatches a fixer |
 | The urge to run a test or read the diff for a verdict | Out of bounds — that judgement is the fleet's. Fix what it CONFIRMS |
 | A cap halts the shared block | Its halt is this flow's halt. Carry the status summary to the user and wait; never proceed to PHASE 6 |
+| The shared block returns with a tier under *Not run* | Not a cap and not a red suite, so nothing halts you. Stop and ask anyway — committing a feature no test ever covered is the outcome GATE 2 exists to prevent |
 | Only MEDIUM and INFO findings remain | Proceed to PHASE 6 and carry them into the block report. They are never chased |
 | A CONFIRMED HIGH is real but outside this feature's scope | Ask the user; never silently demote it to clear the gate |
 | `finishing-a-development-branch` offers its integration options | That is GATE 2. Present them, wait, and let the user choose — including any force push |

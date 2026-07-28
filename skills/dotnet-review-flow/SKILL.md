@@ -171,6 +171,11 @@ below into another skill.*
 Run **TEST-LOOP** to green, then **REVIEW-LOOP**. Every fix inside REVIEW-LOOP
 re-enters TEST-LOOP before the next review round.
 
+**Halting means the loop stops. It never means the deliverable stops.** Every
+stop condition below — a cap, a timeout, an unanswered question — ends a loop
+and still owes the final report. Fusing those two decisions together is what
+once let a blocked test tier consume a whole run and produce nothing.
+
 ### TEST-LOOP
 
 **Spawn both testers in parallel**, in one message, each with the spawn contract:
@@ -191,7 +196,7 @@ Each tester ends on one of six verdict strings. Branch on them:
 | `RED — tests failed` | Fix and rerun — see who fixes, below |
 | `RED — build failed` | Fix the build; no test result exists to interpret yet |
 | `RED — environment` | **Enter NO-SIGNAL. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
-| `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt |
+| `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt the loop — **the report is still owed.** This does not enter NO-SIGNAL: unlike a blocked or absent tier, a timeout can be the code's own fault |
 
 **Who fixes:** embedded mode, the calling flow's implementer. Standalone mode,
 **nobody** — report the failures and stop; fixing is offered after the report,
@@ -235,15 +240,16 @@ acquire something over the network?**
 |---|---|---|
 | Start containers whose images are already local | **Anything acquired over the network** — a missing package, an image not yet pulled | Anything irreversible on the user's machine |
 | Re-run the pair **serially** — unit first, then integration — on an artifact lock, and note the serialization | Install software on the machine | Anything needing administrator rights |
-| Re-run a command, read configuration | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
+| Re-run a diagnostic command, read configuration — never a test suite; the tiers are re-run only by re-spawning the testers | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
 | | | Edit a test to dodge a failure — the testers' ban, and it does not loosen because the coordinator is the one holding the pen |
 
-**Two attempts, then explain and ask.** One attempt is one repair pass followed
-by one re-spawn of the testers, however many individual actions that pass
-contained — the cap governs the reruns, not the actions inside them. Every other
-loop here is capped; an uncapped repair loop spends a session invisibly. An ordinary build restoring
-its own packages is building, not repairing, and this table does not govern it
-— a build that **fails because acquisition failed** is what enters here.
+**Two attempts, then explain and ask.** One attempt is one repair pass
+followed by one re-spawn of the testers, however many individual actions
+that pass contained — the cap governs the reruns, not the actions inside
+them. Every other loop here is capped; an uncapped repair loop spends a
+session invisibly. An ordinary build restoring its own packages is building,
+not repairing, and this table does not govern it — a build that **fails
+because acquisition failed** is what enters here.
 
 **4 — Offer options built from the measurement. Never a bare yes/no.** The list
 is generated from what step 2 counted; it is not written down here, because a
@@ -259,6 +265,10 @@ What a test looks like belongs to `dotnet-testing`; none of it is taught here.
 **This offer is standalone only.** Embedded under `dotnet-feature-flow`, tests
 are written as the feature is built and the calling flow owns that. The repair
 ladder above applies in both modes.
+
+**If NO-SIGNAL changed the tree — tests written, a project file edited — re-enter
+TEST-LOOP and recompute the diff before REVIEW-LOOP.** Reviewers handed a diff
+that predates the tests just written are grading something nobody will ship.
 
 **Then continue to REVIEW-LOOP regardless.** Every tier that produced no signal
 goes into *Not run* with what was attempted and what the user chose.
@@ -353,8 +363,9 @@ impression of one.
 ## The final report
 
 **Always produced** — in both modes, when everything passed, when a cap halted
-the run, and when NO-SIGNAL ended in an unanswered question. **There is no path
-through this flow that ends without the report.** Every section appears; write
+the run, and when NO-SIGNAL ended in an unanswered question. **There is no path through the shared block that ends without the report.**
+PHASE 0 and the pre-build gate stop *before* the block and hand back diagnostics
+instead; everything after them owes this report. Every section appears; write
 `None.` when empty.
 
 ```markdown
@@ -376,7 +387,10 @@ Mode: standalone / embedded in dotnet-feature-flow · Base: <ref>
 <counts exactly as the testers reported them, with their verdict strings. A tier
 that reported `tier absent — nothing run` still gets its row here, with the
 verdict spelled out and dashes in the counts — it is never omitted, never merged
-into another row, and never written as green. It appears again under *Not run*.>
+into another row, and never written as green. It appears again under *Not run*.
+A tier that reported `RED — environment` is handled identically — its row
+carries the verdict and dashes, and it appears again under *Not run* with what
+NO-SIGNAL attempted.>
 
 ### CONFIRMED findings
 <per finding: lens · severity · file:line · fixed (what changed) or outstanding (why)>
