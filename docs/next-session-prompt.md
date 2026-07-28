@@ -146,9 +146,12 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
 - [D, 2026-07-29] **`RED — tests failed` in standalone mode never reaches the
   review lenses.** Nobody fixes in standalone, so the tiers never go green and
   REVIEW-LOOP's entry condition is never met — the same shape as the defect
-  0.3.25 just closed, in a case that was explicitly out of its scope. Detail:
-  final-review findings, `.superpowers/sdd/2026-07-28-review-flow-no-signal/`.
-  Unblocks: a `dotnet-review-flow`-owning session.
+  0.3.25 just closed, in a case that was explicitly out of its scope. Concretely:
+  standalone mode fixes nothing, so a failing tier never goes green, REVIEW-LOOP's
+  entry condition is never met, and the run reports four empty lens verdicts —
+  even though the lenses never needed the tiers. Raised by the final whole-branch
+  review of 0.3.25 and deliberately not fixed there. Unblocks: a
+  `dotnet-review-flow`-owning session.
 
 ## Standing rules (unchanged, summarized)
 
