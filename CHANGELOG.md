@@ -8,6 +8,131 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.20] — Review rubric #4: `dotnet-performance-review`, 2026-07-28
+
+### Added
+- **`skills/dotnet-performance-review/`** — the fourth and last review rubric
+  (SKILL.md 499 lines; `references/performance-checks.md` 510). Five areas
+  ordered by where the money is: query shape and round trips, blocking and
+  async cost, cache and staleness cost, lock and contention,
+  search-infrastructure cost. Body checks 1.1–5.4 as table rows; references
+  continues each area's numbering (1.7–1.11, 2.5–2.10, 3.6–3.10, 4.6–4.10,
+  5.5–5.9) plus a round-trip comparison table ("a floor, not a budget") and a
+  12-row `Refused — and why` table (rate limiting with the inbound route from
+  `dotnet-security-review` named and body 1.3 as the one house-grounded
+  mitigation; Hangfire/background jobs; benchmark/profiling methodology;
+  HybridCache version-neutral; compiled queries + query-construction; Span/
+  pooling/ValueTask; TimeProvider; sealing; DbContext-direct; ClockSkew-Zero;
+  pool-sizing/context-pooling; projection-safety routed to its owner).
+- **Honesty rule, verbatim in every report** (Principle 1 = template
+  blockquote, word-identical, checked at the final pass): *static inspection
+  of code shape, not a measurement … it cannot tell you which of them your
+  traffic actually reaches*. No finding may carry a number not read out of the
+  code — countable (round trips, hold times, page bounds, configured seconds)
+  vs not-countable (percentages, milliseconds, allocation sizes) stated as a
+  two-list rule.
+- **Severity calibration** citing rubric #1's ladder, never restating: HIGH is
+  the home rung ("fails predictably under load or on a second request");
+  CRITICAL = stopped-not-sluggish (thread-pool exhaustion, unbounded fetch,
+  transaction-before-lock — with the stated reconciliation that the lock's own
+  queue is not a P1-style precondition); degrade-to-correct de-escalates and
+  says so; one cross-area rule (unbounded growth = HIGH, code-bounded =
+  MEDIUM) replacing per-row qualifiers.
+- **Grade-once enforced structurally**: fifteen graded-by rows carry the
+  owning `dotnet-code-review` check in the severity cell and no severity of
+  their own (deepening 1.2, 1.3, 3.1, 3.2, 3.3, 3.4, 3.6, 3.8, 3.10, 4.7,
+  4.8; 2.10 is the one split-cell row — HTTP arm graded by 4.8,
+  capability-singleton arm HIGH here). The routing table names the eleven
+  deepened checks and is the single authority (Principle 6 no longer
+  duplicates the list — the assembly-time D4 lesson: enumerate a cross-skill
+  list exactly once and name the authority).
+- **Suppression discipline**: per-area *Not a finding* blocks (sync validator
+  predicates; the four connection values; RetryTime; the outbound-spanning
+  lock "correct, a throughput ceiling"; terminateAfter's permitted default;
+  first-resolve; eager lock-factory connect; separate multiplexers; the
+  non-async dispatch) + report-level `Suppressions applied` (not optional when
+  an area ran) + `Area coverage`.
+- **Router alignment (same commit)**: the `dotnet-performance-review`
+  reservation row DELETED from *Not yet covered* (0.3.18 planted it for this
+  session); a base-map review row added; one disambiguation row added
+  ("this is slow"/performance cost — the shape's owner vs grading in review,
+  the same owner-vs-review split as the architecture and security rows).
+
+### Rulings (the loop worked — the densest catch series of any session)
+- **Six grade-once violations caught before ship, none shipped**: A's 1.7
+  (tracking = #1's 1.2) and 2.5 (async void = #1's 3.3); 4.6 (nested
+  single-key locks = #1's 3.8 — missed by BOTH authors AND the arbiter,
+  caught by the coordinator's full-title-list sweep); 4.8 (pre-lock-read key
+  = #1's 3.6, the arbiter's own re-sweep); body 4.1 and 4.3/4.4/4.5 seams vs
+  #1's 3.6/3.7 (final pass, fixed with zero-line disambiguation clauses).
+  **Root cause systematic and recorded: the brief handed authors seven check
+  numbers instead of the sibling's complete check-title list. Durable fix:
+  future rubric/lane briefs carry the full sibling check-title inventory in
+  the context package.**
+- **Verified-false claims cut before ship**: A's P1 CRITICAL example fused
+  two distributed-lock shapes (outbound-span is shipped-*correct*;
+  pool-pressure belongs to transaction-before-lock); B's 5.2 graded
+  "unnecessary `terminateAfter: null`" — the shipped sentence constrains
+  keeping the default, it does not oblige it (S13b permission-into-obligation
+  drift, mirror image); B's `AbortOnConnectFail = true` library-default claim
+  (API recall, S16 precedent) — the check survives on the shipped consequence
+  sentence; B's disclaimer third sentence bounding provenance where the
+  precedent bounds capability; A's "get shape = one round trip" comparison
+  row (no shipped sentence numbers it — dropped, compositions marked as
+  compositions).
+- **Citation corrections**: A cited permission-internals §7 for the §4
+  *Implied permissions* rule; A declared the ToPagedList overload sentence
+  nonexistent (it lives at api-surface request-response-dtos.md:328); B's
+  grade-once list was short by 3.10; B's routing list short by 1.2; B's 1.3
+  guide row used its own unshipped title. The arbiter's "4.4 does not exist"
+  alarm was itself refuted (layer-4 body checks are SKILL.md table rows;
+  references only carries 4.10+).
+- **Description**: 94 words; `permission cache internals — auth-and-security`
+  added on the roster rule set this session (*a check target or a suppression
+  creates the Not-for obligation; routes and refusals do not*), paid for by
+  dropping the `a dead Include` noun; `automapper-mapping` stays out (its own
+  description routes ProjectTo to ef-core-data-access — S15 dangle rule);
+  `mediatr-messaging` is a routing-table destination, no roster entry.
+- **Form rulings**: the novel-form rule ("a novel form ships only when the
+  sibling form demonstrably fails at something") — B's numbered suppression
+  block rejected under it, content kept unnumbered; FAIL lives in the
+  template + its own paragraph (architecture precedent), not as findings rule
+  5; body 1.3 hosts the DoS landing (half-sentence naming the security
+  inbound route).
+- **Budget**: assembled body measured 515 by actual `wc -l` (the arbiter's
+  ~451 projection was once again an estimate — the 0.3.19 defect class, this
+  time caught pre-ship). Fixed per the adopted priority: Principle 6
+  de-duplication (−2), five redundant Decision Guide rows deleted (−5),
+  prose rewrap at wider columns, content untouched (−9). Final 499/500 —
+  margin one line; the next addition to this body must be paid for by a cut.
+- **Final consistency pass**: FAIL→PASS. D1 references "How to read a check"
+  clause widened for the one split-cell row; D2/D3 zero-line seam cites in
+  4.1/4.5; D4 duplicate-enumeration fix; blockquote-vs-Principle-1
+  word-identical (the 0.3.18 D1 class did NOT recur); 15/15 graded-by
+  numbers+names verified; teasers ↔ references reconciled; sanitization
+  clean.
+
+### Process notes
+- Coordinator committed the S16-class verbatim violation TWICE (P3 and P4
+  forwarded as compressed indexes); the arbiter refused to rule on summaries
+  both times and the full texts were re-sent — the safeguard held from the
+  reviewer side. Lesson: forwarding VERBATIM means the draft prose itself, in
+  the message body, every round, however long.
+- Banked, still unowned (unchanged from 0.3.18/0.3.19 logs): ClockSkew-Zero
+  clock-drift (refused a second time, as predicted); Hangfire/background
+  scheduling (waits for `background-worker`); the S11 CompileQueryAsync
+  pagination extension (R7, user must name the file; user re-confirmed
+  banked this session). Area 4 ships with no BAD/GOOD pair — no labelled
+  lock anti-example exists in any bank (R8; recorded beside the S17
+  seventh-anti-pattern gap). Two shipped shapes recorded as
+  never-labellable-without-the-user: the outbound-spanning lock (owner says
+  "Correct") and the semaphore registry window (owner: "not a defect to fix
+  in passing").
+- **Lane D is UNLOCKED**: all four review rubrics have shipped
+  (0.3.15 / 0.3.17 / 0.3.18 / 0.3.20).
+
+---
+
 ## [0.3.19] — Rubric session #3 budget fix, 2026-07-28
 
 ### Changed

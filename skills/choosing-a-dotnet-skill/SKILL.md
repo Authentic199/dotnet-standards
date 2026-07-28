@@ -53,6 +53,7 @@ mapping → failure → text → capabilities → tests → review.
 | Reviewing changed code: review depth and blast radius, finding severity, the review report, cleanup candidates | `dotnet-code-review` |
 | Reviewing a solution's architecture: dependency direction and project references, layer and namespace leaks, placement conformance, the composition root | `dotnet-architecture-review` |
 | Reviewing security posture: committed secrets and key handling, missing authorization gates, injection and mass assignment, data exposure through DTOs, logs and error responses | `dotnet-security-review` |
+| Reviewing performance: round-trip counts and N+1, page-size and index coverage, blocking calls, cache, lock and search cost | `dotnet-performance-review` |
 
 ## When two skills both look right
 
@@ -75,6 +76,7 @@ alone picks wrong. Match the question, not the word.
 | secrets / tokens / authorization gates | deciding what the rule is — schemes, grants, the current principal, auth settings — `auth-and-security`; checking whether what is already there is safe — `dotnet-security-review` |
 | a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
+| "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |
 
 ## Not yet covered
 
@@ -94,7 +96,6 @@ about that skill's area, not about this one.
 | Domain modelling: aggregates, value objects, domain events, invariants | — |
 | HTTP calls to another service: retry, timeout, circuit breaker, client setup | — |
 | Observability: logging, tracing, health checks | `observability` |
-| Performance review: query cost, N+1, allocation, blocking calls, missing indexes | `dotnet-performance-review` |
 | Repository bootstrapping: starting a new solution from nothing — once the projects exist, placement belongs to `facade-module-architecture` | `project-scaffolding` |
 
 ## When the work is being planned, not yet written
