@@ -33,7 +33,8 @@ Rows marked *not yet covered* mean no skill here owns that area yet — see
 ## Base map — one area, one skill
 
 Ordered by build sequence: placement → behaviour → messaging → data → HTTP →
-mapping → failure → text → capabilities → tests → review → flows.
+mapping → failure → text → capabilities → tests → review → flows → project
+memory.
 
 | The question in hand | Load |
 |---|---|
@@ -56,6 +57,7 @@ mapping → failure → text → capabilities → tests → review → flows.
 | Reviewing performance: round-trip counts and N+1, page-size and index coverage, blocking calls, cache, lock and search cost | `dotnet-performance-review` |
 | Running the test-and-review fleet — parallel tester and reviewer subagents with verified findings — over an existing diff or branch | `dotnet-review-flow` |
 | Taking one .NET feature end to end as a single flow: brainstorm, plan, human gates, implement, test loop, review loop, commit | `dotnet-feature-flow` |
+| Writing or refreshing the repository's own `CLAUDE.md`: the commands, layout facts and hard rules a session must hold, and trimming that file back under 200 lines | `claude-md-builder` |
 
 ## When two skills both look right
 
@@ -76,6 +78,7 @@ alone picks wrong. Match the question, not the word.
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
 | `Repository<T>()` / "repository" | through the data-access wrapper — `ef-core-data-access`; through the search wrapper — `elasticsearch-search`; a brand-new source repository to bootstrap — *not yet covered* |
 | secrets / tokens / authorization gates | deciding what the rule is — schemes, grants, the current principal, auth settings — `auth-and-security`; checking whether what is already there is safe — `dotnet-security-review` |
+| a convention or a rule | deciding what it should say — the owning knowledge skill in the base map; recording that it governs *this* repository, in its `CLAUDE.md` — `claude-md-builder`; checking whether the code follows it — the four review rubrics |
 | a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 | "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |

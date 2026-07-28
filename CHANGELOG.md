@@ -8,6 +8,96 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.23] — `claude-md-builder` speaks Vietnamese, 2026-07-28
+
+Language is now settled at both levels, on user direction.
+
+- **New rule group in `static-rules.md` — Communication and language**, ungated,
+  shipping in every generated file. **R22:** the user is addressed in Vietnamese
+  — chat, questions, summaries and prose documents; code, identifiers, commands
+  and paths stay English. **R23:** with Superpowers, brainstorming output is
+  Vietnamese and the plan stays English — a plan is an artifact other agents
+  execute, so it stays in the language of the tooling and the codebase. R23 is
+  self-gating: it states its own condition, so no scan detection is needed.
+- **New template section 7b — Communication**, required, 4 lines, placed near
+  the top of the rules so a reader who stops early has still seen it.
+- **The generated `CLAUDE.md` stays in English** (user ruling), and the static
+  rules ship in their canonical English form. The split is the one R23 already
+  draws: the conversation is Vietnamese, the artifact agents execute against
+  stays in the language of the codebase.
+- **The skill itself converses in Vietnamese**, added to its hard constraints.
+
+---
+
+## [0.3.22] — `claude-md-builder`, the tier-3 generator, 2026-07-28
+
+The plugin gains a skill that writes the **per-project `CLAUDE.md`** — tier 3 in
+the README's three-tier model. Built to a user-directed phased spec (research →
+approved static rules → approved discovery design → build → dry run), **not**
+through the three-way drafting loop: the user ruled the loop off for this
+session.
+
+**Shipped:**
+
+- **`skills/claude-md-builder/`** — `SKILL.md` plus four `references/` files:
+  `scan-map.md` (13-row scan table, three user questions), `static-rules.md`
+  (the approved rule set, each gated by an `Applies when` condition),
+  `template.md` (section skeleton, ordering, per-section line budgets summing to
+  165 with a 200 ceiling), `checklist.md` (anti-pattern list in cutting order).
+- **Router alignment, same commit** — one base-map row (`claude-md-builder`),
+  one shared-token row (*a convention or a rule*), and the build-sequence line
+  extended with *project memory*.
+
+**Rulings recorded:**
+
+- **18 static rules approved, 3 rejected.** Rejected: dependency-direction and
+  marker-interface DI registration (user: out of scope for tier 3), and the
+  config-precedence rule. Every candidate was checked against a live
+  StyleCop + SonarAnalyzer + Roslynator configuration first — formatting, naming,
+  using-ordering, XML-doc and nullable rules were excluded by construction,
+  because a rule an analyzer enforces must not spend session context.
+- **Blocking-async (R11) ships despite Sonar `S4462` covering it** (user ruling).
+  Evidence: `TreatWarningsAsErrors=false` in the corpus, and three surviving
+  violation sites — an advisory analyzer did not stop them.
+- **`CancellationToken` (R6) is prescriptive, not descriptive.** The corpus is at
+  roughly 37% adoption (63 of 172 `Task`-returning controller methods); the rule
+  imposes the convention going forward. `CA2016` does not cover it — that rule
+  forwards an existing token and never asks for the parameter to exist.
+- **Committed credentials are not assumed to be leaks.** The user's repositories
+  are hosted in a private registry, so real values in tracked config can be
+  deliberate. R12 became a question with two opposite outcomes (R12a forbid /
+  R12b deliberate); R13 — never letting a secret reach a transcript, log or
+  commit message — is absolute in both arms.
+- **`/init` is not used and its output is not trusted** (user direction,
+  following HumanLayer over the official "run `/init`, then refine" advice). It
+  generates precisely the derivable content the trim step exists to remove.
+- **Test policy is always asked, never inferred.** Decisive evidence: a corpus
+  repository ships two fully-built test projects while its own `CLAUDE.md`
+  forbids writing tests.
+- **Static rules are conditional.** Each carries an `Applies when` gate, so a
+  repository without migrations receives no EF rules. This is what keeps two
+  generated files from converging on the same generic text.
+- **Greenfield branch** (user-raised gap, same session). A repository with no
+  business code yet has nothing to scan, so the skill takes documents the user
+  names — spec, design note, ERD, API contract — as a source, and only those.
+  The boundary is hard: *a document states intent; only the codebase states
+  fact.* Documents may produce the project's purpose, a domain glossary,
+  intended boundaries and agreed constraints; they may never produce a command,
+  a path, a framework or a package, and nothing from them may be phrased as
+  already existing. Document-derived lines carry a stripped-at-load HTML comment
+  naming their source, so the next update knows what to re-verify. A capped
+  10-line `Planned, not yet built` section holds the rest and is the one part of
+  the file with an expiry rule — surviving two updates unchanged makes it the
+  *historical archive* anti-pattern, and it is cut. The greenfield branch also
+  swaps PHASE 6's three probes, since build commands and migration projects do
+  not exist to be asked about.
+
+**Not done this session:** the dry run against the reference projects (user
+deferred it — the plugin ships first, feedback comes from real use on a
+consumer repository).
+
+---
+
 ## [0.3.21] — Process-integration layer v1 (Lane D), 2026-07-28
 
 The "Knowledge only" promise is deliberately broken, per the approved design
