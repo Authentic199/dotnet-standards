@@ -51,6 +51,7 @@ mapping → failure → text → capabilities → tests → review.
 | Full-text search: the search facade, documents, indexing, reindexing | `elasticsearch-search` |
 | Writing or changing tests: unit, integration, fixtures, test doubles | `dotnet-testing` |
 | Reviewing changed code: review depth and blast radius, finding severity, the review report, cleanup candidates | `dotnet-code-review` |
+| Reviewing a solution's architecture: dependency direction and project references, layer and namespace leaks, placement conformance, the composition root | `dotnet-architecture-review` |
 
 ## When two skills both look right
 
@@ -66,6 +67,7 @@ alone picks wrong. Match the question, not the word.
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature`; dispatching that envelope and the handler that receives it — `mediatr-messaging` |
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
 | a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
+| placement / project references / the composition root | deciding where a file, project or registration goes — `facade-module-architecture`; checking whether what is already there conforms — `dotnet-architecture-review` |
 | a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature`; dispatching it and its handler — `mediatr-messaging` |
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
 | `Repository<T>()` / "repository" | through the data-access wrapper — `ef-core-data-access`; through the search wrapper — `elasticsearch-search`; a brand-new source repository to bootstrap — *not yet covered* |

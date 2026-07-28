@@ -8,6 +8,81 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.17] — Rubric session #2 (solo), 2026-07-28
+
+### Added
+- **`dotnet-architecture-review`** — review rubric #2 of four, built under the
+  three-way process (verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency
+  pass PASS on the skill files + one defect in a coordinator edit fixed, one
+  router disambiguation arm added on arbiter recommendation). Checks conformance
+  to the ONE house architecture (`Core ← Infrastructure ← Migrators.<Provider> ←
+  Web`, `Facades/` × `Modules/`) against the shipped skill bodies — it cites,
+  never re-teaches (dotnet-code-review Principle 5 precedent). Body: Overview +
+  3 Core Principles + diff/sweep mode table + five audits with numbered checks
+  (1.1–1.6 project graph, 2.1–2.3 namespace leaks, 3.1–3.4 presentation
+  boundary, 4.1–4.9 facades/modules, 5.1–5.7 composition root) + severity
+  calibration + report template + Routing + Decision Guide (411 lines).
+  `references/conformance-checks.md` continues the numbering (1.7–1.13, 2.4–2.8,
+  4.10–4.15, 5.8–5.12; audit 3 has no tail) plus unnumbered comparison data
+  (reference matrix, 21-facade set, module tiers, settings homes, 13 config
+  topics) — 436 lines, H1 + TOC.
+- Session rulings recorded:
+  - **Severity ladder reused** from 0.3.15 (CRITICAL/HIGH/MEDIUM/INFO), cited
+    not restated, with architecture calibrations: boundary *crossed* = HIGH,
+    shape *inside* a correct boundary = MEDIUM, placement alone never CRITICAL;
+    inverted project reference and migrator-name/provider-key mismatch are the
+    two CRITICALs. Verdict = PASS/FAIL decided by CRITICAL+HIGH only ("PASS
+    (N drift findings)" replaces a proposed fifth vocabulary word).
+  - **Kit-anchor divergences (A02 `arch-check`), recorded explicitly:** Step 1's
+    four-baseline table collapsed to the one fixed architecture; Step 3's
+    standalone cycle audit DROPPED (project cycles cannot survive MSBuild in
+    the fixed chain — the real risk, a type-level Facades↔Modules cycle,
+    folds into the namespace-leak audit as check 2.1's mutual-naming
+    escalation); every Roslyn-MCP step replaced by a manual instruction (C01),
+    incl. the comment-out-the-reference → `dotnet build` → read-`CS0246`
+    dependency-graph substitute and a RUN-verified `grep -o … | sort | uniq -d`
+    duplicate-registration probe.
+  - **Banked check 5.8 claimed from `dotnet-code-review`** (per the 0.3.15
+    bank): ships here as check 4.9; rubric #1's 5.8 row slimmed to a pointer
+    (number kept, `Find:` kept, owner column = the legislating skill
+    `module-feature` — arbiter-corrected coordinator edit). Check 5.9 NOT
+    claimed (intra-type structure, stays with rubric #1). B's proposed
+    entity-base-response check cut as a duplicate of rubric #1's 2.7.
+  - **Six false-positive suppressions** shipped as "not a finding" blocks
+    (Web-using-Core, module-naming-module, business-shaped facade, big
+    `Facades/Common/`, module-without-Startup, existing `Events/` folders) +
+    three more in the catalogue (unwired `stylecop.json`, `using MassTransit;`
+    in Core, analyzer `Update=` in Core.csproj) — each traced to a shipped
+    sentence; the kit's Clean/VSA/Modular-Monolith baselines generate exactly
+    these false positives.
+  - **Refused for lack of a shipped owner** (provenance law): facade-hosting-a-
+    background-worker (banked for `background-worker`); namespace-must-match-
+    folder (no shipped sentence — candidate rule for a future fma session);
+    `Guid.NewGuid()` on entity keys (verified ORPHAN: `core-contracts.md:40`
+    states it, no rubric checks it — banked for rubric #1's data-access area).
+  - Shared-blind-spot catches this session: both authors printed the fenced
+    chain and severity laws correctly (verified), but Author A miscited three
+    body check numbers and Author B one — all caught by cross-reference
+    verification; body 4.9's own citation erratum (*When a service grows* →
+    *When a service outgrows one file*) was a coordinator catch.
+- **Router alignment (same commit, alignment rule 0.3.10):** base-map row for
+  `dotnet-architecture-review` (review group; order-note unchanged — "review"
+  already covers both rubrics) + NEW disambiguation row "placement / project
+  references / the composition root" splitting deciding-where-it-goes
+  (`facade-module-architecture`) from checking-conformance
+  (`dotnet-architecture-review`) — arbiter-recommended: those tokens now appear
+  in two base-map rows.
+
+### Known seams (logged, not fixed here — outside this session's ownership)
+- `facade-module-architecture` still prints `Events/` in its module tier list
+  (SKILL.md:197, `references/modules.md:26`) — stale against
+  `mediatr-messaging`'s `DomainEvents/` ruling; the catalogue ships an explicit
+  precedence note. Queued for an fma-owning session.
+- `Guid.NewGuid()` sequential-key rule remains unchecked by any rubric — queued
+  for a `dotnet-code-review`-owning session (area 1).
+
+---
+
 ## [0.3.16] — S17 (Lane C), 2026-07-28
 
 ### Added

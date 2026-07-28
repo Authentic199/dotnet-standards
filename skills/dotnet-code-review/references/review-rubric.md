@@ -481,16 +481,11 @@ shared helper that hardcodes one property name and is then reused for a second. 
 is invisible to every test that asserts only the status code.
 
 **5.8 A file in `Services/` that is not a service part** — *MEDIUM* ·
-`module-feature`
+`module-feature`, *When a service outgrows one file*
 `Find:` `ls src/Modules/<Module>/Services/`
-A file not named `<X>Service.cs` or `<X>Service.<Role>.cs`; a subfolder; a part
-named after a layer — `Helper`, `Logic`, `Extensions`; a private part declaring a
-partial interface. A part named after a layer is a dumping ground with the
-`partial` keyword on it: it attracts everything that has no obvious home, and by
-the time it needs subfolders the module has lost its shape. A private part that
-declares a partial interface has published its helper as public API. A pure rule
-belongs on the entity, a computed value in its expressions folder, a reusable
-mechanism in a facade, a bag of records in responses or settings.
+The full test and the destinations live in `dotnet-architecture-review` check 4.9,
+which owns `Services/` folder shape as a placement question. Note the hit here,
+cite that check, and do not re-derive the rule.
 
 **5.9 A base list on a non-core partial part** — *MEDIUM* · `module-feature` +
 `api-surface`
