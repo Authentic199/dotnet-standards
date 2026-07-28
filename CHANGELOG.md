@@ -21,12 +21,10 @@ Language is now settled at both levels, on user direction.
   self-gating: it states its own condition, so no scan detection is needed.
 - **New template section 7b — Communication**, required, 4 lines, placed near
   the top of the rules so a reader who stops early has still seen it.
-- **The generated `CLAUDE.md` is written in Vietnamese** — prose and rule lines
-  Vietnamese, commands, paths, identifiers and code English. `static-rules.md`
-  keeps the canonical English text and the skill restates it on the way out;
-  translation changes wording, never what a rule requires. This matches the
-  corpus: two of the three reference `CLAUDE.md` files are already written this
-  way.
+- **The generated `CLAUDE.md` stays in English** (user ruling), and the static
+  rules ship in their canonical English form. The split is the one R23 already
+  draws: the conversation is Vietnamese, the artifact agents execute against
+  stays in the language of the codebase.
 - **The skill itself converses in Vietnamese**, added to its hard constraints.
 
 ---

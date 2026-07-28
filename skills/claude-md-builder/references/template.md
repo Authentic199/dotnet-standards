@@ -103,12 +103,11 @@ lines.
 
 ## Formatting rules for the output
 
-- **The generated file is written in Vietnamese.** Headings, prose and rule lines
-  in Vietnamese; commands, paths, identifiers, package names and code always in
-  English. The rules in `static-rules.md` are held in canonical English — restate
-  them in Vietnamese when writing them into the output, and change nothing about
-  what they require. Two of the three reference `CLAUDE.md` files in this
-  plugin's corpus are already written this way.
+- **The generated file is written in English** — headings, prose, rule lines, all
+  of it. The rules in `static-rules.md` ship in their canonical English form,
+  unchanged. This is separate from R22: the file is an artifact agents execute
+  against, so it stays in the language of the codebase, while the *conversation*
+  about it is in Vietnamese.
 - Markdown headings and bullets, no dense paragraphs — structure is what makes
   the file scannable.
 - One rule per line, imperative mood, present tense.
