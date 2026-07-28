@@ -8,6 +8,105 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.18] — Rubric session #3 (solo), 2026-07-28
+
+### Added
+- **`dotnet-security-review`** — review rubric #3 of four, built under the
+  three-way process (verdicts: P1 MERGE, P2 MERGE, P3 MERGE, P4 router MERGE;
+  final whole-skill consistency pass FAIL→PASS, 3 defects fixed). Six layers —
+  packages, secrets, injection and unsafe input, auth posture, CORS, data
+  protection and exposure — checked against the shipped skill bodies; it cites,
+  never re-teaches. Body: Overview + 5 Core Principles + six layers with
+  numbered checks (1.1, 2.1–2.5, 3.1–3.5, 4.1–4.9, 5.1–5.3, 6.1–6.6) + severity
+  calibration (cited from dotnet-code-review, calibrated per the
+  0.3.17 precedent) + report template + Routing + Decision Guide (~500 lines
+  rendered). `references/security-checks.md` continues the numbering (1.2,
+  2.6–2.7, 3.6–3.8, 4.10–4.17, 5.4, 6.7–6.8) plus three comparison-data blocks
+  (shipped pipeline order; the five-site principal-type list restored to the
+  shipped enumeration after BOTH authors corrupted it identically; which gate
+  answers what) and an in-file `Refused — and why` table (457 lines).
+- Router alignment, same commit: base-map row for `dotnet-security-review`;
+  disambiguation row `secrets / tokens / authorization gates` (write-the-rule →
+  `auth-and-security` vs audit-what-exists → `dotnet-security-review`, twinned
+  with the 0.3.17 placement row's structure); **flagged extra beyond strict
+  alignment**: a `dotnet-performance-review` reservation row added to *Not yet
+  covered* — this session raised its dangling-pointer count to three, and the
+  section's stated purpose is resolving exactly that dead end (Author B's
+  stricter merge-time reading recorded; rubric #4 deletes the row).
+
+### Rulings and process notes
+- **House-over-kit at the JWT center (kit divergences recorded per the 0.3.17
+  convention):** the kit anchor `security-scan` (A32) demands
+  `ValidateIssuer/ValidateAudience = true` and a 1-minute ClockSkew; the rubric
+  checks HOUSE doctrine (per-family signing key is the boundary; ClockSkew
+  Zero) and ships the suppressions as first-class *Not a finding* blocks. Kit's
+  Minimal-API `[Authorize]` samples re-expressed as
+  `[HasPermission]`/`[AllowAnonymous]`/`[ApiKey]` on controllers. Kit's 6-layer
+  taxonomy and severity-with-context kept; kit's Critical/High/Medium/Low
+  re-expressed in the house CRITICAL/HIGH/MEDIUM/INFO ladder; the honesty rule
+  ("static analysis, not a penetration test") kept VERBATIM in every report and
+  canonicalised to one wording (final-pass defect D1: Principle 1 and the
+  template had drifted apart). Kit's per-layer MCP steps (endpoint map,
+  find-references) degrade to grep, stated in the body.
+- **Partition vs rubric #1:** dotnet-code-review's 2.1–2.7 and 1.7 keep their
+  home and numbers; this rubric deepens and cites (2.2 called "the
+  highest-value single grep in either rubric"). No claiming.
+- **CORS limited to what has an owner:** pipeline position + registration
+  pairing + the one universal defect (5.3, SPLIT: reflected origin
+  `SetIsOriginAllowed(_ => true)`+credentials = CRITICAL; literal
+  `AllowAnyOrigin()`+credentials = MEDIUM misunderstanding — browsers reject
+  it). Origin/header/method policy REFUSED — no shipped owner.
+- **R8 (user-labelled, sanitized):** the response-DTO property documented
+  "internal only, not returned in JSON" while remaining a plain public property
+  ships as the BAD/GOOD block under 6.2 — the first C# code block in any rubric
+  body (deliberate divergence, both authors independent). Username enumeration
+  at login (user-banked at S9b) ships as 4.17, MEDIUM,
+  decision-not-defect framing — the shipped login flow itself distinguishes the
+  branches, so the check surfaces a trade-off, never grades the house example.
+- **Provenance rulings:** mass assignment = universal reinforced by
+  api-surface *Binding sources* (description promise from both shipped rubrics'
+  routing tables honoured by check 6.1); `SaveToken = true` deepening stamped
+  "universal consequence of a shipped setting" (the setting is corpus-grounded
+  at jwt-and-tokens.md:130); 6.5 redaction-verifiability check ships — the
+  "observed behaviour, not a pattern to copy" text necessitates the check, the
+  check asks nobody to copy it. REFUSED for lack of a shipped owner: XSS (no
+  view layer), CORS origin policy, a numbered test-posture check ("a test
+  scheme reachable from a deployed composition" — banked; the routing row to
+  dotnet-testing ships), rate limiting/lockout, password-hashing primitives,
+  security response headers, token-lifetime ceilings, a prescribed secret
+  store.
+- **Coordinator catches on the arbiter (recorded per the honest-log norm):**
+  (1) the "two independent gates" sentence was cut as unverifiable but is
+  shipped verbatim at jwt-and-tokens.md:452-455 — restored; (2) the arbiter
+  twice misread `Required(...)`'s exclusion semantics (called Author A's
+  optionality clause false at P3, then claimed an auth-and-security intra-skill
+  contradiction at the final pass) — the shipped file documents the semantics
+  at jwt-and-tokens.md:89-92, NO seam exists, the false Known-seam note was
+  withdrawn and A's clause restored into 2.7. Also caught by the loop: Author
+  A's fabricated `[AllowAnonymous]` stale-principal mechanism (the shipped
+  mechanism is principal-unset-by-design), A's four miscited body-check titles,
+  Author B's abridged pipeline order (omitted APM and CORS) and inverted 5.1
+  rationale, and the shared five-site corruption — shared-blind-spot instances
+  5+ of the S13b/S15/S17 series.
+- **Severity calibration precedents set:** refresh-token replay response =
+  HIGH not CRITICAL (attacker must already hold a superseded token — first
+  mechanical application of the ladder's precondition test to overrule an
+  author); fail-closed defects de-escalate (3.6 MEDIUM, 5.4 MEDIUM);
+  availability defects on the key path are MEDIUM and say so (2.6).
+- Body forecloses tail lesson: layer-1 and layer-5 preambles written before
+  the references file asserted the layer's total size — both softened at the
+  final pass. A body written before its references file over-claims
+  completeness in exactly the layers with the smallest tails.
+
+### Known seams (logged, not fixed here — outside this session's ownership)
+- `dotnet-performance-review` remains the only unshipped rubric; its
+  reservation row ships in the router this commit and rubric #4 deletes it.
+- Banked for rubric #4 or later: the ClockSkew-Zero clock-drift trade-off (no
+  shipped body mentions it); a test-posture security check pending a user-named
+  shipped sentence; the `[ApiKey]`+`[HasPermission]` pairing as a BAD/GOOD
+  anti-example candidate (not user-labelled); `GetFallbackPolicyAsync` null as
+  an R8 hazard-label candidate (user's call).
+
 ## [0.3.17] — Rubric session #2 (solo), 2026-07-28
 
 ### Added
