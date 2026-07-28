@@ -7,13 +7,13 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.14 (13 skills; 0.3.14 = router-alignment hotfix for
-auth-and-security)** as of 2026-07-28:
+Shipped through **v0.3.15 (14 skills)** as of 2026-07-28:
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
 choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
-0.3.12 · auth-and-security 0.3.13.
+0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
+dotnet-code-review 0.3.15.
 
 ## Lane status
 
