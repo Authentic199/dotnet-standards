@@ -11,7 +11,7 @@ independent plugin. No Superpowers file is ever modified.
 |---|---|---|
 | 1. Process | **Superpowers** | brainstorm → plan → TDD → review |
 | 2. Knowledge | **`dotnet-standards`** (this repo) | What the code looks like: architecture, in-process messaging pipeline, EF Core, caching, search, API surface, testing |
-| 3. Context | Per-project `CLAUDE.md` | Which conventions apply to *this* codebase |
+| 3. Context | Per-project `CLAUDE.md` | Which conventions apply to *this* codebase — generated and maintained by `claude-md-builder` |
 
 Since the process-integration layer (Lane D, spec
 `docs/superpowers/specs/2026-07-27-process-integration-design.md`), this plugin
@@ -22,12 +22,13 @@ revised by that spec. Project-specific context still belongs to tier 3.
 
 ## Status
 
-**v0.3.21 — knowledge layer + process-integration layer shipped.**
+**v0.3.22 — knowledge layer + process-integration layer shipped, plus the
+tier-3 generator.**
 
 | Component | State |
 |---|---|
 | `hooks/` | ✅ two hooks, `post-edit-format` + `superpowers-check` — see [`hooks/README.md`](hooks/README.md) |
-| `skills/` | ✅ knowledge skills, four review rubrics, the router, and two flow skills |
+| `skills/` | ✅ knowledge skills, four review rubrics, the router, two flow skills, and `claude-md-builder` — the tier-3 `CLAUDE.md` generator |
 | `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
 | `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
 
