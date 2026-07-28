@@ -7,13 +7,13 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.15 (14 skills)** as of 2026-07-28:
+Shipped through **v0.3.16 (15 skills)** as of 2026-07-28:
 facade-module-architecture 0.3.0 · api-surface 0.3.2 · module-feature 0.3.3 ·
 error-handling 0.3.4 · elasticsearch-search 0.3.5 · distributed-caching 0.3.6 ·
 message-keys 0.3.7 · distributed-lock 0.3.8 · ef-core-data-access 0.3.9 ·
 choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
 0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
-dotnet-code-review 0.3.15.
+dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16.
 
 ## Lane status
 
@@ -21,7 +21,7 @@ dotnet-code-review 0.3.15.
 |---|---|---|---|
 | **A — Data & Feature Spine** | `next-session-prompt-A.md` | S9b closed 2026-07-27: `auth-and-security` v0.3.13 shipped (module-feature, ef-core-data-access before it) | Confirm with the user whether the queue is unfrozen; if yes: `domain-modeling`, then `modern-csharp` (order TBC). Warm-up task carried: fix the stale line `module-feature/references/validation-rules.md:322` (S15 flag) **+ second instance found by rubric #1: `module-feature/SKILL.md:187` and validator examples at lines 165–172 (superseded entity-typed `Messages<T>` form)** |
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
-| **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md while C is in flight) | S16 closed 2026-07-27: `automapper-mapping` v0.3.12 shipped; **S17 in flight: `mediatr-messaging`** | Finish S17 (mediatr-messaging + mandatory router edits, same commit). After that: `observability` / `background-worker` / `http-resilience` remain user-PENDING |
+| **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
 | **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **Rubric #1 `dotnet-code-review` shipped v0.3.15, 2026-07-28** — severity ladder CRITICAL/HIGH/MEDIUM/INFO set for the phase; router alignment row shipped in the same commit; full log in the rubrics file | Rubric #2 `dotnet-architecture-review` next (solo, sequential — never in parallel with a lane); it may claim P2 checks 5.8/5.9 from rubric #1 (banked in the Rubric log) |
 | **D — Process Integration** | `next-session-prompt-D.md` | Blocked by design: runs ONLY after the four rubrics (dotnet-testing prerequisite already shipped) | Closed-loop workflows + specialist agents per the approved S14 spec |
 
@@ -69,6 +69,17 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
 - [C, 2026-07-28] S11 `CompileQueryAsync(...)` pagination extension — needs
   the USER to name its source file (R7) — then belongs to
   `elasticsearch-search` or a rubric; blocked on user.
+- [C→rubrics, 2026-07-28] S17 declined anti-example candidates, banked: dead
+  `params Assembly[]` on a registration extension; a generic handler branching
+  on `typeof(TData)` (handler-body territory) — detail in CHANGELOG 0.3.16 —
+  consumed by the rubric sessions.
+- [C, 2026-07-28] Seventh-anti-pattern candidate for `mediatr-messaging`:
+  registration/behaviours carry no negative example (all six user labels are
+  shape-and-naming) — flagged by both authors + arbiter at S17 — needs a
+  future mediatr-owning session and a user label.
+- [C, 2026-07-28] `qms-backend` reference scope: named at S17 for ONE file
+  only (`Modules/Reports/Startup.cs`); not a general quarry — user may widen
+  or close it.
 - [C, 2026-07-28] Small notes bank: automapper `references/` future
   candidates (troubleshooting catalogue; IncludeMembers precedence;
   value/type-converters — CHANGELOG 0.3.12) and `dotnet-testing`'s untouched
