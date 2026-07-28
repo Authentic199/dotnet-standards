@@ -22,7 +22,7 @@ revised by that spec. Project-specific context still belongs to tier 3.
 
 ## Status
 
-**v0.3.24 — knowledge layer + process-integration layer shipped, plus the
+**v0.3.26 — knowledge layer + process-integration layer shipped, plus the
 tier-3 generator.**
 
 | Component | State |

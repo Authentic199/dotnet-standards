@@ -45,9 +45,18 @@ owns the area (see the skill's principle 8 table):
 
 - **Matches the skill** → not a finding. It becomes a pointer to that skill, and
   the detail is dropped. Most findings end here.
-- **Differs from the skill** → a real finding. Keep it, and say *that* it differs
-  and why.
+- **Contradicts the skill** → **never resolved by the scan alone.** It goes on
+  the PHASE 1c report and the user classifies it: deliberate → into the file
+  under *Where this repository differs*; a defect → reported, and kept out of the
+  file entirely.
+- **The skill assumes something this repository does not have** → a real finding,
+  and the most valuable one. Straight into *Where this repository differs*.
 - **The skill has no answer** → a real finding, usually a domain rule. Keep it.
+
+A contradiction is easy to mistake for a match, because both are *about* a topic
+the skill covers. Read what the skill actually requires before deciding — a
+controller declaring its own route prefix is not "the routing convention", it is
+the opposite of it.
 
 Two extra suppressions:
 
