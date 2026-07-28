@@ -1,0 +1,7 @@
+---
+description: Run the dotnet review workflow — parallel specialist reviewers + testers with verified findings — on an existing diff or branch, per the dotnet-review-flow skill.
+argument-hint: [branch, range, or scope — defaults to the working diff]
+---
+
+Invoke the dotnet-standards:dotnet-review-flow skill and follow it exactly.
+Review target: $ARGUMENTS (if empty, the current working diff against the default branch).
