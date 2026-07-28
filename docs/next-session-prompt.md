@@ -35,6 +35,10 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
 - [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
   `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze
   is lifted for them and picks the order.
+- [A, 2026-07-28] Second instance of the same drift family (found by rubric
+  #1, CHANGELOG 0.3.15): `module-feature/SKILL.md:187` + validator examples at
+  lines 165–172 carry the superseded entity-typed `Messages<T>` form — fix
+  together with the entry below in one Lane A warm-up chore.
 - [A, 2026-07-27] `module-feature/references/validation-rules.md:322` stale
   line ("every message… `T` is the entity" — superseded by the S15 ruling:
   requests type validator messages) — flagged in the S15 log — any Lane A

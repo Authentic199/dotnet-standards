@@ -181,4 +181,9 @@ Customer are ruled generic-enough for auth contexts.
   the rubric sessions consume the ledger above plus the S13/S13b/S12/S8/S9
   lists; "Services/ is not a dumping ground" rubric item still carried; the
   `validation-rules.md:322` stale-line fix (flagged S15; Lane A owns
-  module-feature) remains OPEN — a good warm-up task for the next session.
+  module-feature) remains OPEN — a good warm-up task for the next session,
+  **now a family of two**: rubric #1 (CHANGELOG 0.3.15) found the same
+  superseded entity-typed `Messages<T>` form at `module-feature/SKILL.md:187`
+  and in the validator examples at lines 165–172. Fix both in one warm-up
+  chore (patch bump + reinstall proof per protocol; grep the whole
+  module-feature skill for further instances while there).
