@@ -237,8 +237,10 @@ acquire something over the network?**
 | Re-run a command, read configuration | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
 | | | Edit a test to dodge a failure — the testers' ban, and it does not loosen because the coordinator is the one holding the pen |
 
-**Two attempts, then explain and ask.** Every other loop here is capped; an
-uncapped repair loop spends a session invisibly. An ordinary build restoring
+**Two attempts, then explain and ask.** One attempt is one repair pass followed
+by one re-spawn of the testers, however many individual actions that pass
+contained — the cap governs the reruns, not the actions inside them. Every other
+loop here is capped; an uncapped repair loop spends a session invisibly. An ordinary build restoring
 its own packages is building, not repairing, and this table does not govern it
 — a build that **fails because acquisition failed** is what enters here.
 
