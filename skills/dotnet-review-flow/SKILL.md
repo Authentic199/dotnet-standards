@@ -352,8 +352,10 @@ impression of one.
 
 ## The final report
 
-**Always produced** — in both modes, when everything passed, and when a cap
-halted the run. Every section appears; write `None.` when empty.
+**Always produced** — in both modes, when everything passed, when a cap halted
+the run, and when NO-SIGNAL ended in an unanswered question. **There is no path
+through this flow that ends without the report.** Every section appears; write
+`None.` when empty.
 
 ```markdown
 ## Review: <scope label>
@@ -390,7 +392,8 @@ in the reviewer's own wording>
 <lenses, tiers, layers, areas or checks that did not run, and why>
 
 ### Run
-TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · <cap hit? say so> · <commands the flow ran>
+TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · NO-SIGNAL <what was attempted, what
+the user chose, or "not entered"> · <cap hit? say so> · <commands the flow ran>
 ```
 
 Three rules for the report:
