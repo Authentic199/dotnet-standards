@@ -1,100 +1,132 @@
-# Lane D — Process Integration · Session D1: closed-loop workflows (feature + review)
+# Lane D — Process Integration · Session D2: the `bugfix` flow (v1.5)
 
-> Copy everything below the line into a fresh Claude Code session in
-> `D:\ALTA\Project\dotnet-standards`. **DO NOT OPEN THIS SESSION until the four
-> review rubrics AND `dotnet-testing` have shipped** — the deliverables bind to
-> them (see the spec §7). Written at the close of S14, 2026-07-27, from the
-> approved design spec.
+> Copy everything below the line into a fresh Claude Code session in the
+> dotnet-standards checkout. Written at the close of D1, 2026-07-28, which
+> shipped process-integration v1 at **v0.3.21**.
 
 ---
 
 ## CONTEXT
 
-I am building `dotnet-standards`. This lane adds the **process-integration
-layer**: closed-loop agentic workflows that combine Superpowers (process) with
-this plugin's knowledge skills, so one command walks brainstorm → plan →
-implement → test-loop → review-loop → git without me invoking each Superpowers
-skill by hand. **The full approved design is
-`docs/superpowers/specs/2026-07-27-process-integration-design.md` — read it
-FIRST; it is the source of truth for this lane and this file does not repeat
-it.** The user chose to build this INSIDE `dotnet-standards` (the "Knowledge
-only" description promise is deliberately broken and must be rewritten).
-**No Superpowers file may ever be modified** — the relationship is *call*,
-never *copy*.
+I am building `dotnet-standards`. Lane D owns the **process-integration
+layer** — shipped at v1 (v0.3.21, D1, 2026-07-28): `dotnet-feature-flow` +
+`/dotnet-feature`, `dotnet-review-flow` + `/dotnet-review`, six specialist
+agents (4 read-only reviewers, 2 testers), the SessionStart `superpowers-check`
+hook, the two-layer description. **The design source of truth is
+`docs/superpowers/specs/2026-07-27-process-integration-design.md`; the v1
+rulings live in CHANGELOG 0.3.21 — read both FIRST and treat everything in them
+as settled.** No Superpowers file may ever be modified — call, never copy.
 
-**You own ONLY:** `skills/dotnet-feature-flow/`, `skills/dotnet-review-flow/`,
-`commands/`, `agents/` (the six specialist agents), the `hooks/hooks.json`
-SessionStart addition + its script, the `plugin.json` description rewrite, and
-this file. Refuse and log anything else.
+**This session's deliverable is v1.5: the `bugfix` flow (spec §6.3).**
+Shape already approved: PHASE 0 → `superpowers:systematic-debugging` → fix →
+the shared TEST/REVIEW blocks → git. ~70% shared with `feature`.
+
+**You own ONLY:** `skills/dotnet-bugfix-flow/` (or the name the loop settles),
+`commands/dotnet-bugfix.md`, the router rows + CHANGELOG + version alignment
+the ship protocol mandates, and this file. Refuse and log anything else.
 
 **START IN YOUR OWN WORKTREE:**
-`git worktree add ../dotnet-standards-laned-d1 -b lane-d/process-integration main`
+`git worktree add ../dotnet-standards-laned-d2 -b lane-d/bugfix-flow main`
 
-## THE DELIVERABLE — v1 per the spec
+## SETTLED AT D1 — DO NOT RELITIGATE (full detail: CHANGELOG 0.3.21)
 
-1. `dotnet-feature-flow` skill + `/dotnet-feature` command (spec §6.1).
-2. `dotnet-review-flow` skill + `/dotnet-review` command (spec §6.2 — the
-   shared TEST/REVIEW block extracted).
-3. Six specialist agents (spec §4): 4 read-only rubric reviewers + 2 testers
-   whose roster mirrors the shipped `dotnet-testing` taxonomy exactly.
-4. SessionStart `superpowers-check` hook (spec §5 — warn only; the hard STOP
-   lives in each flow's PHASE 0). Reuse the shipped polyglot `run-hook.cmd`
-   convention: script name without extension.
-5. `plugin.json` description rewrite (two layers; requires Superpowers).
+- The shared block is `dotnet-review-flow`'s heading
+  `## The shared block: TEST-LOOP then REVIEW-LOOP` — bugfix QUOTES it verbatim
+  and invokes the skill embedded, exactly as `dotnet-feature-flow` does
+  (arbiter ruling D1: bugfix quotes review-flow's heading; feature-flow
+  deliberately exposes NO stable heading of its own — do not mint one there).
+- Embedded mode must be STATED in the invocation; absent it, review-flow
+  defaults to standalone (offers instead of fixing) — the safe direction.
+- Diff preparation + the pre-build gate sit on the CALLING flow's side of the
+  seam; the caller owns repo/branch/worktree, performs review-flow's
+  `Diff preparation — the spawn contract` section, then runs the block.
+- Tester verdict vocabulary is CLOSED (six strings, see the tester bodies);
+  `RED — environment` halts immediately without consuming a round;
+  `tier absent — nothing run` never blocks the loop and never reads as a pass.
+- PHASE 0 checks Superpowers by LOADING a Superpowers skill (never the
+  registry); plugin completeness by the session's skill/agent ROSTER (never by
+  loading five rubrics). STOP style with exact remedy.
+- Severity = CRITICAL/HIGH/MEDIUM/INFO (dotnet-code-review's ladder, cited
+  never defined); loop exit = no CONFIRMED CRITICAL/HIGH; MEDIUM/INFO never
+  chased. Caps: 5 test / 3 review — they are review-flow's; a cap number in a
+  calling flow's body is a defect.
+- Fix route matches the implementation route (context symmetry). GATE placement:
+  a human gate binds the actual choice point (D1 moved GATE 2 inside PHASE 6 to
+  the finishing-a-development-branch option choice — same reasoning will apply
+  to any bugfix gate).
+- Description law §5 binds flow SKILLS in full; agent files are NOT under §5
+  (noun-phrase register, <100 words, Not for: names sibling AGENTS).
+- Flow skills teach nothing; single-body unless a true long tail appears
+  (117–450 norm, <500 hard).
 
-`bugfix` flow is v1.5 — NOT this session (one session, one deliverable set; the
-spec already records its shape).
+## THE PROCESS
 
-## OPEN ITEMS TO RESOLVE FIRST (spec §9)
-
-Before writing anything: (1) verify plugin-command namespacing/collision
-behavior with the `claude-code-guide` agent — do not guess; (2) read the
-shipped rubrics' severity vocabulary and `dotnet-testing`'s test taxonomy —
-the flows consume their vocabulary, never invent one; (3) decide
-references-split per flow skill through the loop.
-
-## PROCESS
-
-The three-way process (author A + `skill-writer-sp` + `skill-arbiter`,
-per piece) applies to the two FLOW SKILLS and the six AGENT definitions.
-Commands, the hook script and the description rewrite are mechanical — single
-author, arbiter sanity pass only. The arbiter MUST invoke
-`skill-creator:skill-creator` live (restart the parent session if it reports
-`Unknown skill` — subagent rosters snapshot at parent start; user ruling S14).
-**STANDING DELEGATION (LAW, memory `delegate-on-recommendation`):** execute
-recommendations, report done; ask only when genuinely undecidable. Carve-out:
-naming canonical sources/exemplars stays with the user. Verification target for
-the arbiter here = the spec + the installed Superpowers/rubric/testing skill
-bodies (not `reference/projects/`).
+Three-way loop (`three-way-skill-loop`) for the flow skill body+frontmatter;
+command + alignment edits are mechanical (single author + arbiter sanity pass).
+The arbiter MUST invoke `skill-creator:skill-creator` LIVE (`Unknown skill` →
+restart the parent session). Verification target = the spec + CHANGELOG 0.3.21
++ the shipped v1 bodies (not reference/projects/). STANDING DELEGATION (LAW):
+execute clear recommendations, report, log each use; R7/R8 stay with the user.
 
 ## HARD CONSTRAINTS
 
-1. Prove it end to end: validate + reinstall + `claude plugin details` shows
-   the new commands/agents/hook counts; then ONE live smoke test —
-   `/dotnet-review` on a small real diff — before calling the lane done.
-   Report failures honestly.
-2. Merge/version protocol as always (patch +1 vs main at merge time, both
-   manifests agree, CHANGELOG at top, one install at a time; delete
-   `reference/` from the new cache copy).
-3. Artifact language English; talk to me in Vietnamese.
-4. End: commit per protocol (branch `lane-d/process-integration`, merge into
-   main), then rewrite THIS file to open Lane D's next session (`bugfix` flow,
-   v1.5), carrying the Lane log forward.
+1. One session, one deliverable (+ router/CHANGELOG/version alignment, same
+   feat family). Prove it: validate + `claude plugin update
+   dotnet-standards@dotnet-standards-dev` + details shows the new counts +
+   `installed_plugins.json` points at the new cache (gitCommitSha = merge
+   head) + delete `reference/` from the new cache dir + ONE live smoke test of
+   `/dotnet-bugfix` on a small real bug (the D1 smoke-repo pattern in the
+   session scratchpad works: tiny solution + seeded defect). Report failures
+   honestly.
+2. Merge protocol: patch +1 vs main at merge time, both manifests agree,
+   CHANGELOG at top, merge main INTO the lane branch BEFORE alignment edits.
+3. Artifact language English; talk to the user in Vietnamese.
+4. End: commit per protocol, rewrite THIS file for Lane D's next session (v2
+   candidates: the deferred PM workflow and project-setup workflow — spec §2
+   records both as technical debt; neither is designed), update the LANE BOARD
+   row, carry the Lane log.
 
 ## Lane log
 
-- **D0 (2026-07-27, S14 session):** design brainstormed under
-  `superpowers:brainstorming` and approved section-by-section; spec committed
-  (`docs/superpowers/specs/2026-07-27-process-integration-design.md`, commit
-  c6d2a73). Key user rulings captured there: v1 = feature + review, bugfix
-  v1.5; approach 2 (inside dotnet-standards, promise deliberately broken); two
-  human gates (design/plan approval; pre-push) + loop caps (review 3, test 5);
-  test-before-review ordering; agent-per-concern roster (4 reviewers + 2+
-  testers), review/test ALWAYS subagents (context-contamination rule);
-  implementation via superpowers:subagent-driven-development when > 3
-  use-cases; dependency = warn-early (SessionStart) + hard-stop (PHASE 0), no
-  auto-install. Deferred as recorded tech debt: PM workflow (BA requirements /
-  ad-hoc → task skeleton + overview), project-setup workflow (per-project
-  CLAUDE.md).
-- **First action of D1:** invoke `superpowers:writing-plans` on the spec to
-  produce the implementation plan, then run the plan through the process above.
+- **D1 (2026-07-28) — shipped process-integration v1 at v0.3.21** (merge head
+  5d4c4c9; 20 skills + 2 commands + 6 agents + 2 hooks). All four loop pieces
+  MERGE verdicts; full rulings in CHANGELOG 0.3.21. Smoke test: `/dotnet-review`
+  run in a fresh headless session on a scratch .NET solution — PASS end to end
+  (PHASE 0, gate build, 2 testers + 4 reviewers parallel, closed verdict
+  strings used correctly incl. `tier absent`, CONFIRMED-vs-PLAUSIBLE
+  verification with real evidence, cross-lens dedup, standalone offer honored —
+  nothing auto-fixed). ONE observed deviation, logged: subagents spawned by the
+  flow had NO Skill tool on first attempt — all three affected reviewers
+  stopped per their body's rule, the flow's retry-once resent with the rubric
+  file path on disk, and every lens completed. First entry in the
+  observed-behaviour bank; D2 should check whether agent definitions should
+  point at the rubric PATH as the documented fallback.
+- D1 process events: blanket delegation per the brief; agents pinged once and
+  continued via SendMessage across all pieces; arbiter loaded skill-creator
+  LIVE first thing (no restart needed). `main` never moved mid-session (solo
+  day). Two shared-blind-spot catches by the arbiter (piece 1: the Low-radius
+  report-collapse exception; piece 4: the router's uncovered-area carve-out,
+  router SKILL.md L114–115) — the S13b/S15/S17 pattern held twice more.
+- D1 verified facts recorded for reuse: plugin commands are always namespaced
+  `/dotnet-standards:<name>`, bare form as fallback (v2.1.216+), plugins CAN
+  shadow built-ins; agent frontmatter fields = name/description/tools/model/
+  disallowedTools (`capabilities:` in the house template is drift);
+  `superpowers:writing-plans` has no "use-case" unit (unit = `### Task N`);
+  `superpowers:finishing-a-development-branch` presents push as a user-chosen
+  option; `installed_plugins.json` shape = `{"plugins": {"name@marketplace":
+  [{...}]}}`.
+- D1 coordinator boundary calls (logged for veto): minimal README corrections
+  beyond the literal ownership list (three lane-falsified statements + the CQRS
+  phrase, arbiter-flagged, recorded in CHANGELOG 0.3.21); `hooks/README.md`
+  restructure to keep `post-edit-format` contiguous with its Step-4 footnote.
+- D1 banked for later: rewrite the six agents' rationalization tables from
+  OBSERVED behaviour if smoke/real runs diverge from the predictions (they are
+  predicted, not baselined — B's flag, arbiter-endorsed); the four reviewer
+  bodies share ~50% structure with no include mechanism — a shared-wording edit
+  is made four times (recorded maintenance cost); flow-level single pre-build
+  is encoded as a GATE (review-flow) — if artifact-lock collisions still occur
+  in practice, revisit; `README.md` install snippet still names a stale path
+  (`D:/ALTA/Project/...`) — pre-existing, parked to the LANE BOARD PENDING log.
+- Deferred (spec §2, unchanged): PM workflow (BA requirements → task skeleton),
+  project-setup workflow (per-project CLAUDE.md). Neither is designed; v2
+  discussion starts from the spec's Deferred section.
