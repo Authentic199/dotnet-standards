@@ -15,8 +15,9 @@ description: >-
 ## Overview
 
 This skill is an **orchestration graph, not a rubric.** It runs a change through
-two loops — tests, then review — using fresh-context subagents, and it decides
-only *what runs, in what order, who runs it, and when to stop*.
+two loops — tests, then review, with a third named unit for when the tiers
+produce no signal — using fresh-context subagents, and it decides only *what
+runs, in what order, who runs it, and when to stop*.
 
 **It teaches nothing.** Process belongs to Superpowers, which this flow **calls
 and never copies**. What each lens checks belongs to the four rubric skills; what
