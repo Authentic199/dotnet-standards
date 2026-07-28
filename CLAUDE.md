@@ -1,3 +1,25 @@
+> **CORRECTION BANNER — 2026-07-29.** The opener below is **Lane C's** brief and
+> its numbers are stale. The tree ships **v0.3.25 (23 skills)**, not v0.3.16 (15).
+> Everything else in the opener still stands for a Lane C session; a Lane D
+> maintenance session added this banner rather than rewriting another lane's
+> brief out from under it. **Open `docs/next-session-prompt.md` (LANE BOARD)
+> first — it is authoritative for versions, lanes and parked work; this file is
+> not.**
+>
+> What landed since the opener was written: rubrics #2–4
+> (`dotnet-architecture-review` 0.3.17, `dotnet-security-review` 0.3.18/0.3.19,
+> `dotnet-performance-review` 0.3.20) · process-integration v1 0.3.21 ·
+> `claude-md-builder` 0.3.22–0.3.24 · `dotnet-review-flow`'s NO-SIGNAL branch
+> 0.3.25.
+>
+> **Two process facts worth more than the version numbers.** The plugin installs
+> from the **GitHub** repo, not from this checkout, and at **project** scope
+> bound to an unrelated repository — so a local merge to `main` ships nothing
+> until it is pushed, and `claude plugin update` needs `--scope project`. And two
+> sessions running at once can pick the **same version number with no git
+> conflict**, because identical strings in both manifests merge silently; read
+> the version off `main` at merge time, never off your own branch.
+
 > **OPENER — 2026-07-28, S17 close (Lane C).** `mediatr-messaging` SHIPPED at
 > **v0.3.16 (15 skills)**. **Lane C's queue is now empty of unblocked work** —
 > the remaining Lane C names (`observability`, `background-worker`,
