@@ -8,6 +8,68 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.26] — `claude-md-builder`: contradictions are reported, never cut, 2026-07-29
+
+Second real run, same consumer repository, this time in update mode. It worked —
+and it also deleted something it should have kept, which exposed the flaw behind
+both failures so far.
+
+The repository has one controller declaring its own `[Route]` prefix
+(`api/Events/{eventId:guid}/Booths`). `api-surface` rules the opposite: the
+prefix is declared once on `BaseController` and **no other controller declares a
+`[Route]`** (`SKILL.md:41-42`); nesting is expressed by the verb attribute's tail
+(`SKILL.md:51`, `72-75`). So the repository *contradicts* the skill. The compare
+step saw a routing topic, matched it to the skill that owns routing, and cut the
+line as a restatement.
+
+The step was only asking *"does a skill own this?"*. It never asked *"does the
+repository agree with it?"* — and a contradiction is the single most valuable
+thing a scan can find, because it is the one thing no skill can tell you.
+
+The user classified this instance as a defect to fix in code, not a deliberate
+choice — which is exactly the ruling the skill should have asked for instead of
+deciding alone.
+
+**Changed:**
+
+- **PHASE 1's comparison is now two questions, not one:** does a skill own this,
+  and does the repository match or contradict it. Four outcomes, only one of
+  which is "drop it": match → pointer; contradiction → PHASE 1c; skill assumes
+  something absent → content; skill silent → content.
+- **New PHASE 1c — report every contradiction, decide nothing alone.** The scan
+  cannot distinguish a deliberate local choice from a defect; both look identical
+  on disk. Every contradiction is listed for the user — what the skill requires,
+  what the repository does, where — and the user classifies it. Deliberate goes
+  into the file with its reason; a defect goes into the report and **nowhere in
+  the file**, because a line describing a bug expires when the bug is fixed. This
+  is a report, not a question, and does not count against the PHASE 2 cap.
+  Silence is the one forbidden outcome.
+- **Template section 6b — *Where this repository differs from what a skill
+  assumes* — is now a required section**, 10 lines. The first run invented it ad
+  hoc; making it part of the template is what makes it repeatable. It holds three
+  things: a capability a skill assumes and the repository lacks, a confirmed
+  deliberate contradiction, and a specified-but-unbuilt capability.
+- **Source marking now applies in every mode, to any line describing something
+  not yet true** — not only to greenfield and document-derived lines. Trigger for
+  the change: a generated rule read *"event-scoped data (booths, devices,
+  customers, gifts) is always bound to an event"* while exactly one controller
+  did that, with no mark to say it was intent. Preference stated: narrow the
+  claim to what is built; failing that, keep it broad and mark it. Never leave a
+  broad claim unmarked.
+- **Checklist item 2 narrowed** — cut only what the repository does *the same way*
+  as the skill; an opposite is the finding, never the bin. Two new final-gate
+  checks cover marks and contradiction handling.
+
+`api-surface` is unchanged and needed no change — it already owns sub-resource
+nesting. The earlier claim in session that it did not was wrong.
+
+**Version note:** 0.3.25 was taken by a concurrent session, so this is 0.3.26.
+Two sessions choosing the same number produce no git conflict — identical strings
+in both manifests merge silently — so the number was read off `main` at merge
+time rather than off this branch.
+
+---
+
 ## [0.3.25] — `dotnet-review-flow`: the NO-SIGNAL branch, 2026-07-29
 
 A real run of `/dotnet-review` against an external repository produced no

@@ -25,6 +25,7 @@ heading is bloat with a title.
 | 5 | Architecture and layering | conditional | 8 | the dependency direction deviates from `facade-module-architecture`; omitted entirely when it conforms |
 | 6 | Conventions — pointers only | conditional | 12 | scan row 12 found convention documents |
 | 7 | Configuration and secrets | conditional | 10 | scan rows 5–6 found a non-obvious config story |
+| 6b | Where this repository differs from what a skill assumes | required | 10 | always — omit only if the scan genuinely found no difference |
 | 7b | Communication | required | 4 | always |
 | 8 | Rules | required | 55 | always |
 | 9 | Gotchas | conditional | 15 | question 3 answered, or the scan found a trap |
@@ -73,6 +74,22 @@ Static rules R9, R10 and R20 live here.
 it here is what pushes a file past 200 lines — and a summary of a skill is the
 one form of bloat that also makes the reader stop consulting the original.
 
+**6b — Where this repository differs from what a skill assumes.** One line per
+difference, each naming the skill and then the fact that replaces its assumption.
+Three things belong here:
+
+- **A skill assumes a capability this repository does not have** — no MediatR, no
+  distributed lock, caching that is in-memory rather than cache-aside, a test
+  stack without the libraries the testing skill expects. This is the highest-value
+  content the scan produces: without it, Claude loads the skill and hunts for a
+  type that was never written.
+- **A deliberate local choice that contradicts a skill**, once PHASE 1c has
+  confirmed it is deliberate — with its reason.
+- **A capability specified but not built yet**, marked per the rule below.
+
+*Never:* a difference the user classified as a defect. That goes in the report,
+not in the file — it expires the moment the defect is fixed.
+
 **7 — Configuration and secrets.** How configuration resolves, which override
 form wins, and the R12 arm the user selected. Key names only.
 *Never:* a configuration value, of any kind, secret or not.
@@ -109,6 +126,29 @@ unchanged has become the *historical archive* anti-pattern and is cut on sight.
 lines.
 
 ---
+
+## Marking anything that is not yet true
+
+**Every line describing something the code does not do yet carries a source
+comment**, whatever produced it — a document, a user's answer, or a decision made
+in conversation:
+
+```
+<!-- source: <where it came from>, intent — <what is actually built>, checked <date> -->
+```
+
+This is not a greenfield rule. It applies in every mode, and the line that most
+needs it is the one that sounds like a fact. A rule reading *"every event-scoped
+resource is bound to an event"* when exactly one controller does that is not
+false — it is intent — but unmarked it reads as a description of the code, and
+the next session goes looking for the other four.
+
+Two ways to satisfy it, and the narrower one is preferred: **narrow the claim to
+what is actually built**, or **keep the broad claim and mark it**. Never leave a
+broad claim unmarked.
+
+Block-level HTML comments are stripped before the file reaches context, so the
+marks cost nothing at runtime and are visible to whoever opens the file next.
 
 ## Formatting rules for the output
 

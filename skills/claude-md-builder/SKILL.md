@@ -120,10 +120,20 @@ Three rules hold across the whole scan:
 - **Record where each inference came from.** A fact with no file behind it does
   not go in the draft.
 - **Then compare every layout and convention finding against the owning skill**
-  (principle 8). A finding that matches what the skill already prescribes is
-  *not* a finding — it becomes a pointer. Only mismatches survive as content.
-  This step is what keeps the scan from re-introducing doctrine through the back
-  door.
+  (principle 8), and answer two questions in order, never just the first:
+
+  1. *Does a skill own this area?* No → it is project-specific content, keep it.
+  2. *Does this repository match the skill, or contradict it?*
+     - **Matches** → not a finding. It becomes a pointer, and the detail is
+       dropped. Most findings end here.
+     - **Contradicts** → **never cut this silently.** See below.
+     - **The skill assumes something this repository does not have** → a real
+       finding, and the most valuable kind. It goes in the *Where this repository
+       differs* section (`references/template.md` §6b).
+
+  Answering only question 1 is how the scan re-introduces doctrine through the
+  back door, and it is also how a genuine contradiction gets deleted for looking
+  like a topic the skill already covers.
 
 **Then check the gate.** Did the scan produce enough to fill the two required
 sections — *Project overview* and *Commands*? Concretely: a solution or project
@@ -157,6 +167,27 @@ exactly which lines still need checking against real code.
 
 With no code, the `Commands` section stays **empty rather than invented**. Say so
 in the file, in one line.
+
+### PHASE 1c — Report every contradiction, decide nothing alone
+
+A place where the repository contradicts a skill is either a deliberate local
+choice or a defect, and **the scan cannot tell which**. Both look identical on
+disk. Deciding alone is how a real defect gets written into `CLAUDE.md` as though
+it were a convention, where it then outlives the fix and teaches the wrong rule.
+
+So list every contradiction for the user, one line each: what the skill requires,
+what the repository does, and where. Then ask which it is. The two answers lead
+opposite ways:
+
+- **Deliberate** → it belongs in the file, under *Where this repository differs*,
+  with the reason.
+- **A defect** → it belongs in the report and **nowhere in the file**. A line
+  describing a bug expires the moment the bug is fixed, and a stale line is worse
+  than no line.
+
+This is a report, not one of the PHASE 2 questions, and it does not count against
+that batch's cap. Silence is the one forbidden outcome: never delete a
+contradiction merely because its topic belongs to a skill.
 
 ### PHASE 2 — Ask, once
 

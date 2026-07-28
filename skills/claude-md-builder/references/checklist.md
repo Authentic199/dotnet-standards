@@ -21,6 +21,10 @@ table, and check it twice for anything the user rejected as a static rule — a
 rejected rule returning as a "scan finding" is the same rule wearing a different
 hat. Also cut any directory tree of a repository still taking shape: it reads as
 the intended final layout and stops Claude creating what is missing.
+**Cut only what the repository does the same way as the skill.** A line recording
+that the repository does the *opposite* is not doctrine — it is the finding, and
+it is never cut here. If unsure which one a line is, it goes on the PHASE 1c
+report, not into the bin.
 
 **3 — Analyzer duplicates.** Any rule already enforced by StyleCop,
 SonarAnalyzer, Roslynator, `.editorconfig` or the ruleset: formatting, naming
@@ -79,3 +83,6 @@ Answer yes to all of these, or keep working:
 - [ ] No two lines contradict each other.
 - [ ] Each of the three PHASE 6 probes is answerable from the file alone.
 - [ ] No section heading stands empty.
+- [ ] Every line describing something not yet built carries its source mark.
+- [ ] Every contradiction found was reported and classified — none was cut
+      silently, and none classified as a defect reached the file.
