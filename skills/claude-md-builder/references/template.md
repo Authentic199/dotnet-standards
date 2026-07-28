@@ -21,8 +21,8 @@ heading is bloat with a title.
 | 1 | Title + one-line purpose | required | 2 | always |
 | 2 | Project overview | required | 8 | always |
 | 3 | Commands | required | 20 | always — **deferred on the greenfield branch** |
-| 4 | Project structure | conditional | 25 | layout is not obvious from the solution file; deferred on the greenfield branch |
-| 5 | Architecture and layering | conditional | 15 | the `ProjectReference` graph shows a real direction to protect |
+| 4 | Project structure | conditional | 8 | **the layout deviates from what the owning skill prescribes**; omitted entirely when it conforms |
+| 5 | Architecture and layering | conditional | 8 | the dependency direction deviates from `facade-module-architecture`; omitted entirely when it conforms |
 | 6 | Conventions — pointers only | conditional | 12 | scan row 12 found convention documents |
 | 7 | Configuration and secrets | conditional | 10 | scan rows 5–6 found a non-obvious config story |
 | 7b | Communication | required | 4 | always |
@@ -48,21 +48,30 @@ config or the solution layout. Cover: build, run, test, and EF migration when th
 migration block applies. Group them in one fenced block per concern.
 *Never:* a command that was not verified against a real source.
 
-**4 — Project structure.** A tree **no deeper than two levels**, annotated only
-where the name does not explain the role. The purpose is to say where new code
-goes, not to inventory what exists.
-*Never:* a full recursive listing — Claude reads that from disk faster than from
-here, and it goes stale the same day.
+**4 — Project structure.** **Deviations only.** Open with one line pointing at
+the skills that own placement — `facade-module-architecture` for where files and
+projects go, `module-feature` for what a module folder holds — then list only the
+places where this repository does *not* match them, each with one clause saying
+why.
+*Never:* a directory tree. A tree that merely mirrors the canonical shape is
+doctrine restated, and a tree of a repository still taking shape is worse than
+none — it reads as the intended final shape, so Claude stops creating what is
+missing. If the layout conforms, this section is one pointer line, or absent.
 
-**5 — Architecture and layering.** The dependency direction as the
-`ProjectReference` graph actually shows it, plus any rule that protects it. State
-the *why* in one clause where the direction is not self-evident.
-*Never:* an essay on clean architecture.
+**5 — Architecture and layering.** **Deviations only**, on the same rule. The
+dependency direction is owned by `facade-module-architecture`, diagram included;
+if this repository matches it, **omit the section entirely** rather than drawing
+the diagram again. Keep only an edge that genuinely differs, and say why it
+differs.
+*Never:* the canonical diagram. Never an essay on clean architecture.
 
-**6 — Conventions — pointers only.** A list of the convention documents found,
-each with one clause saying when to read it. Static rule R20 lives here.
-*Never:* the content of those documents, summarised or otherwise. Copying it here
-is what pushes a file past 200 lines.
+**6 — Conventions — pointers only.** Two kinds of pointer, in one list: the
+convention documents found in the repository, and the `dotnet-standards` skills
+that own an area this repository touches. One clause each saying when to read it.
+Static rules R9, R10 and R20 live here.
+*Never:* the content of a document or a skill, summarised or otherwise. Copying
+it here is what pushes a file past 200 lines — and a summary of a skill is the
+one form of bloat that also makes the reader stop consulting the original.
 
 **7 — Configuration and secrets.** How configuration resolves, which override
 form wins, and the R12 arm the user selected. Key names only.

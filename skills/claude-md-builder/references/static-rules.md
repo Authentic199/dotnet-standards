@@ -67,15 +67,21 @@ errors in this stack, so violations survive. The rule ships anyway, by ruling.
 **Applies when** the scan found a modular layout — a folder holding domain
 modules, or facades for integrations.
 
-**R9** — `Business logic lives in <ModulesPath>. Controllers only validate the route, delegate to a service, and return; never put a query, a mapping or a business branch in a controller.`
-*Slot:* `<ModulesPath>` from the project layout in scan row 2.
-*Prevents:* logic stranded in a controller — untestable, unreusable, and a second
-home for business rules.
+Both rules below were **narrowed to pointers** after the first real run, which
+showed them restating what `facade-module-architecture` and `module-feature`
+already teach in more detail. Ship them as written; do not re-expand them into a
+description of the layout.
 
-**R10** — `Add a new capability inside the existing skeleton — a folder under <ModulesPath> for a domain, under <FacadesPath> for an integration. Do not create a new top-level folder or a new project without asking.`
-*Slots:* both from scan row 2. Ship only the arms whose paths were found.
+**R9** — `Placement is owned by facade-module-architecture (where a file, project or registration goes) and module-feature (service and validator internals). Load the skill rather than inferring the rule from the current tree.`
+*Prevents:* a flattened copy of a rule the skill states with its exceptions
+intact, which a reader then trusts instead of the real source.
+
+**R10** — `Do not create a new top-level folder or a new project without asking.`
 *Prevents:* an invented project or top-level folder that the solution file, CI
 and every sibling repository then disagree with.
+*Why this arm survived:* it is a guard, not a convention. The owning skill says
+where things go; it does not say *stop and ask before inventing a new place*,
+and that is the part a scan cannot supply either.
 
 ---
 
