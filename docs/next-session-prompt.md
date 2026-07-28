@@ -29,7 +29,7 @@ budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
 | **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
 | **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **COMPLETE. Rubric #4 `dotnet-performance-review` shipped v0.3.20, 2026-07-28** (#1 v0.3.15, #2 v0.3.17, #3 v0.3.18/19 before it) — 5 areas, honesty rule verbatim, 15 graded-by rows, 12-row Refused table; router: reservation row deleted + base-map row + slow/cost disambiguation row same commit; six grade-once violations caught pre-ship, durable fix recorded (briefs carry the sibling's full check-title inventory); full log in the rubrics file | Nothing — the rubrics file exists to hold its log. **Lane D is UNLOCKED** |
-| **D — Process Integration** | `next-session-prompt-D.md` | **D1 closed 2026-07-28: process-integration v1 shipped at v0.3.21** (two flows, two commands, six agents, warn hook, description; live smoke test run; rulings in CHANGELOG 0.3.21) | Session D2: the `bugfix` flow (v1.5, spec §6.3 — reuses review-flow's shared block); v2 candidates (PM workflow, project-setup) stay deferred per the spec |
+| **D — Process Integration** | `next-session-prompt-D.md` | **D1 closed 2026-07-28: process-integration v1 shipped at v0.3.21** (two flows, two commands, six agents, warn hook, description; live smoke test run; rulings in CHANGELOG 0.3.21). **Lane PENDING by user direction since 2026-07-28** | Nothing until the user unfreezes it. When unfrozen: session D2, the `bugfix` flow (v1.5, spec §6.3) — brief ready in the lane file; v2 candidates (PM workflow, project-setup) stay deferred per the spec |
 
 **Solo-only (never in a lane):** `project-scaffolding` (pending), the four
 rubrics, Lane D.
@@ -103,6 +103,9 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   `GetFallbackPolicyAsync`-null hazard label (R8, user's call); ClockSkew-Zero
   clock-drift trade-off (no shipped owner) — first three unblock on user word,
   the last likely refuses again at rubric #4.
+- [D, 2026-07-28] The `bugfix` flow (v1.5, spec §6.3) — full session brief
+  ready in `next-session-prompt-D.md` — **user-PENDING since 2026-07-28**;
+  unblocked only by user direction, like Lane C's frozen queue.
 - [D, 2026-07-28] `README.md` install snippet still names a stale path
   (`D:/ALTA/Project/dotnet-standards`) — pre-existing staleness, NOT caused by
   Lane D (which corrected only its own falsified lines) — any solo chore

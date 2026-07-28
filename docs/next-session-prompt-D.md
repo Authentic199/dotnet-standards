@@ -1,8 +1,11 @@
 # Lane D — Process Integration · Session D2: the `bugfix` flow (v1.5)
 
-> Copy everything below the line into a fresh Claude Code session in the
-> dotnet-standards checkout. Written at the close of D1, 2026-07-28, which
-> shipped process-integration v1 at **v0.3.21**.
+> **LANE PENDING — user direction, 2026-07-28.** Do not open this session until
+> the user unfreezes Lane D. At session start, confirm with the user that the
+> freeze is lifted; do not decide that yourself (same rule as Lane C's frozen
+> queue). Written at the close of D1, 2026-07-28, which shipped
+> process-integration v1 at **v0.3.21**. When unfrozen: copy everything below
+> the line into a fresh Claude Code session in the dotnet-standards checkout.
 
 ---
 
