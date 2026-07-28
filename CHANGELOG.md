@@ -8,6 +8,29 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.19] — Rubric session #3 budget fix, 2026-07-28
+
+### Changed
+- **`dotnet-security-review/SKILL.md` compressed 804 → 498 lines** (bar: <500;
+  siblings 246/411). Root cause was structural, not prose: the body carried all
+  29 checks in prose form where the shipped sibling convention
+  (dotnet-architecture-review, 28 of 29 checks) is table rows. 26 checks
+  converted to table rows; 3 keep prose form for sub-structure a cell cannot
+  hold (3.1 four bullets, 6.1 two lettered shapes, 6.2 the R8 BAD/GOOD blocks —
+  the 4.9 precedent). Nothing dropped: every check number, title, severity,
+  owner and `Find:` survives; all suppressions, the report template, the
+  calibration table, routing tables and Decision Guide untouched.
+  `references/security-checks.md` needed no edit (all ten body-check titles it
+  cites survive verbatim). Body-tables + references-prose confirmed as the
+  shipped house pattern, not a divergence.
+- **Defect class recorded: "an estimate presented as a count."** The 0.3.18
+  final pass reported "P2 ~470 lines" without measuring; the real figure was
+  804 assembled. Caught by the coordinator with `wc -l` post-assembly; the
+  S17-precedent budget pass (553→450) applied at larger scale. Standing rule:
+  line counts are reported only from an actual count.
+- **Margin warning:** the body ships at 498/500. The next addition to it must
+  be paid for by a cut.
+
 ## [0.3.18] — Rubric session #3 (solo), 2026-07-28
 
 ### Added
