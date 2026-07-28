@@ -15,7 +15,7 @@
 | # | Rubric | Status |
 |---|---|---|
 | 1 | `dotnet-code-review` | ☑ v0.3.15, 2026-07-28 |
-| 2 | `dotnet-architecture-review` | ☐ |
+| 2 | `dotnet-architecture-review` | ☑ v0.3.17, 2026-07-28 |
 | 3 | `dotnet-security-review` | ☐ |
 | 4 | `dotnet-performance-review` | ☐ |
 
@@ -138,6 +138,44 @@ Superpowers for the review process itself.
    After rubric #4: state explicitly that Lane D is UNLOCKED.
 
 ## Rubric log
+
+- **Rubric #2 (`dotnet-architecture-review`, 2026-07-28) — shipped v0.3.17.**
+  Verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency pass PASS on the
+  skill files (zero defects), one defect in a coordinator edit fixed
+  (rubric-1 5.8 pointer: owner column must name the LEGISLATING skill, `Find:`
+  must stay), one router disambiguation arm added on arbiter recommendation.
+  Full ruling list in CHANGELOG 0.3.17. Ran in worktree
+  `../dotnet-standards-rubric-2`, branch `rubric/dotnet-architecture-review`,
+  merged fast-forward; install proof: 16 skills, registry at 0.3.17 cache
+  (gitCommitSha = merge commit), `reference/` (2.4G) deleted from cache.
+- **Rubric #2 rulings the next sessions inherit:** severity ladder cited from
+  rubric #1 and CALIBRATED per rubric (crossing = HIGH, shape inside a correct
+  boundary = MEDIUM, placement alone never CRITICAL) — #3/#4 may calibrate the
+  same way, never re-define; check numbering is per-audit and CONTINUES into
+  the references file (body 1.1–5.7, catalogue 1.7–5.12, no reuse — a citation
+  never needs a filename); kit-anchor divergences are RECORDED in the CHANGELOG
+  (arch-check Step 1 four-baseline table collapsed, Step 3 cycle audit dropped
+  with reason); false-positive suppressions ("not a finding" blocks) are
+  first-class rubric content when the kit anchor generates them.
+- **Claimed/settled cross-rubric at #2:** rubric #1's check 5.8 → pointer to
+  rubric #2's 4.9 (number and `Find:` kept, owner = `module-feature`); check
+  5.9 stays in rubric #1; entity-base-response stays rubric #1's 2.7.
+- **Banked, verified orphan:** `Guid.NewGuid()` on entity keys —
+  `facade-module-architecture/references/core-contracts.md:40` states the
+  sequential-key rule, NO rubric checks it; natural home is rubric #1's
+  review-rubric area 1 (data access) — a dotnet-code-review-owning session.
+- **Flagged outside ownership (CHANGELOG 0.3.17 Known seams + board PENDING):**
+  fma still prints `Events/` in its module tier list (SKILL.md:197,
+  references/modules.md:26) — stale vs `mediatr-messaging`'s `DomainEvents/`
+  ruling; rubric #2's catalogue ships an explicit precedence note.
+- **Rubric #2 process notes:** all three agents pinged once, continued across
+  P1→P2→P3→final pass via SendMessage; drafts forwarded VERBATIM every round
+  (clean session); coordinator catches: body 4.9 section-name erratum (*When a
+  service outgrows one file*), 3 of A's + 1 of B's body cross-references
+  miscited (arbiter verified and fixed all); the `uniq -d` duplicate-
+  registration one-liner was RUN before shipping; standing delegation held,
+  R7/R8 untouched (no new exemplars, no new labels, `reference/projects/`
+  never opened).
 
 - **Rubric #1 (`dotnet-code-review`, 2026-07-27/28) — shipped v0.3.15.**
   Verdicts: P1 MERGE, P2 MERGE, P3 MERGE; final consistency pass PASS (3
