@@ -37,10 +37,29 @@ produced them live in [`docs/01-triage-rules.md`](docs/01-triage-rules.md).
 
 ## Install
 
-The plugin is served from a local marketplace in this same repository.
+The plugin is served from a marketplace declared in this same repository
+(`.claude-plugin/marketplace.json`, name `dotnet-standards-dev`). Point the
+marketplace at the GitHub remote — no local checkout required on the target
+machine:
 
 ```
-/plugin marketplace add D:/ALTA/Project/dotnet-standards
+/plugin marketplace add Authentic199/dotnet-standards
+/plugin install dotnet-standards@dotnet-standards-dev
+```
+
+Requires the [Superpowers](https://github.com/obra/superpowers) plugin —
+install it first (or alongside):
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install superpowers@claude-plugins-official
+```
+
+Working on this repo itself and want the marketplace to track your local
+checkout instead of GitHub, use a directory source:
+
+```
+/plugin marketplace add /absolute/path/to/dotnet-standards
 /plugin install dotnet-standards@dotnet-standards-dev
 ```
 
