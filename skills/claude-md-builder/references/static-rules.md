@@ -112,6 +112,25 @@ analyzer cannot protect on its own.
 
 ---
 
+## Communication and language
+
+**Applies when** always. This group ships in every generated file — it is the one
+group that costs almost nothing and is wrong in a way nobody notices until a
+whole document comes back in the wrong language.
+
+**R22** — `Talk to the user in Vietnamese: chat replies, questions, summaries, and any prose document written for the user. Code, identifiers, commands and paths stay in English.`
+*Prevents:* a long report or a design document delivered in a language the reader
+did not ask for, which then has to be produced twice.
+
+**R23** — `When using Superpowers: brainstorming output is written in Vietnamese. The plan stays in English.`
+*Prevents:* the split being guessed. Brainstorming is a conversation with the
+user and follows R22; a plan is an artifact other agents execute, so it stays in
+the language the tooling and the codebase use.
+*Note:* self-gating — the rule states its own condition, so it ships whether or
+not the scan can detect Superpowers in the repository.
+
+---
+
 ## Scope, workflow and verification
 
 **Applies when** always, except where noted.
