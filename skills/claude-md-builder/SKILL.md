@@ -247,10 +247,10 @@ These are not preferences. A draft violating any of them is rejected and redraft
   do not commit. Proposing the commit is the last step; approving it is the
   user's.
 - **Talk to the user in Vietnamese** — every question, summary and hand-over in
-  this workflow. The generated `CLAUDE.md` is written in Vietnamese too;
-  commands, paths, identifiers and code stay in English. Static rules are stored
-  in English in `references/static-rules.md` and restated in Vietnamese on the
-  way into the output — their meaning does not change in translation.
+  this workflow. **The generated `CLAUDE.md` itself is written in English**, and
+  the static rules ship in their canonical English form. The split is the same
+  one R23 draws: the conversation is Vietnamese, the artifact agents execute
+  against stays in the language of the codebase.
 
 ## Resources
 
