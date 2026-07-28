@@ -8,6 +8,105 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.21] — Process-integration layer v1 (Lane D), 2026-07-28
+
+The "Knowledge only" promise is deliberately broken, per the approved design
+`docs/superpowers/specs/2026-07-27-process-integration-design.md` (user ruling,
+S14/D0). The plugin now has two layers: knowledge (unchanged) and process
+integration — closed-loop workflows that CALL Superpowers, never copy it.
+
+**Shipped (five groups):**
+
+- **Two flow skills** (three-way loop, one MERGE verdict each):
+  `dotnet-review-flow` — the shared TEST-LOOP → REVIEW-LOOP block, standalone
+  (`/dotnet-review`, ends at the report, fixing OFFERED) or embedded (called by
+  the feature flow as its PHASES 4–5; caller must state "embedded", default is
+  standalone — the safe direction). `dotnet-feature-flow` — PHASE 0 → brainstorm
+  → plan → GATE 1 (human) → implement (≤3 use-cases: TDD in-session; >3:
+  subagent-driven-development; plan-step skill pointers mandated via the
+  router's planning section) → the sibling's shared block, embedded → git →
+  GATE 2 (human, before any push).
+- **Six specialist agents** (three-way loop, two MERGE verdicts): four
+  read-only reviewers (`dotnet-code-reviewer`, `dotnet-architecture-reviewer`,
+  `dotnet-security-reviewer`, `dotnet-performance-reviewer`) bound to the four
+  rubrics, `tools: ["Read","Grep","Glob"]` — read-only by configuration; and
+  two testers (`dotnet-unit-tester`, `dotnet-integration-tester`) bound to
+  `dotnet-testing`'s two tiers, `+Bash` for build/test only, file mutation via
+  shell forbidden by instruction.
+- **Two commands**: `/dotnet-feature`, `/dotnet-review` — thin deterministic
+  entries; plugin-command namespacing verified against current docs before
+  naming (spec §9.1): always `/dotnet-standards:<name>`, bare form as fallback;
+  plugins CAN shadow built-ins, hence the `dotnet-` prefix.
+- **SessionStart `superpowers-check` hook** (warn-only; PHASE 0 of each flow is
+  the hard stop) + `hooks/README.md` justification against the wrapper's
+  silent-absence rule; `.gitattributes` pins LF on the new script.
+- **Description rewrite** in BOTH manifests (two layers; requires Superpowers).
+  The rewrite also drops two claims for skills that do not ship
+  (`observability`, `worker services` — both user-PENDING) and corrects "CQRS
+  pipeline" to "in-process messaging pipeline" per the S8 ruling (0.3.3) that
+  renamed `cqrs-feature-slice`; the same correction is applied to README's tier
+  table.
+
+**Key rulings (arbiter + coordinator, recorded):**
+
+- Severity vocabulary: the spec's "blocking/major" is superseded by the shipped
+  ladder CRITICAL/HIGH/MEDIUM/INFO (`dotnet-code-review` owns it; spec §9.3
+  anticipated this). Loop exit = no CONFIRMED CRITICAL/HIGH remain.
+- Test taxonomy verified: exactly two tiers (unit, integration; flow tests live
+  inside integration) — two tester agents, adding nothing (spec §9.2/§4).
+- Closed tester verdict vocabulary (arbiter addition): GREEN · RED — tests
+  failed · RED — build failed · RED — environment · RED — timed out · tier
+  absent — nothing run. The flow branches on exactly these; `RED — environment`
+  halts immediately without consuming a round; `tier absent` never blocks the
+  loop and never reads as a pass.
+- PHASE 0 checks Superpowers by ACTUALLY LOADING a Superpowers skill, never by
+  reading `installed_plugins.json` (a disabled install keeps its registry key);
+  plugin completeness checked against the session's skill/agent roster, not by
+  loading five rubrics (contamination + cost).
+- Reviewer tools allow-list is the sole read-only mechanism (`disallowedTools`
+  rejected as drift); agent files are NOT bound by the §5 skill-description law
+  (different selection mechanism) but keep <100 words + anti-triggers; agent
+  `Not for:` entries name sibling AGENTS, not skills (the reader is choosing
+  what to spawn).
+- Both piece-1 authors shared a blind spot the arbiter corrected: the Low-radius
+  report-collapse exception (`dotnet-code-review` L185) was missing from the
+  code reviewer. Unverified runner-flag claims (`--logger` verbosity) cut per
+  the S16/S17 provenance precedent.
+- Spec §9.4 resolved: both flow skills are single-body (398 and 362 lines); no
+  references/ split — one control-flow graph has no long tail.
+- `superpowers:writing-plans` has no "use-case" unit — its unit is `### Task N`
+  (verified). The spec's `≤ 3 use-cases` threshold is kept as the user's own
+  approved concept and defined in `dotnet-feature-flow` as units of delivered
+  behaviour grouped from the plan's tasks, with a count-as-two tie-break. It is
+  deliberately NOT the task count: a three-use-case feature routinely spans six
+  tasks, so re-expressing the threshold in tasks would have silently moved
+  almost every run onto the subagent route.
+- GATE 2 moved INSIDE PHASE 6, binding `finishing-a-development-branch`'s
+  integration-option choice (spec §6.1 draws it after PHASE 6; the verified
+  fact that the push option lives inside that skill makes the after-placement a
+  race — the spec's constraint "no push without GATE 2" is preserved, the
+  mechanism refined).
+- `superpowers:finishing-a-development-branch` presents push as a user-chosen
+  option (verified) — GATE 2 is positioned at the option choice, not after the
+  skill returns.
+- Router alignment (same session): two base-map rows (the two flows), a "review"
+  shared-token row, the base-map order line gains "→ flows", and the router
+  description's `Not for:` narrowed from "process-layer workflow — Superpowers"
+  to "the process skills themselves" (the flows are now in-plugin process
+  layer). README.md minimally corrected where this lane falsified it
+  ("commands deliberately absent", "does not own workflow", stale status
+  table) — a coordinator boundary call, logged for veto.
+- Known maintenance cost (recorded, not engineered around): the four reviewer
+  bodies share ~50% structure with no include mechanism — a future edit to the
+  shared report-discipline wording is made four times.
+
+**v1.5 next (Lane D's next session):** the `bugfix` flow (spec §6.3 —
+systematic-debugging → fix → the same shared blocks). Banked: rewrite the
+agents' rationalization tables from observed smoke-test behaviour if it
+diverges from the predictions.
+
+---
+
 ## [0.3.20] — Review rubric #4: `dotnet-performance-review`, 2026-07-28
 
 ### Added

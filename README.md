@@ -10,22 +10,26 @@ independent plugin. No Superpowers file is ever modified.
 | Tier | Owner | Responsibility |
 |---|---|---|
 | 1. Process | **Superpowers** | brainstorm → plan → TDD → review |
-| 2. Knowledge | **`dotnet-standards`** (this repo) | What the code looks like: architecture, CQRS pipeline, EF Core, caching, search, API surface, testing |
+| 2. Knowledge | **`dotnet-standards`** (this repo) | What the code looks like: architecture, in-process messaging pipeline, EF Core, caching, search, API surface, testing |
 | 3. Context | Per-project `CLAUDE.md` | Which conventions apply to *this* codebase |
 
-This plugin does not own workflow and does not own project-specific context. If
-a component here starts prescribing a process, it is in the wrong tier.
+Since the process-integration layer (Lane D, spec
+`docs/superpowers/specs/2026-07-27-process-integration-design.md`), this plugin
+also ships closed-loop workflows (`/dotnet-feature`, `/dotnet-review`) that sit
+ON TOP of tier 1: they call Superpowers skills and this repo's knowledge skills;
+they copy neither. The old "does not own workflow" promise was deliberately
+revised by that spec. Project-specific context still belongs to tier 3.
 
 ## Status
 
-**v0.1.0 — scaffold only.**
+**v0.3.21 — knowledge layer + process-integration layer shipped.**
 
 | Component | State |
 |---|---|
-| `hooks/` | ✅ one hook, `post-edit-format` — see [`hooks/README.md`](hooks/README.md) |
-| `skills/` | empty — built in S7–S8 |
-| `agents/` | empty — one agent planned |
-| `commands/` | **deliberately absent.** Slash-command names collide too easily with Claude Code built-ins; the review rubrics ship as skills instead. |
+| `hooks/` | ✅ two hooks, `post-edit-format` + `superpowers-check` — see [`hooks/README.md`](hooks/README.md) |
+| `skills/` | ✅ knowledge skills, four review rubrics, the router, and two flow skills |
+| `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
+| `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
 
 Triage of the reference kit is complete: 94 components decided across four
 groups. The decisions live in [`docs/TRIAGE.md`](docs/TRIAGE.md); the rules that
