@@ -200,6 +200,66 @@ never before.
 tests, what changed between rounds, how many rounds ran — and ask the user. Never
 a sixth, and never relax the green bar to escape the cap.
 
+### NO-SIGNAL
+
+Entered when a tester returns `RED — environment` or `tier absent — nothing
+run`. Both mean one thing — **no evidence about the code under review, and
+nothing in the code to fix** — so from here the flow treats them identically.
+Splitting them is what let one of them deliver a report and the other deliver
+nothing.
+
+> **NO-SIGNAL may end in a question. It may never end in nothing delivered.**
+> Whether repair succeeds, fails, or waits on an answer, REVIEW-LOOP still runs
+> and the report is still produced. The lenses never depended on the tiers.
+
+**1 — State it so the user can act on it.** Name what is missing and why, in
+words that support a decision. A verdict string and an error code are a
+symptom, not a diagnosis. A user who cannot tell what is being asked does not
+answer, and an unanswered question is exactly how a run ends with nothing.
+
+**2 — Measure before offering. Numbers, not adjectives.**
+
+| Entry | Measure |
+|---|---|
+| `RED — environment` | What is blocking, taken from the tester's *Environment* section; whether it is repairable here; which rung of the table below it falls on |
+| `tier absent — nothing run` | How many types in scope have no test, which tiers exist versus are empty, and whether the missing tier needs infrastructure stood up — that last one changes the size of the job by an order of magnitude |
+
+"This would be a large job" is unusable. "Module X: 14 types, 0 tests" is a
+decision input.
+
+**3 — Repair, at most twice.** One question classifies every action: **does it
+acquire something over the network?**
+
+| Do it | Ask first | Never |
+|---|---|---|
+| Start containers whose images are already local | **Anything acquired over the network** — a missing package, an image not yet pulled | Anything irreversible on the user's machine |
+| Re-run the pair **serially** — unit first, then integration — on an artifact lock, and note the serialization | Install software on the machine | Anything needing administrator rights |
+| Re-run a command, read configuration | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
+| | | Edit a test to dodge a failure — the testers' ban, and it does not loosen because the coordinator is the one holding the pen |
+
+**Two attempts, then explain and ask.** Every other loop here is capped; an
+uncapped repair loop spends a session invisibly. An ordinary build restoring
+its own packages is building, not repairing, and this table does not govern it
+— a build that **fails because acquisition failed** is what enters here.
+
+**4 — Offer options built from the measurement. Never a bare yes/no.** The list
+is generated from what step 2 counted; it is not written down here, because a
+fixed menu cannot know what was measured. It always includes *do nothing,
+record it in the report*, and it includes a partial option whenever the
+measurement decomposes into parts — one module rather than four, the unit tier
+rather than both. Yes/no forces a user who has an hour to choose between
+nothing and everything.
+
+If the user accepts writing tests, **this session writes them** — the same
+mechanism as the end-of-report offer, on the same authority: the user's answer.
+What a test looks like belongs to `dotnet-testing`; none of it is taught here.
+**This offer is standalone only.** Embedded under `dotnet-feature-flow`, tests
+are written as the feature is built and the calling flow owns that. The repair
+ladder above applies in both modes.
+
+**Then continue to REVIEW-LOOP regardless.** Every tier that produced no signal
+goes into *Not run* with what was attempted and what the user chose.
+
 ### REVIEW-LOOP
 
 Entered **only with both tiers green** (or absent and recorded).
