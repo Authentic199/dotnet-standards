@@ -28,7 +28,7 @@ has one — never regenerate over a file a human has tuned.
 Cutting across both, one branch: a repository that has no business code yet.
 There the codebase answers nothing, and the only available source is whatever
 documentation the user hands over. That branch is narrower, not looser — see
-*PHASE 1b* and principle 8.
+*PHASE 1b* and principle 9.
 
 ## Core Principles
 
@@ -66,7 +66,30 @@ documentation the user hands over. That branch is narrower, not looser — see
    that matter. Depth goes into the documents `CLAUDE.md` points at, never into
    `CLAUDE.md` itself.
 
-8. **A document states intent; only the codebase states fact.** A spec, a design
+8. **Record the delta, not the doctrine.** This plugin already owns most .NET
+   conventions, and its skills load on demand while `CLAUDE.md` spends context
+   every session. So where a `dotnet-standards` skill owns a convention,
+   `CLAUDE.md` **points at the skill and says nothing more**. Write a line only
+   where this repository *differs* from what the skill prescribes, or where the
+   skill has no answer.
+
+   The skill is always present — this skill ships inside the plugin, so if it is
+   running, the plugin is installed. No detection is needed.
+
+   | Area | Owner — point here, do not restate |
+   |---|---|
+   | Project layout, project references, dependency direction, the composition root, DI lifetime markers | `facade-module-architecture` |
+   | What a module folder holds; service and validator internals | `module-feature` |
+   | Repositories, queries, entities, migrations | `ef-core-data-access` |
+   | Routes, controller actions, request and response DTOs | `api-surface` |
+   | User-facing text and message keys | `message-keys` |
+   | Anything unclear | `choosing-a-dotnet-skill` |
+
+   A restatement is worse than a pointer even when it is accurate: it is shorter
+   than the skill, so it flattens rulings the skill draws carefully, and a reader
+   who believes they now know the rule stops opening the real source.
+
+9. **A document states intent; only the codebase states fact.** A spec, a design
    note or an ERD is evidence about what the project *means to be*. It is never
    evidence that a command runs, that a folder exists, or that a framework was
    chosen — those are settled by the repository or not at all. Everything taken
@@ -96,6 +119,11 @@ Three rules hold across the whole scan:
   `RedisSettings` exists is the inference; the connection string is not.
 - **Record where each inference came from.** A fact with no file behind it does
   not go in the draft.
+- **Then compare every layout and convention finding against the owning skill**
+  (principle 8). A finding that matches what the skill already prescribes is
+  *not* a finding — it becomes a pointer. Only mismatches survive as content.
+  This step is what keeps the scan from re-introducing doctrine through the back
+  door.
 
 **Then check the gate.** Did the scan produce enough to fill the two required
 sections — *Project overview* and *Commands*? Concretely: a solution or project
@@ -207,8 +235,9 @@ about intent and unreliable about facts.
 1. **Scan first anyway** (PHASE 1) — commands, layout and packages drift; the
    file does not.
 2. **Diff, do not regenerate.** Produce a change list: lines that are now factually
-   wrong, lines that duplicate an analyzer, lines Claude can derive from the code,
-   and genuine gaps. Show it before editing.
+   wrong, lines that duplicate an analyzer, lines that restate a convention a
+   `dotnet-standards` skill owns, lines Claude can derive from the code, and
+   genuine gaps. Show it before editing.
 3. **Ask the update question:** *"What mistake did Claude repeat recently?"* Every
    answer is a candidate rule — this is the highest-yield source of real rules
    there is, because it is evidence rather than prediction. Add each as one
@@ -230,6 +259,9 @@ These are not preferences. A draft violating any of them is rejected and redraft
 
 - **Never paste generic content the model already knows.** If the sentence would
   be equally true in a Node repository, it does not belong here.
+- **Never restate a convention a `dotnet-standards` skill owns.** Point at the
+  skill. A rule the user rejected as a static rule must not return as a "scan
+  finding" — that is the same rule wearing a different hat.
 - **Never duplicate a linter or analyzer rule.** Formatting, naming casing, using
   ordering, XML-doc presence and nullable warnings are all out of scope by
   construction.

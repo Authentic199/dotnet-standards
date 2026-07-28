@@ -37,6 +37,27 @@ pinned SDK or an existing `CLAUDE.md` are all real findings. What it cannot
 produce is a command, a module path or a package list, and none of those may be
 supplied from a document.
 
+## Compare against the owning skill before writing anything down
+
+Layout and convention findings — rows 2, 5, 6, 7, 8 and 9 — do not go straight
+into the draft. Each is first compared against the `dotnet-standards` skill that
+owns the area (see the skill's principle 8 table):
+
+- **Matches the skill** → not a finding. It becomes a pointer to that skill, and
+  the detail is dropped. Most findings end here.
+- **Differs from the skill** → a real finding. Keep it, and say *that* it differs
+  and why.
+- **The skill has no answer** → a real finding, usually a domain rule. Keep it.
+
+Two extra suppressions:
+
+- **Never emit a directory tree that merely mirrors the canonical shape.** It is
+  doctrine restated, and it goes stale the first time a folder is added.
+- **A repository still taking shape gets no tree at all.** Signals: few modules,
+  a layout that is obviously partial, or a `Planned, not yet built` section in
+  play. A snapshot of an unfinished layout reads as the intended final shape, so
+  Claude stops creating what is missing — the opposite of what the file is for.
+
 ## What is never inferred
 
 Test policy, deliberate oddities, and whether committed credentials are

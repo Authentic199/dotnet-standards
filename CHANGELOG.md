@@ -8,6 +8,55 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.24] — `claude-md-builder` records the delta, not the doctrine, 2026-07-29
+
+First real run, against a live consumer repository, exposed a design hole: the
+user had rejected R7 (dependency direction) and R8 (marker-interface DI
+registration) as static rules **because `facade-module-architecture` already owns
+them** — and the scan then rediscovered both from source and wrote them into the
+generated file's *Project structure* and *Architecture and layering* sections. A
+rejected rule returned as a "scan finding". The rejection was recorded at one
+layer; the skill had a second, unguarded path.
+
+Verified before acting: `facade-module-architecture` teaches both, in more
+detail than the generated file did — `SKILL.md:21` carries the same dependency
+diagram, `references/solution-layout.md:16-21` adds the trap that a redundant
+`Core` reference in `Web.csproj` still compiles, and `SKILL.md:95-100` rules that
+there are exactly two lifetime markers and deliberately no singleton one. The
+generated file had flattened that to a single marker. The failure mode is not
+inaccuracy but confidence: a reader who believes they know the rule stops opening
+the source that states its exceptions.
+
+**Changed:**
+
+- **New core principle 8 — *Record the delta, not the doctrine*.** Where a
+  `dotnet-standards` skill owns a convention, `CLAUDE.md` points at it and says
+  nothing more; a line is written only where the repository *differs*, or where
+  the skill has no answer. Includes the owner table. The skill can assume the
+  plugin is installed — it ships inside it, so if it runs, the plugin is there.
+- **PHASE 1 gains a comparison step.** Layout and convention findings are checked
+  against the owning skill before reaching the draft: match → pointer, differ →
+  content, no answer → content.
+- **Template sections 4 and 5 are now deviations-only**, budgets cut 25 → 8 and
+  15 → 8, both omitted entirely when the repository conforms. Directory trees are
+  banned outright: one that mirrors the canonical shape is doctrine restated, and
+  one of a repository still taking shape reads as the intended final layout and
+  stops Claude creating what is missing. Section 6 now carries skill pointers
+  alongside document pointers.
+- **Checklist gains cut item 2** — doctrine an owning skill already covers, with
+  an explicit instruction to check twice for rules the user rejected. Later items
+  renumbered.
+- **R9 narrowed to a pointer**; **R10 narrowed to its guard arm** — *do not create
+  a new top-level folder or project without asking* — which survives because it
+  is a guard, not a convention, and no skill states it.
+- **New hard constraint:** never restate a convention a `dotnet-standards` skill
+  owns.
+
+Expected effect on the run that triggered this: the two sections collapse from
+27 lines to about 8, and *Architecture and layering* disappears entirely.
+
+---
+
 ## [0.3.23] — `claude-md-builder` speaks Vietnamese, 2026-07-28
 
 Language is now settled at both levels, on user direction.
