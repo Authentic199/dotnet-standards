@@ -1,5 +1,24 @@
 # Lane D — Process Integration · Session D2: the `bugfix` flow (v1.5)
 
+> **A MAINTENANCE SESSION RAN ON 2026-07-29 — read this before the brief below.**
+> It shipped **v0.3.25**: the `NO-SIGNAL` section in `dotnet-review-flow`. It did
+> not touch the D2 brief, which stands unchanged. Why it matters to D2: the
+> shared block now has **three** named units, not two, and `dotnet-feature-flow`
+> was amended to stop when the block returns a tier under *Not run*. A bugfix
+> flow quoting the shared block inherits both. Full rulings: CHANGELOG 0.3.25;
+> design and plan under `docs/superpowers/`.
+>
+> Two process facts that session paid for, which D2 should not rediscover:
+> the plugin installs from **GitHub**, not from this checkout, and at **project
+> scope** bound to an unrelated repo — so `claude plugin update` needs
+> `--scope project` and a `git push` first. And a parallel session took the same
+> version number without any git conflict, because both wrote the identical
+> string into both manifests; read the version off `main` at merge time.
+>
+> The user waived the three-way drafting loop for that session because it was a
+> bugfix to an already-shipped skill, not new skill content. That waiver was
+> per-session and does not carry to D2.
+
 > **LANE PENDING — user direction, 2026-07-28.** Do not open this session until
 > the user unfreezes Lane D. At session start, confirm with the user that the
 > freeze is lifted; do not decide that yourself (same rule as Lane C's frozen

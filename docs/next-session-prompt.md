@@ -7,8 +7,10 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.21 (20 skills + 2 commands + 6 agents + 2 hooks)** as of
-2026-07-28 (0.3.21 = process-integration v1, Lane D session D1:
+Shipped through **v0.3.25 (23 skills + 2 commands + 6 agents + 2 hooks)** as of
+2026-07-29. The board header sat at 0.3.21 for four releases — if you ship,
+update this line, or the next session reads a stale roster.
+Earlier: 0.3.21 = process-integration v1, Lane D session D1:
 `dotnet-feature-flow`, `dotnet-review-flow`, `/dotnet-feature`,
 `/dotnet-review`, six specialist agents, SessionStart `superpowers-check`,
 two-layer description — full rulings CHANGELOG 0.3.21). Before it:
@@ -19,7 +21,9 @@ choosing-a-dotnet-skill 0.3.10 · dotnet-testing 0.3.11 · automapper-mapping
 0.3.12 · auth-and-security 0.3.13 (0.3.14 = router-alignment hotfix) ·
 dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16 ·
 dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18 (0.3.19 =
-budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21.
+budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21 ·
+claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
+`dotnet-review-flow` NO-SIGNAL 0.3.25.
 
 ## Lane status
 
@@ -29,7 +33,7 @@ budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
 | **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
 | **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **COMPLETE. Rubric #4 `dotnet-performance-review` shipped v0.3.20, 2026-07-28** (#1 v0.3.15, #2 v0.3.17, #3 v0.3.18/19 before it) — 5 areas, honesty rule verbatim, 15 graded-by rows, 12-row Refused table; router: reservation row deleted + base-map row + slow/cost disambiguation row same commit; six grade-once violations caught pre-ship, durable fix recorded (briefs carry the sibling's full check-title inventory); full log in the rubrics file | Nothing — the rubrics file exists to hold its log. **Lane D is UNLOCKED** |
-| **D — Process Integration** | `next-session-prompt-D.md` | **D1 closed 2026-07-28: process-integration v1 shipped at v0.3.21** (two flows, two commands, six agents, warn hook, description; live smoke test run; rulings in CHANGELOG 0.3.21). **Lane PENDING by user direction since 2026-07-28** | Nothing until the user unfreezes it. When unfrozen: session D2, the `bugfix` flow (v1.5, spec §6.3) — brief ready in the lane file; v2 candidates (PM workflow, project-setup) stay deferred per the spec |
+| **D — Process Integration** | `next-session-prompt-D.md` | **Dm1 (maintenance) closed 2026-07-29: `dotnet-review-flow` NO-SIGNAL shipped at v0.3.25.** Triggered by a real `/dotnet-review` run that halted on `RED — environment` and delivered no report at all. Also fixed a regression this same change introduced in `dotnet-feature-flow`. Rulings in CHANGELOG 0.3.25; spec + plan under `docs/superpowers/`. Before it: D1 shipped process-integration v1 at v0.3.21 | Lane D's *feature* queue stays PENDING by user direction. When unfrozen: session D2, the `bugfix` flow (v1.5, spec §6.3) — brief still valid in the lane file. A maintenance session on an already-shipped flow does **not** need that unfreeze; treat it as a separate track |
 
 **Solo-only (never in a lane):** `project-scaffolding` (pending), the four
 rubrics, Lane D.
@@ -122,6 +126,29 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   it) — detail in CHANGELOG 0.3.17 Known seams — belongs in
   `dotnet-code-review` review-rubric area 1; needs a dotnet-code-review-owning
   session.
+
+- [D, 2026-07-29] **The install is project-scoped, and it installs from GitHub,
+  not from this checkout.** `installed_plugins.json` records
+  `dotnet-standards@dotnet-standards-dev` at scope **project**, bound to
+  `D:\ALTA\Project\TWOH\ops-service`; the marketplace source is the GitHub repo
+  `Authentic199/dotnet-standards` with `autoUpdate: true`. Consequences the
+  prove-it rule does not yet state: `claude plugin update ...` without
+  `--scope project` fails with "not installed at scope user", and a local merge
+  to `main` changes nothing until it is **pushed**. Unblocks: someone folding
+  this into the standing prove-it rule.
+- [D, 2026-07-29] **Two sessions can silently pick the same version number.**
+  Both this lane and the parallel `claude-md-builder` session wrote `0.3.24`
+  into both manifests. Git saw identical strings and merged them without a
+  conflict — only `CHANGELOG.md` conflicted, and only because both entries
+  wanted the top slot. The duplicate would have shipped unnoticed. Unblocks:
+  a check in the ship protocol that reads the version off `main` at merge time
+  and compares, rather than trusting the branch's own number.
+- [D, 2026-07-29] **`RED — tests failed` in standalone mode never reaches the
+  review lenses.** Nobody fixes in standalone, so the tiers never go green and
+  REVIEW-LOOP's entry condition is never met — the same shape as the defect
+  0.3.25 just closed, in a case that was explicitly out of its scope. Detail:
+  final-review findings, `.superpowers/sdd/2026-07-28-review-flow-no-signal/`.
+  Unblocks: a `dotnet-review-flow`-owning session.
 
 ## Standing rules (unchanged, summarized)
 
