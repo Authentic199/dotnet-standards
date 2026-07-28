@@ -39,18 +39,27 @@ of failure persists; only the instance changed.
 
 ## Scope
 
-**In:** `skills/dotnet-review-flow/SKILL.md` only.
+**In:** `skills/dotnet-review-flow/SKILL.md`, plus one additive report section
+in `agents/dotnet-unit-tester.md` (see below).
+
+**Neither tester gains any power to repair.** Both forbid all repair — no file
+writes, no `dotnet add package`, no starting or stopping containers by hand —
+for a reason stated in their own bodies: *"a tester that repairs its own red is
+no longer evidence the suite was ever red."* That constraint is correct and
+load-bearing, and nothing here touches it. Environment repair belongs to the
+coordinating session, which is also the only actor that can ask the user and
+the only one not running in parallel with a peer.
+
+`agents/dotnet-unit-tester.md` gains an `### Environment` section in its report
+template, mirroring `agents/dotnet-integration-tester.md:61`. Verified gap: the
+integration tester carries an environment message verbatim in its own section;
+the unit tester's template has no such section, leaving a one-sentence Verdict
+tail as the only home for it. NO-SIGNAL's Steps 1 and 2 require that message to
+diagnose and measure, and the unit tier is the one that failed in the
+originating incident. Purely additive — a place to put text the agent already
+has.
 
 **Out, deliberately:**
-
-- `agents/dotnet-unit-tester.md` and `agents/dotnet-integration-tester.md` are
-  **not touched.** They forbid all repair — no file writes, no `dotnet add
-  package`, no starting or stopping containers by hand — for a reason stated in
-  their own bodies: *"a tester that repairs its own red is no longer evidence
-  the suite was ever red."* That constraint is correct and load-bearing.
-  Environment repair therefore belongs to the coordinating session, which is
-  also the only actor that can ask the user and the only one that is not
-  running in parallel with a peer.
 - How to write a test. This skill "teaches nothing" (`:21`). When tests must be
   written, it routes to `dotnet-testing`.
 - The four rubric skills, the four reviewer agents, `dotnet-feature-flow`.
@@ -191,11 +200,13 @@ bar is <500, so it does not break — but sibling skills run 117–450, putting
 this at the top of the range. If trimming is needed, cut wording, never content
 (arbiter ruling, S17).
 
-**Verification gap.** The flow's diagnosis quality depends on the testers
-reporting enough detail to classify a failure. `dotnet-integration-tester.md:61`
-already carries the environment message verbatim in its *Environment* section.
-Confirm the unit tester does the same before relying on it; if it does not, that
-is a follow-up on the agent file, not a change to this design.
+**Verification gap — checked, and it was real.** The flow's diagnosis quality
+depends on the testers reporting enough detail to classify a failure.
+`dotnet-integration-tester.md:61` carries the environment message verbatim in
+its *Environment* section; `dotnet-unit-tester.md:81-104` has no such section.
+In the originating incident the unit tester surfaced the blocking message
+anyway, by improvising around its own template — which is not a property to
+depend on. Closed by the additive section in Scope, above.
 
 ## Decisions and who made them
 
@@ -208,6 +219,7 @@ is a follow-up on the agent file, not a change to this design.
 | No standing read-only lock is codified | User |
 | One new named section rather than scattered edits | User (option A) |
 | Three-way drafting loop waived for this bugfix | User |
+| Add `### Environment` to the unit tester's report template | User, after the gap was verified |
 | Repair belongs to the coordinator, not the testers | Session, from the agent files' own stated reasoning |
 | Cap of 2 repair attempts | Session, by analogy with the skill's other caps |
 | Missing-tests offer is standalone-only | Session |
