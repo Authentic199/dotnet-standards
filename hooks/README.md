@@ -1,11 +1,15 @@
 # Hooks
 
-`dotnet-standards` ships **exactly one hook**: `post-edit-format`.
+`dotnet-standards` ships **exactly two hooks**: `post-edit-format` and
+`superpowers-check`.
 
 That is not an accident of scope. Nine hook components were triaged against
 Superpowers and against the Windows failure mode described below; eight were
-refused. If a future session thinks a second hook is needed, read
-[Why only one hook](#why-only-one-hook) first.
+refused. `superpowers-check` was added later (Lane D, spec
+`docs/superpowers/specs/2026-07-27-process-integration-design.md` §5) and was
+admitted only because it passes the same test the eight failed. If a future
+session thinks another hook is needed, read
+[Why only these hooks](#why-only-these-hooks) first.
 
 ---
 
@@ -22,11 +26,11 @@ all:
 | **Utility script** | Nowhere — invoked by a workflow or piped by hand | A human or a skill runs it |
 
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
-ships one hook of the first kind and zero of the other two.**
+ships two hooks of the first kind and zero of the other two.**
 
 ---
 
-## The one hook
+## The two hooks
 
 **`post-edit-format`** — after Claude edits or writes a file, format it.
 
@@ -55,8 +59,6 @@ red-green loop; formatting one file inside one project is not. Swallowing
 failures is deliberate for the same reason — a formatter must never be able to
 interrupt an edit.
 
-Nothing else in this plugin registers a Claude Code event.
-
 ### Step 4 is not written the obvious way, and it cannot be
 
 The reference kit invokes `dotnet format "$PROJECT" --include "$FILE"` with
@@ -78,6 +80,29 @@ comparison of the file on disk.
 
 The fix is to `cd` into the project directory and pass both the project file and
 the `--include` path relative to it. That is what the script does.
+
+**`superpowers-check`** — at session start, warn if Superpowers is missing.
+
+| | |
+|---|---|
+| Event | `SessionStart` |
+| Command | `"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" superpowers-check` |
+| Mode | synchronous (`"async": false`) |
+
+Reads `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json`; if
+no `superpowers@…` entry exists, emits a `systemMessage` warning (with the
+exact install command and a restart reminder) plus `additionalContext` telling
+Claude the flow skills will hard-stop at their PHASE 0 preflight. **Warn only —
+it always exits 0 and never blocks a session**: knowledge-only sessions without
+Superpowers are legitimate (spec §5.1).
+
+Why it passes the rule below that killed the guard candidates: its silent
+absence is benign **by design**, because it is only the early warning — the
+enforcement lives in each flow skill's PHASE 0 hard-stop, which runs with or
+without this hook. A machine with no bash loses the courtesy warning and
+nothing else.
+
+Nothing else in this plugin registers a Claude Code event.
 
 ---
 
@@ -156,7 +181,7 @@ whether the file changes on disk. If it does not, run
 
 ---
 
-## Why only one hook
+## Why only these hooks
 
 The other eight candidates, and why each was refused:
 
@@ -183,4 +208,5 @@ not "is this useful?" but "if this silently never runs, is the user still safe?"
 |---|---|
 | `hooks.json` | The manifest. Auto-loaded by Claude Code — it must **not** also be declared under `plugin.json`'s `manifest.hooks`, which raises *"Duplicate hooks file detected"*. |
 | `run-hook.cmd` | The polyglot CMD/POSIX wrapper. Copied from Superpowers (MIT — see `NOTICE`). |
-| `post-edit-format` | The hook itself. Extensionless. Derived from the reference kit (MIT — see `NOTICE`). |
+| `post-edit-format` | The formatting hook. Extensionless. Derived from the reference kit (MIT — see `NOTICE`). |
+| `superpowers-check` | The dependency warning hook. Extensionless. Warn-only by design (spec §5). |
