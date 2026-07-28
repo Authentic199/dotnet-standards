@@ -32,13 +32,14 @@ Rows marked *not yet covered* mean no skill here owns that area yet — see
 
 ## Base map — one area, one skill
 
-Ordered by build sequence: placement → behaviour → data → HTTP → mapping →
-failure → text → capabilities → tests → review.
+Ordered by build sequence: placement → behaviour → messaging → data → HTTP →
+mapping → failure → text → capabilities → tests → review.
 
 | The question in hand | Load |
 |---|---|
 | Where a file, project, facade or module belongs; project references; the composition root | `facade-module-architecture` |
 | A service and its validation inside a module: rules, `IsExist`/`ThrowIf` guards, MediatR envelopes | `module-feature` |
+| Dispatching a message in-process through MediatR: notifications and requests, their handlers and registration, pipeline behaviours | `mediatr-messaging` |
 | Repositories and queries, entities and their configurations, migrations, transactions, seeding | `ef-core-data-access` |
 | A route, controller action, request or response DTO chain, pagination or search contract, or OpenAPI setup | `api-surface` |
 | Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
@@ -62,10 +63,10 @@ alone picks wrong. Match the question, not the word.
 | a controller | which folder its file goes in — `facade-module-architecture`; the route, action body and attributes — `api-surface`; `try`/`catch` and building an error inside one — `error-handling` |
 | an exception | which to throw and how it becomes a response — `error-handling`; the text it carries — `message-keys`; one raised because a resource was already being processed — `distributed-lock`; where the class itself lives — `facade-module-architecture` |
 | mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — `automapper-mapping` |
-| "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature` |
+| "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature`; dispatching that envelope and the handler that receives it — `mediatr-messaging` |
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
 | a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
-| a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature` |
+| a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature`; dispatching it and its handler — `mediatr-messaging` |
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
 | `Repository<T>()` / "repository" | through the data-access wrapper — `ef-core-data-access`; through the search wrapper — `elasticsearch-search`; a brand-new source repository to bootstrap — *not yet covered* |
 | a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
@@ -88,7 +89,6 @@ about that skill's area, not about this one.
 | C# idiom in general: language features, nullability, analyzer settings | — |
 | Domain modelling: aggregates, value objects, domain events, invariants | — |
 | HTTP calls to another service: retry, timeout, circuit breaker, client setup | — |
-| Messaging pipeline: dispatch, behaviours, handler registration — the thin envelope itself belongs to `module-feature` | `mediatr-messaging` |
 | Observability: logging, tracing, health checks | `observability` |
 | Repository bootstrapping: starting a new solution from nothing — once the projects exist, placement belongs to `facade-module-architecture` | `project-scaffolding` |
 
