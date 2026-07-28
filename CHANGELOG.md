@@ -8,6 +8,74 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.16] — S17 (Lane C), 2026-07-28
+
+### Added
+- **`mediatr-messaging`** — the messaging pipeline: Send/Publish dispatch,
+  notification vs request semantics, event/handler folder and naming
+  conventions, AddMediatR registration analysis, open-generic handler
+  registration, pipeline behaviours (documentation-derived, marked). Built
+  under the three-way process; verdicts: P1 MERGE, P2 MERGE, P3 MERGE
+  (arbiter-corrected), P4 MERGE; final pass PASS + 1 blocking defect fixed
+  (envelope accessibility normalized to `public record` in examples — the
+  skill disclaims envelope shape to `module-feature`) + second budget pass
+  (553 → 450 lines).
+- Session rulings recorded:
+  - **`DomainEvents/` is the canonical event folder** going forward (user
+    ruling); `Events/` is the legacy name — never create new ones; the only
+    shipped instruction about existing ones is that leaving them is not a
+    defect (both authors' rename inferences were refused as beyond the
+    ruling).
+  - **Naming law, three arms** (user ruling, corpus-verified): request →
+    replace kind suffix with `Handler` (12 conforming sites); single-handler
+    notification → `<EventName>Handler`; multi-handler notification →
+    descriptive names (mandatory — 3 corpus events carry 2 handlers each;
+    the derived name would collide). The fan-out arm is an arbiter
+    correction of both authors' unconditional `<EventName>Handler` rule —
+    shared blind spot of the S13b/S16 class.
+  - **Controller dispatch is a house default, not a ban** (S15 modality
+    precedent; census: 0 of ~20 dispatch sites in controllers).
+  - **Handler classes `internal sealed` = recommendation** (canonical
+    project 20-vs-6; second project uniformly `public`; the anti-pattern is
+    the mix, not either form).
+  - **AddMediatR recommendation**: `RegisterServicesFromAssemblyContaining<T>`
+    anchored by a dedicated empty marker type — grounded in the verified
+    fact that `class Startup` is declared 43 times in the canonical
+    Infrastructure assembly, making `typeof(Startup)` binding fragile.
+    `Lifetime` analyzed and declined. Corpus call recorded as the
+    starting point, per user direction, not the standard.
+  - **Open-generic registration (arbiter correction, user-notified, no
+    veto)**: the corpus generic handler's type parameter is NESTED inside
+    the message type (`Handler<TData> : IRequestHandler<Message<TData>>`);
+    the built-in container substitutes positionally and cannot resolve that
+    shape — both authors' MS.DI translation was refused; the shipped pattern
+    keeps a unifying container (module defines, root invokes). "Arity is the
+    trap" also refused — indirection is the trap.
+  - **Refused claims** (S16 precedent, API recall unverifiable in corpus):
+    Send-with-multiple-handlers behaviour (replaced by "a second
+    registration does not give you a second handler"); behaviour
+    execution-order sentence (both authors). `Publish` sequential /
+    stop-at-first-exception shipped ONLY inside documentation-provenance
+    markers; `RegisterGenericHandlers` (12.4+) is an existence note with a
+    version caution, not a recommendation.
+- Anti-patterns shipped (all six user-labelled): request type in the event
+  folder (a 4-type family in the corpus); legacy `Events/` name; descriptive
+  name on a single-handler message; suffix-kept handler name
+  (`...CommandHandler`); log-and-rethrow in a notification handler (framed
+  inside this skill's fence; exception flow routed to `error-handling`);
+  mixed handler accessibility in one folder. Declined by user (banked for
+  rubrics): dead `params Assembly[]` on a registration extension;
+  generic handler branching on `typeof(TData)`.
+
+### Changed
+- **`choosing-a-dotnet-skill`** (router alignment, same commit): messaging
+  row deleted from *Not yet covered*; new base-map row after
+  `module-feature` ("Dispatching a message in-process through MediatR…");
+  order-note gains "messaging"; `"message"` row gains a third arm
+  (dispatching the envelope and its handler); `a query` row gains a fourth
+  arm (dispatch — arbiter-flagged asymmetry, fixed).
+- Both manifests bumped to 0.3.16 together.
+
 ## [0.3.15] — Rubric session #1 (solo), 2026-07-28
 
 ### Added
