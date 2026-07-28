@@ -1,7 +1,7 @@
 {
   "name": "dotnet-standards",
   "version": "0.3.20",
-  "description": "Personal .NET knowledge layer: architecture, CQRS pipeline (MediatR + FluentValidation + AutoMapper), EF Core, Redis caching, Elasticsearch, controller-based Web API conventions, worker services, observability and testing. Knowledge only — the brainstorm/plan/TDD/review process stays with Superpowers.",
+  "description": "Two layers. Knowledge: .NET architecture, the in-process messaging pipeline (MediatR + FluentValidation + AutoMapper), EF Core, Redis caching, Elasticsearch, controller-based Web API conventions, testing, and four review rubrics. Process integration: /dotnet-feature and /dotnet-review closed-loop workflows plus six specialist review/test agents — these sit on top of the Superpowers plugin and require it (the brainstorm/plan/TDD process itself remains Superpowers').",
   "author": {
     "name": "Authentic199",
     "email": "chanh.am.me@gmail.com"
