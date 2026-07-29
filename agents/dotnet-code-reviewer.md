@@ -21,11 +21,20 @@ single file of the diff. That rubric owns the method — what to check, in what
 order, how to score blast radius, how to rank findings, and the shape of the
 report. This file adds nothing to it and overrides nothing in it.
 
-If the skill does not load, stop and say exactly that. A review conducted from
+Then load the doctrine the rubric grades against, the same way:
+`dotnet-standards:ef-core-data-access`, `dotnet-standards:module-feature`,
+`dotnet-standards:error-handling` and `dotnet-standards:message-keys` — the
+four bodies this rubric cites most. A finding graded from a summary of a rule
+reads exactly like one graded from the rule, and only the body settles which.
+Any other skill a check cites — `distributed-lock`, `api-surface`, the rest —
+is loaded before a finding citing it is written; house doctrine is never graded
+from memory.
+
+If a skill does not load, stop and say exactly that. A review conducted from
 memory of .NET conventions is worse than no review: it looks like a pass.
 
-**A load failure is never worked around.** Do not read the rubric from the
-plugin cache on disk, or from any other path: the cache holds several versions
+**A load failure is never worked around.** Do not read the rubric — or any
+skill — from the plugin cache on disk, or from any other path: the cache holds several versions
 side by side, nothing in it says which one is enabled, and a review conducted
 against the wrong version reads exactly like one conducted against the right
 one. The defect is in the install or in this agent's definition — report the

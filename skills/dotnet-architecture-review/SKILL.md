@@ -200,6 +200,7 @@ reporting one burns the author's trust in the whole report:
 | 3.2 | Anything under `Web/Controllers/` that is not `BaseController.cs` or a folder named after a module that exposes endpoints. A helper, filter or attribute parked there is a technical capability — `src/Infrastructure/Facades/Common/`. `Find:` `ls src/Web/Controllers/` | **MEDIUM** |
 | 3.3 | A registration inside `Web`. `Web` registers nothing itself; the only two decisions it owns are controller JSON behaviour and the shape of the invalid-model response. Everything else belongs in a facade's or module's `AddX()`. `Find:` `grep -rn "Services.Add" src/Web/` | **HIGH** |
 | 3.4 | A facade `Startup` that is not `internal static class Startup`. Only `Infrastructure/Startup.cs` composes facades; a `public` one invites composition from anywhere. `Find:` `grep -rn "class Startup" src/Infrastructure/Facades/`. **Escalate to HIGH** when something outside `Infrastructure` already calls it | **MEDIUM** |
+| 3.5 | A controller named for two modules — `OrderShipmentsController`. Neither module owns it, so its route family sits outside both modules' surfaces. The family belongs to the owning module's controller as a suffix part (`OrdersController.Shipments.cs`), its operations to that module's service part whose only foreign reach is a `Send`. `Find:` `ls src/Web/Controllers/*/` and read every controller name against audit 4's module list — a name concatenating two module names is the hit · `api-surface`, *Controller partials* + `module-feature`, *Call the service, or send a message?* | **HIGH** |
 
 Route shapes, casing, attributes and `ProducesResponseType` are **not** this
 rubric's — `api-surface` owns what a controller looks like; this audit asks only
@@ -239,7 +240,10 @@ top-level facade or of `Facades/Common/`?
 *interface*. A part named after a layer is a dumping ground with the `partial`
 keyword on it — it attracts everything with no obvious home, and by the time it
 needs subfolders the module has lost its shape; a private part declaring a partial
-interface has published a helper as API.
+interface has published a helper as API. `<Name>` is this module's own capability:
+a `<Name>` concatenating two modules — `OrderShipmentService` — is the two-module
+controller's sibling defect (3.5), and those operations are a suffix part of the
+owning module's service, foreign data arriving by `Send`.
 
 The destination is specific, and naming it is what makes the finding actionable: a
 genuine business rule goes inside the service or on the entity that owns it, a

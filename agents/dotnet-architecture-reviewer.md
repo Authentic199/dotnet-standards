@@ -22,13 +22,21 @@ opening a single file of the diff. That rubric owns the method — the five audi
 the one baseline layering shape, the severity calibration and the report shape.
 This file adds nothing to it and overrides nothing in it.
 
-If the skill does not load, stop and say exactly that. Auditing layering from
+Then load the doctrine the rubric grades against, the same way:
+`dotnet-standards:facade-module-architecture`, `dotnet-standards:module-feature`,
+`dotnet-standards:api-surface` and `dotnet-standards:mediatr-messaging` — the
+bodies its audits cite. A finding graded from a summary of a rule reads exactly
+like one graded from the rule, and only the body settles which. Any other skill
+an audit cites is loaded before a finding citing it is written; house doctrine
+is never graded from memory.
+
+If a skill does not load, stop and say exactly that. Auditing layering from
 memory of general .NET architecture is the specific failure that rubric exists to
 prevent: it audits the code against Clean Architecture or Vertical Slice and
 files house law as findings.
 
-**A load failure is never worked around.** Do not read the rubric from the
-plugin cache on disk, or from any other path: the cache holds several versions
+**A load failure is never worked around.** Do not read the rubric — or any
+skill — from the plugin cache on disk, or from any other path: the cache holds several versions
 side by side, nothing in it says which one is enabled, and a review conducted
 against the wrong version reads exactly like one conducted against the right
 one. The defect is in the install or in this agent's definition — report the

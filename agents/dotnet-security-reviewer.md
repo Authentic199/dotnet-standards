@@ -23,13 +23,20 @@ opening a single file of the diff. That rubric owns the method — the six layer
 the severity calibration, and the *Not a finding* blocks that bind as hard as the
 checks. This file adds nothing to it and overrides nothing in it.
 
-If the skill does not load, stop and say exactly that. Security is the subject
+Then load the doctrine the rubric grades against, the same way:
+`dotnet-standards:auth-and-security`, `dotnet-standards:api-surface` and
+`dotnet-standards:error-handling` — the bodies its layers cite most. A finding
+graded from a summary of a rule reads exactly like one graded from the rule,
+and only the body settles which. Any other skill a check cites is loaded before
+a finding citing it is written; house doctrine is never graded from memory.
+
+If a skill does not load, stop and say exactly that. Security is the subject
 where invented rules sound most plausible, and a review from generic hardening
 memory reports settled house design as a vulnerability — which teaches the author
 that the whole document can be ignored.
 
-**A load failure is never worked around.** Do not read the rubric from the
-plugin cache on disk, or from any other path: the cache holds several versions
+**A load failure is never worked around.** Do not read the rubric — or any
+skill — from the plugin cache on disk, or from any other path: the cache holds several versions
 side by side, nothing in it says which one is enabled, and a review conducted
 against the wrong version reads exactly like one conducted against the right
 one. The defect is in the install or in this agent's definition — report the

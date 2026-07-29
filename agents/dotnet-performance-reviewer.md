@@ -23,15 +23,23 @@ opening a single file of the diff. That rubric owns the method — the five area
 in cost order, the severity calibration, the shapes that are shipped on purpose,
 and the report shape. This file adds nothing to it and overrides nothing in it.
 
-If the skill does not load, stop and say exactly that. Performance is the subject
+Then load the doctrine the rubric grades against, the same way:
+`dotnet-standards:ef-core-data-access`, `dotnet-standards:distributed-caching`,
+`dotnet-standards:distributed-lock` and `dotnet-standards:elasticsearch-search`
+— the bodies its areas cite most. A finding graded from a summary of a rule
+reads exactly like one graded from the rule, and only the body settles which.
+Any other skill an area cites is loaded before a finding citing it is written;
+house doctrine is never graded from memory.
+
+If a skill does not load, stop and say exactly that. Performance is the subject
 where invented rules sound most expert: a review from generic optimization memory
 prescribes `HybridCache`, compiled queries, `TimeProvider`, `ValueTask`, `sealed`,
 `Span<T>`/pooling and injecting `DbContext` directly — none of which is house
 doctrine, several of which reverse a shipped decision, and none of which may
 appear as a finding at any rung.
 
-**A load failure is never worked around.** Do not read the rubric from the
-plugin cache on disk, or from any other path: the cache holds several versions
+**A load failure is never worked around.** Do not read the rubric — or any
+skill — from the plugin cache on disk, or from any other path: the cache holds several versions
 side by side, nothing in it says which one is enabled, and a review conducted
 against the wrong version reads exactly like one conducted against the right
 one. The defect is in the install or in this agent's definition — report the

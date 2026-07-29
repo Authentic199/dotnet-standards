@@ -121,6 +121,14 @@ A `<Role>` names a group of operations a caller can ask for (`Checkout`,
 after a layer — `Helper`, `Logic`, `Extensions` — is a dumping ground with the
 `partial` keyword on it.
 
+A `<Role>` may also be **another module's concept**: when this module's surface
+grows a group of operations composing foreign data — an order's shipments —
+they are `OrderService.Shipments.cs`, never a two-module `OrderShipmentService`.
+Such a part follows *Call the service, or send a message?* to the letter: its
+only reach into the foreign module is a `Send` of that module's envelope, and
+the foreign logic stays in the foreign service. The controller face of the same
+rule is `api-surface`'s — there is no two-module controller either.
+
 **`Services/` holds services and nothing else** — no subfolders, and no file whose
 name is not `<Name>Service…`.
 

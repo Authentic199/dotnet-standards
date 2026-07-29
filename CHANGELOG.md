@@ -8,6 +8,43 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.32] — cross-module ownership, and the reviewers' knowledge layer, 2026-07-29
+
+Second batch from the same field-trial conversation as 0.3.31; both items are
+user rulings.
+
+**Added:**
+
+- **The two-module-name rule**, extending 0.3.31's split test to the HTTP and
+  service surfaces: there is no `OrderShipmentsController` and no
+  `OrderShipmentService`. A route family about another module's concept — an
+  order's shipments — belongs to the **owning module's controller as a suffix
+  part** (`OrdersController.Shipments.cs`); its operations to that module's
+  service part (`OrderService.Shipments.cs`), whose **only reach into the
+  foreign module is a `Send`** of the foreign module's envelope — the foreign
+  logic stays in the foreign service, exactly the shipped *Call the service,
+  or send a message?* law, now with its partial-part face. Landed in
+  `api-surface` (*Controller partials*: the ownership paragraph plus a fourth
+  anti-pattern row), `module-feature` (*When a service outgrows one file*: a
+  `<Role>` may be a foreign concept, with the Send constraint), and
+  `dotnet-architecture-review` (new check **3.5**, plus 4.9's `<Name>` clause
+  making `OrderShipmentService` its sibling defect).
+- **The four reviewers now load the knowledge layer their rubric grades
+  against.** After the rubric, each agent loads the knowledge skills its
+  rubric cites most — chosen by citation count over the rubric bodies, not by
+  guess: code — `ef-core-data-access`, `module-feature`, `error-handling`,
+  `message-keys`; architecture — `facade-module-architecture`,
+  `module-feature`, `api-surface`, `mediatr-messaging`; security —
+  `auth-and-security`, `api-surface`, `error-handling`; performance —
+  `ef-core-data-access`, `distributed-caching`, `distributed-lock`,
+  `elasticsearch-search`. Every other skill a check cites is loaded **before a
+  finding citing it is written** — house doctrine is never graded from memory,
+  which generalizes the verify-against-the-body clause single checks (5.5)
+  already carried. The 0.3.31 cache-read ban and stop-on-load-failure rule now
+  cover every one of these loads, not the rubric alone.
+
+---
+
 ## [0.3.31] — the first field trial's feedback lands, 2026-07-29
 
 Every change in this version traces to one source: the first production run of
