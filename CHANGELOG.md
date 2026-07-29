@@ -8,6 +8,101 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.29] — the router triggers on entry, not on confusion, 2026-07-29
+
+The third and last defect from the 2026-07-29 observation. 0.3.27 got the plugin
+entered by a hook; 0.3.28 gave the flow something to do when it arrives; this
+repairs the router's own front door.
+
+**The defect.** `choosing-a-dotnet-skill`'s description gated its first arm on
+*"no skill self-triggered on the convention"* — **a non-event**. A session that
+never considered this plugin cannot observe that nothing self-triggered, because
+it never asked the question. The signal could never fire for the reader who most
+needed it. The description's second arm — brainstorming, spec and plan writing,
+composing subagent prompts — was already observable, already worked, and is
+untouched.
+
+**Changed — the first arm only, and at zero cost:**
+
+- **The confusion framing is gone.** The trigger is now a **state of the session**
+  a reader can check against its own transcript: *working in a .NET codebase with
+  no dotnet-standards skill chosen*.
+- **A new observable moment: `before reading, searching or listing files`.** That
+  is the instant the measured failure occupied — the session ran `find`. It is
+  keyed to an action about to be taken, never to a feeling.
+- **`chosen`, not `loaded`.** `loaded` stays true right up until the Skill tool
+  fires, so it would capture the correctly-matched reader in the window between
+  deciding and acting. `chosen` also matches the body's own verb at `:26-28` —
+  *"enough to choose, never enough to act on. Having chosen, load the skill"* —
+  so description and body now describe one state with one word.
+- **`nothing to load`, the body's own phrase** at `:90-92`, replaces *"a skill
+  that does not load"*: plainer, shorter, and identical to the section it points
+  at.
+- **97 words in, 97 words out.** Net zero against a cap of under 100, one column
+  narrower than shipped. Both `Not for:` entries and the whole second arm are
+  byte-identical.
+
+**How the line is drawn — and it is the point of the piece.** A description
+pushy enough to fire on every .NET question inserts a hop before every sibling
+and contradicts this skill's own `Not for:` (*"a question already matched to one
+skill — load that skill directly"*). Three things hold that line: the predicate
+excludes the matched reader by its own terms; the new trigger nouns are
+tool-shaped (`reading`, `searching`, `listing`) where every sibling triggers on
+domain nouns, so the router competes with none of them; and **no .NET domain
+verb was added to buy pushiness** — `review` in particular was refused, since it
+is contested between four rubrics and two flows.
+
+**Rulings — three-way loop, one piece, MERGE:**
+
+- **The decisive finding was the arbiter's, and neither author nor the
+  coordinator raised it.** Author A put its guard in front of **all four**
+  signals — including *"a `Not for` pointer led to a skill that does not load"*.
+  **You can only follow a `Not for:` pointer from a skill you have already
+  loaded**, so under A's guard that trigger is false by construction exactly when
+  it would be true in fact. A defended keeping the clause because dropping it
+  would orphan the body's `## Not yet covered` section, and then orphaned it by
+  another route.
+- **The same structure kills A's headline property.** A presented
+  "self-extinguishes on success" as the repair's virtue. It is the bug: a session
+  that loads one skill on turn 3 has permanently silenced *two skills seem
+  plausible* and *the task spans several areas*, which are post-load signals by
+  nature.
+- **Author B's `or` hinge is what makes its version correct — and B never argued
+  it.** The guard governs only the action-keyed arm; the three post-load signals
+  sit outside it. B defended the umbrella on exhaustiveness grounds; the
+  structural reason is stronger.
+- **Author A produced the single best line in either draft**, and found it by
+  auditing its own text: the observed session ran `find` **twice**, so *"the
+  first read"* had already expired when the user interrupted. `before reading,
+  searching or listing files` is two words cheaper and closes the hole. **Both
+  drafts shared the lapse; only A saw it.** B's objection — the moment must stay
+  bounded — is answered by the guard both drafts carry.
+
+**Anti-example candidates, forwarded unlabelled (R8 is the user's alone):**
+
+1. **A description trigger keyed to a non-event can never fire for the reader who
+   most needs it** — the clause this release removed, with a measured failure and
+   a documented repair behind it.
+2. **A guard clause that silences the very trigger it was written to protect** —
+   A's structure is a textbook instance, and the subtler of the two.
+
+**Known seams:**
+
+- **Plausible and unmeasured.** A description only participates in matching once
+  installed, so no draft could be probed before merge. **Two description trials
+  are now outstanding at once** — 0.3.28's standing-code triggers and this router
+  repair — and the next real session in the consumer repository exercises both.
+  If this one still misses, the next lever is the strength of the `Not for:`
+  backstop, not the trigger wording: the trigger half now leans on it harder than
+  the shipped version did.
+- **The body does not yet state the entry condition the description carries.**
+  `## How to use these tables` (`:14-18`) opens at *"Find the row that matches"*.
+  Nothing is unreachable — the description is the matching surface and the body is
+  read only after a match — but the two tiers would agree better with one
+  sentence. Follow-up for a session that owns the body.
+
+---
+
 ## [0.3.28] — `dotnet-review-flow` reviews standing code, not only diffs, 2026-07-29
 
 The second defect from the 2026-07-29 observation, and the one the user actually
