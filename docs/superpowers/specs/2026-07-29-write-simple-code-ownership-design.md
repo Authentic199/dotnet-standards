@@ -80,7 +80,19 @@ components · **(C)** do nothing.
 | 7 | House-architecture conflict (heaviest) | **FAIL** — rung 1 and rung 6 + "fewest files possible" + "no interface with one implementation" condemn, with no means of exception: the module file family (`module-feature`), the four-tier response chain (`module-feature:189-194`), thin envelopes (CHANGELOG 0.3.16), marker types, `Expressions/`, per-capability Settings (`facade-module-architecture`), the repository abstraction whose *purpose* is substitutability (`unit-testing.md:147`), and the user's Facades-axis carve-out (§1). A generic voice has no knowledge of the shipped bodies and therefore no means to distinguish deliberate structure from slop | **PASS** — the distinction is written *into each rung* as a "does not apply to" clause citing the owning skill (§5.3), which is precisely what (B) buys over (A) | **PASS** — no new judge, no conflict |
 | 8 | Does "call, never copy" transfer? | **FAIL** — Superpowers is called at named phases (`dotnet-feature-flow:30-38`); ponytail has **no call site** in either flow — it is ambient pressure on every token. The pattern this plugin uses for third-party process does not apply to (A) | **PASS** — (B) creates the named call sites the pattern requires: PHASE 2/3 instruction, rubric area, `/simplify` handoff | **N/A** |
 | 9 | Budget | **N/A** — (A) adds no lines to plugin bodies | **PASS with a constraint** — additions land only in files with room: `dotnet-code-review` 246, `dotnet-feature-flow` 369, `claude-md-builder` 327 + its reference file. The three files at the bar are **not touched**: `dotnet-review-flow` 495, `dotnet-security-review` 498, `dotnet-performance-review` 499 (measured `wc -l`, this session). The fleet needs no flow edit — the code reviewer already loads the rubric | **PASS** — trivially |
-| 10 | Timing vs the two outstanding description trials | **FAIL** — a third plugin injecting context into the consumer repository is a third variable confounding both trials (`CHANGELOG.md:91-97`) | **PASS with a constraint** — implementation must not change the two on-trial descriptions (`dotnet-review-flow`, `choosing-a-dotnet-skill`); this design needs router **body-table** rows only, and `dotnet-code-review`'s description (not on trial) may gain trigger nouns. Wait-condition on anything further: the next real consumer-repo session runs and both trials read out | **PASS** — trivially, and it is the only thing (C) has |
+| 10 | Timing vs the two outstanding description trials | **FAIL** — a third plugin injecting context into the consumer repository is a third variable confounding both trials (`CHANGELOG.md:91-97`) | **PASS with a constraint — since satisfied, see below** — implementation must not change the two on-trial descriptions (`dotnet-review-flow`, `choosing-a-dotnet-skill`); this design needs router **body-table** rows only, and `dotnet-code-review`'s description (not on trial) may gain trigger nouns. Wait-condition on anything further: the next real consumer-repo session runs and both trials read out | **PASS** — trivially, and it is the only thing (C) has |
+
+**Test 10 update, same day.** The wait-condition read out before implementation
+began: a real session ran in the consumer repository (`BE-Ops-Service`) after
+0.3.29 shipped. **0.3.28 CONFIRMED PASS** — standing code (no diff) reviewed
+via the path scope. **0.3.29 not isolated** — the session saw `router-nudge`'s
+pointer before the router loaded, and the hook fires on every session's first
+prompt by design, so it structurally pre-empts any chance of observing the
+description trigger alone (recorded in full on the LANE BOARD PENDING log,
+2026-07-29). This does not reopen the wait: the constraint asked for the next
+real session's readout, not a specific verdict, and both trials read out — one
+confirmed, one operationally successful but methodologically unfalsifiable in
+normal use. **The implementation session may proceed.**
 
 ## 4. Verdicts, with the reasons a future session can check
 

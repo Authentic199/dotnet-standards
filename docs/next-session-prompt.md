@@ -35,9 +35,19 @@ path scope 0.3.28 · the router's entry trigger 0.3.29.
 
 **The three defects behind the 2026-07-29 no-trigger failure are now all
 closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's
-own description. **Nothing has been measured yet.** Two description trials are
-outstanding at once; the next real session in the consumer repository exercises
-both. Read CHANGELOG 0.3.29 "Known seams" before assuming any of it works.
+own description. **First real-session readout, 2026-07-29 (user-reported, in
+BE-Ops-Service):** **0.3.28 CONFIRMED PASS** — a session reviewed standing code
+(no diff, nothing changed) via the path scope and it worked, clean evidence.
+**0.3.29 NOT ISOLATED, and may be structurally unable to be**: the user saw the
+`router-nudge` context line *before* the router loaded — the hook fired first,
+as it always does on the first prompt of a session
+(`hooks/README.md` — "the first prompt"), which primes the model before its own
+description ever gets a chance to self-trigger unprompted. Every future real
+session will show the same hook-then-router order, so this trial may never
+cleanly isolate "does the description alone fire" — see PENDING log entry
+below. This does not mean 0.3.29 failed: the observed outcome (router loaded,
+request served) is the one that matters operationally; only the specific
+question "would the description have fired without the hook" stays open.
 
 ## Lane status
 
@@ -231,9 +241,22 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   (user-added, doc §5.1 carrier 1b); two ponytail lines COPY (MIT → `NOTICE`
   obligation 3); router rows named in §5.6; the (A) refusal to be mirrored
   into `hooks/README.md`'s table. Unblocks: one implementation session,
-  three-way loop, 3 pieces — **constrained: do not touch the two on-trial
-  descriptions (`dotnet-review-flow`, `choosing-a-dotnet-skill`) until the
-  consumer-repo trial session runs.**
+  three-way loop, 3 pieces. **The wait condition has read out (see the
+  0.3.28/0.3.29 entry above) — implementation may proceed.** The design never
+  touches the two on-trial descriptions anyway (body-table rows only), so this
+  was a formality confirmed, not a blocker lifted.
+
+- [solo, 2026-07-29] **The 0.3.29 router-description trial may be
+  structurally unfalsifiable in normal use.** `router-nudge` fires on the
+  session's first prompt and always primes the model with a pointer to
+  `choosing-a-dotnet-skill` before the description gets any chance to
+  self-trigger on its own — so a real session can only ever show
+  hook-then-router, never description-alone. If isolating the description's
+  own trigger quality still matters, the only clean test is an artificial one:
+  a session with the hook disabled (or the marker file pre-seeded so the hook
+  stays silent) asked the same kind of request. Whether that test is worth
+  running, or whether hook-primed success is sufficient going forward, is a
+  call for a session that owns `choosing-a-dotnet-skill` or `router-nudge`.
 
 ## Standing rules (unchanged, summarized)
 
