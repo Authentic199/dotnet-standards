@@ -1,8 +1,8 @@
 # Review rubric — the per-area checks
 
 The checklists behind the priority order in `SKILL.md`. Work them in order: data
-access, security, concurrency, integration, correctness, tests. Style and slop
-are not here — `references/cleanup-checklist.md` owns those.
+access, security, concurrency, integration, correctness, tests, simplicity. Style
+and slop are not here — `references/cleanup-checklist.md` owns those.
 
 **Scope, stated once.** The default scope is the change. A solution-wide sweep is
 justified only when hunting consumers of a symbol the diff altered. A finding
@@ -44,6 +44,7 @@ The security section below stays at posture level.
 - [4. Integration](#4-integration)
 - [5. Correctness](#5-correctness)
 - [6. Tests](#6-tests)
+- [7. Simplicity and over-build](#7-simplicity-and-over-build)
 
 ## 1. Data access
 
@@ -599,3 +600,128 @@ FluentAssertions v8 and later require a paid commercial licence, so introducing 
 is a purchasing decision rather than a package bump; Shouldly is the house
 assertion library and NSubstitute the house double library. Moq is not used. A new
 test package of any kind is a decision, not a detail — name it in the review.
+
+## 7. Simplicity and over-build
+
+> The ladder runs after you understand the problem, not instead of it.
+> Read fully, then be lazy.
+
+Three checks, in order: does the task in front of you need this code, does it
+already exist, and is this the smallest shape the owning skills allow. A reviewer
+who has not read the whole method cannot tell deliberate structure from slop, and
+this is the one area where that mistake costs the author real work for nothing.
+
+**Capped at MEDIUM, and the cap is absolute.** The escalation clause in *How to
+read a check* does not reach this area: it produces candidates for `/simplify`,
+not merge blockers. A finding here is written like any other — `file:line`, what
+is wrong, why, the fix — and lands in the MEDIUM or INFO section with *candidate
+for `/simplify`* as its fix. The `Cleanup candidates` section stays
+`cleanup-checklist.md`'s. The scope rule bites harder here than anywhere else: a
+shape the change merely touched is pre-existing, therefore INFO, and usually not
+worth the line — and at **Low** blast radius this area is not reached at all,
+because a rename is not an invitation to redesign.
+
+**Where the simpler shape is itself a shipped convention, the finding already has
+a number and an owner.** Cite it by number and name and stop — one defect, one
+grader. A hand-rolled mutual exclusion is 3.9 *(A hand-rolled lock)* at HIGH. A
+second lock, cache or search capability beside the existing one is ruled by its
+own skill — `distributed-lock`, `distributed-caching` and `elasticsearch-search`
+each state *"if you find one, use it in place"*. A package added where a
+referenced one would do is the repository `CLAUDE.md`'s new-dependency rule where
+it carries one (`claude-md-builder` R16), and in a test project it is 6.8 *(A new
+or unreviewed test package)* at HIGH. None of these is re-graded here.
+
+**Never a simplification candidate, whatever it costs:** validator rules at a
+trust boundary (`module-feature`); the exception flow and the error envelope
+(`error-handling`); `CancellationToken` declaration and propagation (3.1);
+authorization attributes and everything `dotnet-security-review` grades; message
+keys (`message-keys`); migration safety (1.9); the structural families named in
+7.1; and anything the user explicitly asked for. Proposing one of these as
+over-build is itself the defect in the finding.
+
+**7.1 Code written for a need the task does not have** — *MEDIUM* · universal,
+with folders owned by `dotnet-architecture-review`
+`Find:` `git diff main...HEAD` for what the change adds; then for each type,
+member, parameter, overload or interface it introduces,
+`grep -rn --include=*.cs "<SymbolName>" src/ tests/` and count the hits outside
+its own declaration. Read every new `bool` or enum parameter and every new `if`
+or `switch` arm against the guards and the validator that run before it. Then
+read the task, or the plan the change implements, and name the requirement each
+addition serves.
+A parameter nothing passes, an overload nothing calls, a flag with one value, an
+arm for a state a validator already rejected, an interface written for a second
+implementation the task does not have — each is a promise the next author must
+keep, and when the need finally arrives it arrives in a different shape, so the
+code is rewritten anyway, having cost twice. Fix: cut it from the change while
+cutting is still free, and say what would justify writing it later — name the
+missing requirement, never that the code "feels speculative".
+**Zero compile-time references proves nothing on its own.** A service registered
+through its lifetime marker has no references by design; run the safe-delete
+checks in `cleanup-checklist.md` before proposing any removal.
+**Does not apply to** structure a shipped skill mandates. Facades-axis
+infrastructure built ahead of need — *"a technical capability many projects
+reuse"*, where reach decides and not size (`facade-module-architecture`) — is
+sanctioned structure, not over-build. So are the module's file family and its
+response tiers (`module-feature`), a thin request or notification envelope and
+its handler (`mediatr-messaging`), and a marker type an assembly scan resolves
+(`facade-module-architecture`). A type that exists because the convention says
+the module has one is not "code nothing calls", and a finding against one of
+these is wrong rather than merely low-value.
+**Two neighbours own their own halves.** Code the change *orphaned* rather than
+added is `cleanup-checklist.md` category 3 *(Dead code)*, behind the same
+safe-delete checks. A folder created in advance of its trigger is
+`dotnet-architecture-review` 4.2, at INFO. Cite them; do not re-grade them.
+
+**7.2 A helper written where one already exists** — *MEDIUM* · universal
+`Find:` search for what the new code *does*, never for what it is called — a
+duplicate that shared a name would have collided at compile time. For each
+helper, extension method, converter, mapper or private method the diff adds, grep
+the words of its name one at a time —
+`grep -rni --include=*.cs "<NameWord>" src/` — and read every declaration among
+the hits; then `grep -rn --include=*.cs "static class \w*Extensions" src/` for the
+ones in the same module or facade, and `ls src/Facades/ src/Facades/Common/` to
+read the capability list against what the new code does.
+Two implementations of one job do not stay identical. A fix lands on one, the
+other keeps the bug, and the caller that got the stale one is the report filed
+weeks later against the wrong file — so both survive and a third gets written
+beside them. Fix: call what exists, and extend it in place if it is one argument
+short of the job.
+**Does not apply to** a per-module copy the convention requires — each module
+having its own service, validator and profile is the shape, not duplication — nor
+to a capability duplicate, which the paragraph above routes to its owner rather
+than grading here. Collapsing a prescribed repetition into one generic that
+serves every case is a 7.3 finding in the opposite direction, not a saving.
+
+**7.3 A shape more elaborate than the owning skill requires** — *MEDIUM* · the
+skill owning the area + `dotnet-testing`
+`Find:` open the skill that owns whatever the change lands in and compare the
+diff against the shape it prescribes; count the hops from the controller action
+to the code that does the work; and for every interface or abstract type the diff
+adds, `grep -rn --include=*.cs ": I<Name>\b" src/` to count the implementations
+and `grep -rn "<Name>" tests/` to see whether anything substitutes it.
+The floor is the shipped convention, never fewer lines than it. Above that floor,
+an abstraction earns its place when a shipped skill mandates it, or when a test
+must stand in for it — unit tests substitute at the facade boundary, and an
+extension method cannot be substituted because NSubstitute configures only
+members the interface declares (`dotnet-testing`, `references/unit-testing.md`).
+Counting implementations settles nothing on its own: the repository wrapper is
+what unit tests substitute at the facade boundary, and it earns its place
+whatever the count. A wrapper around a wrapper, a strategy with one strategy, a
+generic parameter one caller ever binds, an indirection that only forwards, a
+layer added so the code would "be ready" for a second implementation nobody has
+asked for — each adds a hop the next reader must trace and buys nothing back. Say
+which of the two tests the shape fails.
+**The same defect from the other side.** A simplification that merges two
+concerns into one method, inlines the seam a test substitutes, collapses a guard
+chain into an expression that hides which rule fired, or drops the invalidation
+4.7 *(A mutation that leaves the cache or the index stale)* requires scores here
+exactly as over-build does. Clarity beats brevity, and a candidate that cannot be
+applied without changing behaviour is not a candidate — drop it and say why.
+Fewer lines than the convention is not simpler; it is off-convention, and the
+next author restores the convention by hand.
+**Does not apply to** the shapes the owning skills mandate — the request,
+validator and profile file family and the response tiers (`module-feature`), the
+exception leaf's two members (`error-handling`), the per-capability `Startup.cs`
+and the four-call options binding (`facade-module-architecture`), a thin envelope
+and its one-line handler (`mediatr-messaging`). "Fewer files" is not a house
+value.

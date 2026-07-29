@@ -232,7 +232,7 @@ whether the file changes on disk. If it does not, run
 
 ## Why only these hooks
 
-The other eight candidates, and why each was refused:
+The other eight candidates — plus one later proposal — and why each was refused:
 
 | Candidate | Verdict |
 |---|---|
@@ -244,6 +244,7 @@ The other eight candidates, and why each was refused:
 | `pre-commit-format` | **Refused.** A third layer on a concern `post-edit-format` prevents and `dotnet format --verify-no-changes` verifies. |
 | `UserPromptSubmit` skill index | **Refused in S6 — shipped at 0.3.27 as `router-nudge`.** The S6 verdict read: *"Fires on every prompt — a permanent per-turn token tax against a routing problem solved at zero runtime cost by skill-description discipline."* Observation falsified the premise, not the arithmetic. On 2026-07-29, a session in a consumer .NET repository — this plugin installed and enabled at project scope, every skill description loaded — answered a review request by going straight to `find`, twice, and loaded no skill at all. The token objection was then answered rather than waved off: the shipped hook emits **once per session**, behind a solution-file check, not once per prompt. **Refusing a component is not permanent. Refusing it for a reason that later stops holding is a defect, and correcting it belongs in this file, in the same change that ships the component.** |
 | The kit's `hooks.json` as shipped | **Rebuilt, not carried.** Its command form is unusable on Windows and it registers two scripts this plugin does not ship. |
+| `ponytail` as a third plugin — an ambient simplicity ruleset riding `SessionStart` + `UserPromptSubmit` | **Refused 2026-07-29 — distilled into house pieces instead.** Two independent grounds, either sufficient: (1) its delivery mechanism is ambient session-start injection, the channel this repository has already measured being ignored on turn 1 (the observation behind `router-nudge`, CHANGELOG 0.3.27); (2) a generic YAGNI voice cannot distinguish sanctioned structure — the module file family, thin envelopes, Facades-axis infrastructure built ahead of need (a user ruling, 2026-07-29) — from slop, and it ships no repo-level exception mechanism to be taught the difference. What transfers shipped as house components: `dotnet-code-review` rubric area 7, `dotnet-feature-flow`'s PHASE 2 ladder and cleanup offer, and static rule R24 (`claude-md-builder`). **The refusal stops holding only if BOTH become true:** a measurement *in this environment* shows session-start injection heeded on turn 1, **and** ponytail or a successor ships a repo-level exception mechanism able to express "structure mandated by a shipped skill is exempt". Decision record: `docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md` §3–§4. |
 
 **Adding a hook is not a small change.** It costs a per-event tax on every
 matching tool call, and it inherits the silent-failure mode above. The test is

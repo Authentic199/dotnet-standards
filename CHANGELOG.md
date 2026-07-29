@@ -8,6 +8,130 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.30] — write only the minimum the task needs, 2026-07-29
+
+Implements the decision doc
+`docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md` in
+full: option (B), the ponytail ruleset distilled into house pieces — one grader,
+two carriers, one offered call site. Installing ponytail (A) and doing nothing
+(C) stay refused; the (A) refusal is now mirrored into `hooks/README.md`'s
+refusal table with its reversal conditions.
+
+**Changed:**
+
+- **`dotnet-code-review`** — new priority area **7 Simplicity / over-build**
+  (rubric `## 7. Simplicity and over-build`, checks 7.1–7.3); Cleanup/slop
+  renumbers to row 8. The cap is MEDIUM and **absolute** — the rubric header's
+  escalation clause does not reach the area, and at Low blast radius the area is
+  not reached at all. Findings are severity-ranked with *candidate for
+  `/simplify`* as the fix; the unranked `Cleanup candidates` section stays the
+  checklist's. Where the simpler shape is itself a shipped convention, the area
+  cites the existing grader (3.9, 6.8, the capability reuse laws, R16) and never
+  re-grades. Description gains the trigger nouns (99 words, no `Not for:` entry
+  dropped); Decision Guide gains three rows; `cleanup-checklist.md` renumbers,
+  fixes its own mis-citation (the priority order lives in `SKILL.md`, not the
+  rubric), and gains the grade-once boundary: code this diff *added* that
+  nothing calls is 7.1's, code this diff *orphaned* is category 3's.
+- **`dotnet-feature-flow`** (369 → 442 lines) — PHASE 2 closes with the
+  simplicity ladder applied to steps as they are drafted: the three questions
+  are the trigger, the rule lives in the rubric's area 7, and the instruction
+  **trims the plan's own inventions, never the user's scope** (a step the user
+  asked for goes to GATE 1, not into the bin). New section **The cleanup offer —
+  after PHASE 5, before PHASE 6**: once per run, on an explicit yes only —
+  silence, "up to you" and a yes to a different question are declines — then
+  redo diff preparation and the pre-build gate (this flow's side of the seam)
+  and re-enter the shared block from TEST-LOOP, same block, same caps. Not a
+  gate; GATE 2 unchanged behind both answers; `:234` never-chased untouched;
+  explicitly not `dotnet-review-flow`'s standalone offer reopened. Phase map,
+  Outstanding, the Review-block caption (the carried report is the *last*
+  block's), Routing and the Decision Guide all follow.
+- **`claude-md-builder/references/static-rules.md`** — new rule **R24** (after
+  R21; R7/R8/R14 are burned numbers from user-rejected rules, never reused):
+  search-first with a checkable negative (*call it instead, or say why it does
+  not fit*), and add nothing the task does not need beyond what the generated
+  file's own conventions already require — the scope clause that makes
+  sanctioned structure unreachable rather than exempted.
+- **Router** (`choosing-a-dotnet-skill`, body rows only — the description stays
+  under its 0.3.29 trial): the `dotnet-code-review` base-map row gains the new
+  nouns; new shared-token row *"this is over-built" / "simplify this"* splitting
+  grading, execution, plan-time and every-session carriers.
+- **`NOTICE`** — obligation 3: `DietrichGebert/ponytail`, MIT (© 2026), covering
+  the ladder structure and the two verbatim lines that head area 7.
+- **`hooks/README.md`** — the ponytail refusal row: two independent grounds
+  (session-start injection measured ignored at 0.3.27; a generic YAGNI voice
+  cannot tell sanctioned structure from slop), and the two conditions under
+  which the refusal stops holding.
+
+**Rulings — three-way loop, three pieces, MERGE × 3:**
+
+- **A shared claim at the doctrine's center was retreated, not shipped.** Both
+  authors (and the design doc's own direction) stated *"an abstraction earns its
+  place when something must substitute it"* as `dotnet-testing`'s criterion. The
+  shipped sentences support less: an extension method cannot be substituted, and
+  unit tests substitute at the facade boundary. Area 7.3 ships a two-armed
+  admission test (a shipped skill mandates it, or a test must stand in for it)
+  citing only what the source states. The S13b class, caught again.
+- **`/simplify` provenance, ruled twice the same way.** No house file defines
+  `/simplify`'s constraints (one tree-wide hit, in the design doc); Author B
+  asserted its "no-behaviour-change constraint" in pieces 1 and 2 and was
+  refused both times. The house hedge — *executes with its own verification*
+  (`cleanup-checklist.md`) — ships instead. Author A's refusal to assert the
+  external behaviour was the correct call under the S16 precedent.
+- **Arbiter factual catches:** A cited 4.7 as a simplicity grader (it is stale
+  cache/index — cut); A's greps used `src/Infrastructure/Facades/` against the
+  rubric's own stated-once path convention (`src/Facades/`); A's
+  reached-vs-unreachable dead-code boundary contradicted its own 7.1 `Find:`
+  (B's added-vs-orphaned boundary ships, with the reciprocal checklist edit);
+  B's offer sentence located the code lens's candidates "inside" `Unfixed
+  MEDIUM and INFO` (they survive via the block's *nothing a subagent learned is
+  dropped* rule, not inside that section — final wording names both real
+  sources); the R24 insertion dispute settled on file evidence (every group's
+  rules ascend internally, so after R21 — A's cross-group precedent refuted by
+  A's own examples).
+- **Coordinator catches:** the arbiter's self-declared addition *"the
+  repository wrapper is substituted in every unit test"* overclaimed the source
+  and shipped as *"what unit tests substitute at the facade boundary"*; the
+  dispatch prompts' `references/architecture-rubric.md` path was the
+  coordinator's error, not the design doc's (both authors located the real
+  4.2 at `dotnet-architecture-review/SKILL.md:213`); the block-report shape was
+  verified independently before the piece-2 verdict was accepted.
+- **B-Q1 ruled without touching the sibling:** a `Cleanup candidates` slot in
+  `dotnet-review-flow`'s report would fix the offer's input cleanly, but the
+  file sits at 495 lines among design test 9's "not touched" three; option (a)
+  wording shipped instead.
+- **The user's Facades ruling holds at full strength in three places** (rubric
+  boundary list, 7.1's *does not apply to*, the SKILL.md Decision Guide row):
+  a finding against sanctioned structure is **wrong**, not low-value. B's
+  drafted "if it is worth naming at all, INFO" was rejected as permissive drift.
+
+**Verified live before merge.** A fresh-context subagent given only area 7 and a
+synthetic diff flagged the unused `bool` parameter (7.1, MEDIUM) and the
+one-strategy interface (7.3, MEDIUM), refused to flag an ahead-of-need
+`Infrastructure/Facades/` capability — citing the carve-out's own "wrong, not
+merely low-value" — and left the module file family alone. Both directions of
+the user ruling survived a cold read.
+
+**Known seams:**
+
+- The design doc named one cross-reference for the renumber; five sites needed
+  edits (`cleanup-checklist.md` 3/21/27 and the rubric's opening + ToC). Its
+  §5.3 path shorthand for check 4.2 was accurate; the coordinator's dispatch
+  expansion of it was not.
+- Two cheap live checks logged, not run: B's R24 micro-test (a generated
+  `CLAUDE.md` with and without the rule, against a task inviting a speculative
+  abstraction) and the offer's soft-yes test (is *"sounds good"* treated as the
+  explicit yes the decline enumeration exists to reject?).
+- The cleanup offer's fuller input depends on the code lens's candidate list
+  surviving block aggregation under the *nothing dropped* rule — no named slot
+  exists. If a real run shows it dropped, the offer degrades to `Unfixed MEDIUM
+  and INFO` alone; the fix would live in `dotnet-review-flow` (at the budget
+  bar) and needs a user ruling.
+- The Facades carve-out is structural in R24 — a generated `CLAUDE.md` never
+  *displays* it. Making it visible would be a PHASE 3 project-specific line,
+  not a static rule.
+- The 0.3.28 seam (blast-radius re-rank for standing audits) is unchanged —
+  same file, different problem, still parked.
+
 ## [0.3.29] — the router triggers on entry, not on confusion, 2026-07-29
 
 The third and last defect from the 2026-07-29 observation. 0.3.27 got the plugin
