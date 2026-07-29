@@ -138,6 +138,17 @@ plan time, where it costs a sentence instead of a review round. PHASE 3's
 existing prompt-pointer mandate (`:182-184`) then carries the doctrine to
 implementers by naming the owning skills — no new mechanism.
 
+**Carrier 1b — an OFFERED `/simplify` call site (user decision, this
+session).** After the shared block returns green and before PHASE 6 / GATE 2,
+the flow presents the accumulated cleanup and simplicity candidates and
+**offers** to run `/simplify` on them — run only on the user's yes, behaviour
+preserved by `/simplify`'s own constraint, and the test tiers re-run after it
+edits. An offer, never automatic: MEDIUM/INFO stay never-chased
+(`dotnet-feature-flow:234`), and this is the user choosing to execute cleanup
+in-session instead of the candidates travelling to the closing summary and
+being forgotten — the failure mode the current pointer-only wiring
+(`:335`) permits. Exact wording and placement belong to the three-way loop.
+
 **Carrier 2 — `claude-md-builder` static rule (before the fact, every
 session).** A new approved static rule (next free R-number) in
 `references/static-rules.md`, group *Scope, workflow and verification* —
@@ -165,7 +176,7 @@ Cleanup/slop already does.
 | Code written | PHASE 3 via the existing pointer mandate (`:182-184`) — implementer prompts name the owning skills |
 | Any session, any repo with a generated `CLAUDE.md` | the new static rule, loaded every turn |
 | Review | `dotnet-code-review` new area 7, run by this session's reviews and by the fleet's `dotnet-code-reviewer` (loads the rubric as its first action — **no `dotnet-review-flow` edit**) |
-| Execution of candidates | `/simplify`, unchanged |
+| Execution of candidates | `/simplify`, unchanged — plus the offered in-flow call site (carrier 1b): after the shared block is green, before GATE 2, on the user's yes |
 
 ### 5.3 The house ladder — direction for the three-way loop, not final text
 
@@ -230,8 +241,8 @@ COPY bucket. Written by the implementation session.
 
 Three-way loop (skill pieces), one deliverable, one version: piece 1
 `dotnet-code-review` (area row + rubric checks + cleanup renumber + its own
-description nouns), piece 2 `dotnet-feature-flow` PHASE 2 instruction, piece 3
-the static rule. Plus, outside the loop: router rows (§5.6), `NOTICE` (§5.5),
+description nouns), piece 2 `dotnet-feature-flow` (PHASE 2 instruction + the
+offered `/simplify` call site, carrier 1b), piece 3 the static rule. Plus, outside the loop: router rows (§5.6), `NOTICE` (§5.5),
 the `hooks/README.md` refusal-table row for (A) (§4). Inputs: this file, the
 ponytail SKILL.md + benchmark, the user rulings in §1. Done = validate + both
 manifests agree + `claude plugin update --scope project` + the prove-it checks

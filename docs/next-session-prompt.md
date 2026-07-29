@@ -226,7 +226,9 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   taxonomy has no complex-where-simpler-works category. (B) CHOSEN: new
   `dotnet-code-review` priority area 7 (severity cap MEDIUM; cleanup renumbers
   to 8), a `dotnet-feature-flow` PHASE 2 ladder instruction, a new
-  `claude-md-builder` static rule; two ponytail lines COPY (MIT → `NOTICE`
+  `claude-md-builder` static rule, plus an OFFERED `/simplify` call site in
+  `dotnet-feature-flow` after the shared block goes green, before GATE 2
+  (user-added, doc §5.1 carrier 1b); two ponytail lines COPY (MIT → `NOTICE`
   obligation 3); router rows named in §5.6; the (A) refusal to be mirrored
   into `hooks/README.md`'s table. Unblocks: one implementation session,
   three-way loop, 3 pieces — **constrained: do not touch the two on-trial
