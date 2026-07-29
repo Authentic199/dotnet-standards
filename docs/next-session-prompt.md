@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.27 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.28 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -30,7 +30,8 @@ dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18 (0.3.19 =
 budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21 ·
 claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
 `dotnet-review-flow` NO-SIGNAL 0.3.25 · `claude-md-builder` contradictions
-0.3.26 · `router-nudge` / mechanism E 0.3.27.
+0.3.26 · `router-nudge` / mechanism E 0.3.27 · `dotnet-review-flow`'s standing-code
+path scope 0.3.28.
 
 ## Lane status
 
@@ -167,9 +168,16 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   question … no skill self-triggered"* — a condition about the reader's own
   confusion, which a session that never considered this plugin does not meet.
   0.3.27's hook now names the router directly, so entry no longer depends on
-  this description; the description is still wrong on its own terms. **Next
-  deliverable by user direction.** It is a skill piece → the three-way loop is
-  mandatory. Detail: CHANGELOG 0.3.27 "Defect 2".
+  this description; the description is still wrong on its own terms. **This is
+  now the next deliverable** — the user reordered on 2026-07-29 to put the
+  standing-code scope first, and that shipped at 0.3.28. It is a skill piece →
+  the three-way loop is mandatory. Detail: CHANGELOG 0.3.27 "Defect 2".
+- [solo, 2026-07-29] Two small chores banked at 0.3.28, neither blocking: record
+  the em-dash word-count convention (`wc -w`, count them) in
+  `02-repo-structure.md` §5 — it was ruled at 0.3.28 but never written down; and
+  note that `git ls-files` reads the index while `git diff <empty-tree> HEAD`
+  reads HEAD, so a staged-but-uncommitted file appears in a path scope's file
+  list and not in its patch. Detail: CHANGELOG 0.3.28 "Known seams".
 - [solo, 2026-07-29 — scope narrowed by the user the same day] **The review
   surface is diff-anchored; reviewing standing code has no owner.**
   `dotnet-review-flow` hard-stops without a diffable base (`SKILL.md:99-101`)
@@ -186,13 +194,14 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   user accepts the offer, and the never-write-inside-the-repository rule at
   `SKILL.md:135-136` binds the **diff file**, not the report.
 
-  **Queued next by user direction.** Real design calls that remain: how a path
-  scope is bounded and chunked (a diff is ~20 files, a module tree is hundreds);
-  what replaces blast-radius ranking when nothing changed; and how a first audit
-  of legacy code avoids returning a useless flood — pre-plugin code violates
-  conventions it never knew about, so raw finding counts will be enormous and
-  ranking is the whole product. Router alignment: the base map has no row for
-  reviewing standing code, and that row ships in the same commit.
+  **SHIPPED at 0.3.28** — three-way loop, three pieces, three MERGE verdicts;
+  full rulings, measurements and coordinator catches in CHANGELOG 0.3.28. Router
+  rows `:58` and `:85` rebalanced in the same commit. **One design call was
+  deliberately NOT made and is now the open seam:** `dotnet-code-review` still
+  ranks by blast radius, which assumes a change. A standing audit of pre-plugin
+  code will return volume, and nothing yet re-ranks it — the new Decision Guide
+  row only forbids moving a severity because the code is old. Needs a
+  `dotnet-code-review`-owning session.
 
 ## Standing rules (unchanged, summarized)
 

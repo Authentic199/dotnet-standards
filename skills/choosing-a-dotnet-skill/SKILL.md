@@ -55,7 +55,7 @@ memory.
 | Reviewing a solution's architecture: dependency direction and project references, layer and namespace leaks, placement conformance, the composition root | `dotnet-architecture-review` |
 | Reviewing security posture: committed secrets and key handling, missing authorization gates, injection and mass assignment, data exposure through DTOs, logs and error responses | `dotnet-security-review` |
 | Reviewing performance: round-trip counts and N+1, page-size and index coverage, blocking calls, cache, lock and search cost | `dotnet-performance-review` |
-| Running the test-and-review fleet — parallel tester and reviewer subagents with verified findings — over an existing diff or branch | `dotnet-review-flow` |
+| Running the test-and-review fleet — parallel tester and reviewer subagents with verified findings — over a diff, a branch, or a set of paths whose code never changed | `dotnet-review-flow` |
 | Taking one .NET feature end to end as a single flow: brainstorm, plan, human gates, implement, test loop, review loop, commit | `dotnet-feature-flow` |
 | Writing or refreshing the repository's own `CLAUDE.md`: the commands, layout facts and hard rules a session must hold, and trimming that file back under 200 lines | `claude-md-builder` |
 
@@ -82,7 +82,7 @@ alone picks wrong. Match the question, not the word.
 | a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 | "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |
-| "review" | the rubric applied while reading changed code yourself — `dotnet-code-review` and its three sibling lenses; running the subagent fleet with the test loop over a diff — `dotnet-review-flow`; the whole feature process that ends in that review — `dotnet-feature-flow`; the request/receive review discipline — Superpowers |
+| "review" | the rubric applied while reading changed code yourself — `dotnet-code-review` and its three sibling lenses; running the subagent fleet with the test loop, over a diff or over unchanged code under given paths — `dotnet-review-flow`; the whole feature process that ends in that review — `dotnet-feature-flow`; the request/receive review discipline — Superpowers |
 
 ## Not yet covered
 
