@@ -7,9 +7,12 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.25 (23 skills + 2 commands + 6 agents + 2 hooks)** as of
-2026-07-29. The board header sat at 0.3.21 for four releases — if you ship,
-update this line, or the next session reads a stale roster.
+Shipped through **v0.3.27 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
+through 0.3.26 — if you ship, update this line, or the next session reads a
+stale roster. **The skill count was wrong here too**: this line read "23 skills"
+while `skills/` held 21 — the two commands had been counted as skills. Count the
+directory before writing a number on this line.
 Earlier: 0.3.21 = process-integration v1, Lane D session D1:
 `dotnet-feature-flow`, `dotnet-review-flow`, `/dotnet-feature`,
 `/dotnet-review`, six specialist agents, SessionStart `superpowers-check`,
@@ -23,7 +26,8 @@ dotnet-code-review 0.3.15 · mediatr-messaging 0.3.16 ·
 dotnet-architecture-review 0.3.17 · dotnet-security-review 0.3.18 (0.3.19 =
 budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21 ·
 claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
-`dotnet-review-flow` NO-SIGNAL 0.3.25.
+`dotnet-review-flow` NO-SIGNAL 0.3.25 · `claude-md-builder` contradictions
+0.3.26 · `router-nudge` / mechanism E 0.3.27.
 
 ## Lane status
 
@@ -69,9 +73,11 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   `automapper-mapping` (its description claims "colocated validator and
   mapping profile" but routes nothing back) — detail in CHANGELOG 0.3.12
   "Known seams" — needs an api-surface-owning session; NOT Lane C's.
-- [C, 2026-07-28] Mechanism E: UserPromptSubmit hook pointing at the router
-  (`choosing-a-dotnet-skill` was written hook-friendly) — endorsed by the
-  user at S15 — small solo follow-up session; unblocked any time.
+- [C, 2026-07-28 → CLOSED 2026-07-29] Mechanism E: UserPromptSubmit hook
+  pointing at the router — **SHIPPED at 0.3.27 as `hooks/router-nudge`** by a
+  solo session. Not a speculative build: it was triggered by a real failure in a
+  consumer repository where the plugin was installed, enabled and completely
+  ignored. Rulings + the reversed S6 refusal in CHANGELOG 0.3.27.
 - [C, 2026-07-28] Lane-log consolidation: fold lane logs into
   `docs/03-session-roadmap.md`; roadmap/index still carry stale references
   ("Facades/Cache in one or both projects", reference-project list) —
@@ -152,6 +158,24 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   even though the lenses never needed the tiers. Raised by the final whole-branch
   review of 0.3.25 and deliberately not fixed there. Unblocks: a
   `dotnet-review-flow`-owning session.
+
+- [solo, 2026-07-29] **`choosing-a-dotnet-skill`'s description triggers on
+  confusion, not on entry.** It reads *"when it is unclear which skill owns the
+  question … no skill self-triggered"* — a condition about the reader's own
+  confusion, which a session that never considered this plugin does not meet.
+  0.3.27's hook now names the router directly, so entry no longer depends on
+  this description; the description is still wrong on its own terms. **Next
+  deliverable by user direction.** It is a skill piece → the three-way loop is
+  mandatory. Detail: CHANGELOG 0.3.27 "Defect 2".
+- [solo, 2026-07-29] **The review surface is diff-anchored — a folder audit has
+  no owner.** `dotnet-review-flow` hard-stops without a diffable base
+  (`SKILL.md:99-101`) and derives every subagent input from the diff;
+  `dotnet-code-review`'s description says *"reviewing **changed** … code …
+  before merge"*. The request that exposed all of 0.3.27 — *"audit these
+  modules, change nothing, write the report to a file"* — cannot be served by
+  it: even a perfectly-triggered session stops at an empty diff. **Queued third
+  by user direction**; needs a `dotnet-review-flow`-owning session and a real
+  design call on how a standing-code scope is bounded, chunked and reported.
 
 ## Standing rules (unchanged, summarized)
 

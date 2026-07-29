@@ -27,7 +27,7 @@ tier-3 generator.**
 
 | Component | State |
 |---|---|
-| `hooks/` | ✅ two hooks, `post-edit-format` + `superpowers-check` — see [`hooks/README.md`](hooks/README.md) |
+| `hooks/` | ✅ three hooks, `post-edit-format` + `superpowers-check` + `router-nudge` — see [`hooks/README.md`](hooks/README.md) |
 | `skills/` | ✅ knowledge skills, four review rubrics, the router, two flow skills, and `claude-md-builder` — the tier-3 `CLAUDE.md` generator |
 | `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
 | `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
