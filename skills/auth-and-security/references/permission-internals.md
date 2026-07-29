@@ -153,7 +153,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
 Four facts to carry away:
 
 1. **Several permissions on one attribute mean ANY, not ALL.** The check is `HasAnyPermission…`.
-   A conjunction is not expressible through this attribute.
+   A conjunction is not expressible within one attribute — it is written by stacking, below.
 2. **The principal supplies only an id.** Its claims are not consulted — Principle 6. An anonymous
    request yields an empty id, which matches no row, so the handler denies rather than throws.
 3. **Failure is silence.** The handler never calls `context.Fail()`; it simply does not succeed,
@@ -161,6 +161,15 @@ Four facts to carry away:
 4. **The default principal family is the one that is permission-checked.** The grant tables are
    polymorphic, but this handler resolves grants for one principal type. Other client families are
    gated by scheme selection alone.
+
+> **The stacked form — framework behaviour, from ASP.NET Core documentation.** Two
+> `[HasPermission]` attributes on one action are two policies, and the framework passes the
+> action only when **every** policy on it passes: **stacked attributes mean ALL; one attribute
+> listing several codes means ANY.** The two shapes are one edit apart and read almost alike,
+> so the trap runs both ways — merging two stacked attributes into one "cleaner" attribute
+> silently flips ALL into ANY and widens access; splitting one attribute into two silently
+> narrows it. Neither refactor is cosmetic. Fact 3 does not soften this: multiple handlers may
+> satisfy one requirement, but nothing satisfies a requirement on behalf of a different one.
 
 ## 4. The permission catalogue
 

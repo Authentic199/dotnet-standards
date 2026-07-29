@@ -253,6 +253,10 @@ public class OrderResponse : OrderDefaultResponse
 ```
 
 `Id` and `CreatedAt` are never redeclared — they arrive from `BaseEntity`.
+**The root is the closed `BaseEntity`, never `BaseEntity<Guid>`** — the closed
+form exists precisely so no deriving type re-picks the key type, and writing
+the generic form where the key is a `Guid` is a defect on a response exactly as
+on an entity (`ef-core-data-access` owns the base's anatomy).
 **Unlike the request side, the base rung does carry the `Profile`**, and its
 `.IncludeAllDerived()` means the computed `Status` is correct on every rung; add
 a rung tomorrow and it is correct there too.

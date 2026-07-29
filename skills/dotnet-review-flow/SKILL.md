@@ -130,6 +130,14 @@ price scales with a number the user has not seen, a review of the wrong folder
 reads exactly like a clean one, and one typo among four paths leaves a plausible
 count covering less. Exclusions go into *Not run*: excluded is not reviewed.
 
+**A path scope covering one side of the HTTP boundary warns about the other.**
+A scope with the module folders but not the controllers — or the reverse —
+reviews half of every request path, and the severest defects are routinely in
+the half left out: logic that belongs in a service but sits in a controller is
+exactly the code a module-only scope never opens. Name the missing side's path
+and offer to widen before spawning; the user may decline, and a declined side
+goes under *Not run* like any other exclusion.
+
 ## Diff preparation — the spawn contract
 
 **The flow computes the diff exactly once, and every subagent receives the same
@@ -177,6 +185,20 @@ that does not compile burns six agents to rediscover one error. On success the
 testers still build too, which keeps a build failure reportable separately from a
 test failure and costs little against warm outputs — the gate's second benefit,
 since two agents compiling the same cold tree in parallel collide on artifacts.
+
+**Read the gate's warning count while it is on the screen.** The knowledge
+skills deliberately delegate whole rule families — member ordering, XML-doc
+presence, nullable flow — to the analyzers, and that delegation holds only
+where an analyzer finding can fail a build. A green gate with analyzer warnings
+raises one question: what enforces them? Check `TreatWarningsAsErrors` in the
+build props and per-rule severity in `.editorconfig`. When neither is set and
+the warnings run to the hundreds, the delegated families are enforced by
+nobody — the analyzers are catching, everyone is ignoring, and neither this
+fleet nor the build will surface what they caught. **Tell the user, with the
+count**, recommend raising severity to `error` one rule group at a time rather
+than reviewing what the analyzer already flags, and record the fact in the
+final report under *Not run*: analyzer-delegated rules, not enforced in this
+repository.
 
 This flow owns no worktree and no branch. Worktree lifecycle belongs entirely to
 `dotnet-feature-flow`.
@@ -360,10 +382,23 @@ disagreement from a performative one — load
 
 ### When a subagent fails
 
-A tester or reviewer that errors, returns nothing, or returns something that is
-not its report shape: **retry once with the identical prompt.** Same contract,
-same wording — a reworded retry tests a different thing and its result is not
-comparable.
+A subagent fails in one of two ways, and they are handled differently —
+**classify before retrying**:
+
+**A deterministic environment failure is never retried.** An error naming a
+missing tool (`No such tool available`), a skill that would not load, or an
+agent that could not start at all: the same spawn meets the same defect every
+time, so the retry proves nothing — and a retry that "succeeds" is worse than
+one that fails, because success means the agent improvised around the defect in
+a way this flow never sees and cannot audit. The same command then yields
+different runs depending on whether an agent chose to improvise. **STOP and
+surface it to the user**: the defect is in the install or in an agent's
+definition, and it is fixed there, not by respawning.
+
+**A transient failure is retried once, with the identical prompt.** A timeout,
+an API error, an empty return, or a return that is not the report shape: retry
+once. Same contract, same wording — a reworded retry tests a different thing
+and its result is not comparable.
 
 Still failing: **surface it to the user by name**, say what is now unknown, and
 list it under *Not run*. **Never silently drop a lens or a tier, and never
@@ -490,6 +525,8 @@ Executing cleanup candidates belongs to `/simplify`. **Unclear ownership.**
 | Two lenses report the same defect | Verify once, fix once, report once naming both lenses. Never carry two severities for one shape |
 | A CONFIRMED HIGH is real but outside this change's scope | It still blocks the loop, or the user decides it does not. Ask; never silently demote it |
 | Every line in the diff reads as added | An artifact of the empty-tree base, not a fact about the code. A reviewer's "newly introduced" is wording, and "outside this change's scope" has no referent when the scope is the file set — never move a severity for either |
+| A subagent errors naming a missing tool or an unloadable skill | Deterministic — never retried. STOP and surface it: the defect is in the install or the agent definition, and a "successful" retry only means the agent improvised around it |
+| A path scope covers modules without controllers, or the reverse | Warn: half of every request path is out of scope. Name the missing side, offer to widen; declined goes under *Not run* |
 | A lens fails twice | Surface it by name, list it under *Not run*, continue with the rest. Never review that lens yourself |
 | The user asks what a finding means | Point at the owning rubric or knowledge skill; do not re-explain the rule here |
 | Asked to also plan, brainstorm or commit | Not this skill. `dotnet-feature-flow` owns the full process; Superpowers owns each process step |

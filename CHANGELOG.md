@@ -8,6 +8,118 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.31] — the first field trial's feedback lands, 2026-07-29
+
+Every change in this version traces to one source: the first production run of
+the review fleet — `/dotnet-review` at v0.3.29 (plugin commit f5c5419), run
+standalone with a path scope over the consumer repository this plugin is
+installed into (its commit `416e128`, .NET 8, EF Core with PostgreSQL and MySQL
+migrators, 2026-07-29). Two waves (76 module files, then 10 controller files),
+12 agent spawns, 24 CRITICAL/HIGH findings all verified CONFIRMED, 0 PLAUSIBLE.
+The trial's feedback report catalogued 15 items; 11 shipped here directly and 4
+more after the user answered the five open questions it posed. One item was
+**declined on the user's answer**: XML `<summary>` on DTO/entity properties
+(C4) stays delegated to the analyzer — the remedy is severity raised to
+`error`, not a plugin rule.
+
+**Fixed:**
+
+- **E1 — all six agents commanded a Skill-tool load their `tools` list did not
+  grant.** Measured in the trial: 2 of 12 spawns failed outright with
+  `No such tool available: Skill`; the other 10 "succeeded" by reading rubric
+  bodies straight from the plugin cache on disk — one tester self-reported it
+  could not verify which of five cached versions was the enabled one, and one
+  failed reviewer falsely reported the plugin absent from the machine. `"Skill"`
+  is now first in every agent's `tools`, and every *First action* section gains
+  a uniform paragraph — **a load failure is never worked around**: no reading
+  rubrics from the plugin cache or any disk path, report the load error
+  verbatim, the defect is fixed in the install or the agent definition. The
+  paragraph makes explicit what "stop and say exactly that" already required.
+- **E2 — `dotnet-review-flow` retried deterministic failures.** *When a
+  subagent fails* now classifies before retrying: a deterministic environment
+  failure (missing tool, unloadable skill, an agent that cannot start) is
+  **never retried** — STOP and surface it, since a "successful" retry only
+  means the agent improvised around the defect invisibly, which the trial
+  observed twice; a transient failure (timeout, API error, wrong report shape)
+  retries once with the identical prompt, as before. Matching Decision Guide
+  row added.
+
+**Added:**
+
+- **`ef-core-data-access`** — three rulings under *Entities and
+  configurations*: (1) length and business conditions live in the validator,
+  not the schema — no `HasMaxLength`, no `HasColumnType("varchar(n)")`, no
+  business check constraint; keys, FKs, uniqueness (`HasCitextUnique`) and
+  defaults stay (user ruling, questions 1–2: house-wide, no exception clause);
+  (2) with `Nullable` enabled, `IsRequired()` is never written for a value type
+  or non-nullable reference — EF already derives it; (3) the closed-`BaseEntity`
+  rule binds **every deriving type, not entities alone** — a response written
+  `: BaseEntity<Guid>` is the same defect in a different layer (question 4: no
+  trade-off note). `api-surface/references/request-response-dtos.md` carries
+  the reciprocal sentence so the DTO layer's reviewer sees it too. This closes
+  the trial's C1 gap, where a reviewer saw the generic form on a response and
+  logged it under *Suppressions applied* as correct.
+- **`facade-module-architecture`** — **the split test** under the Modules axis
+  (question 3: a general principle, not a project opinion): *what exists only
+  because of X and is only ever created because of X stays with X; anything
+  else is its own module.* Also the tool a reviewer uses to answer placement
+  questions instead of leaving them open — the trial's architecture reviewer
+  found the right question and was correctly stopped by the no-invented-
+  conventions rule; the missing piece was this rule.
+- **`module-feature/references/validation-rules.md`** — new section *The
+  facade's rule helpers come first*: check `ValidatorExtension` before writing
+  a `.Matches(...)` regex or one-off predicate into a rule chain, and **the
+  fixed order when the helper itself is wrong** — warn, fix on approval, only
+  then migrate call sites (migrating first launders the defect into every
+  caller). Review checklist line added.
+- **`dotnet-code-review/references/review-rubric.md`** — check **5.14, a
+  suspicious range in a regex character class** (`A-z`, `a-Z`): grep-able,
+  HIGH, graded at the pattern's reach. The trial found a live one — a
+  character-class helper admitting the six ASCII characters between `Z` and
+  `a` that it was named to block — and no lens had a check that could see it.
+- **`dotnet-review-flow`** — two additions. At the pre-build gate: **read the
+  warning count while it is on the screen** — when analyzer warnings run to
+  the hundreds and neither `TreatWarningsAsErrors` nor `.editorconfig`
+  severity enforces them, the rule families the knowledge skills deliberately
+  delegate to analyzers are enforced by nobody; tell the user with the count,
+  recommend `error` severity one rule group at a time (question 5), and record
+  it under *Not run*. At target determination: **a path scope covering one
+  side of the HTTP boundary warns about the other** — the trial's first wave
+  scoped modules only and missed the three severest defects, all living in
+  controllers. Decision Guide rows for both.
+- **`dotnet-architecture-review`** — the standard repair for check 2.1's
+  commonest shape, promoted from a trial reviewer's own proposal: when a
+  facade reaches for the principal, point it at the abstraction under
+  `Facades/Identity/Base` — the facade keeps the concept, the module keeps the
+  type, the type-level cycle unwinds without a new edge.
+- **`dotnet-security-review` + `auth-and-security`** — check 4.2 and
+  `permission-internals.md` §3 now carry the conjunction's true spelling, in a
+  marked framework-documentation block: **stacked `[HasPermission]` attributes
+  mean ALL, one attribute listing several codes means ANY** — and the two
+  refactors between the shapes are never cosmetic: merging silently widens
+  access, splitting silently narrows it. The shipped "a conjunction is not
+  expressible" sentence was true of one attribute and false of the action;
+  the trial's reviewers derived the stacked semantics unaided (all four
+  lenses), which earned it a place in the rubric.
+- **`dotnet-security-review`** — check 3.3's grep and prose now cover
+  **identifier generators minted as one-time credentials**: `NewId`,
+  `Guid.NewGuid()`, COMB and ULID produce unique values, not unpredictable
+  ones. Promoted from the trial's severest finding — a sequential id used as a
+  password-recovery code, caught by the security lens alone, which is also the
+  standing argument for the never-drop-a-lens rule.
+
+Process notes for the record: version read off `main` at merge time — another
+lane shipped 0.3.30 mid-session, exactly the collision the numbering rule
+exists for. The four `[CẦN XÁC NHẬN]` items shipped only after the user
+answered the report's five questions (recorded above beside each). The trial
+also confirmed three mechanisms worth keeping verbatim: *Suppressions applied*
+(it is what made C1 traceable — seen-and-suppressed is not missed), *Not run* /
+layer coverage (the package layer has never run; nobody mistook that for
+clean), and the CONFIRMED/PLAUSIBLE verify discipline (24/24 verified, zero
+phantom findings).
+
+---
+
 ## [0.3.30] — write only the minimum the task needs, 2026-07-29
 
 Implements the decision doc

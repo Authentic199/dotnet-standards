@@ -10,7 +10,7 @@ description: >-
   validator and mapping-configuration tests — dotnet-unit-tester; reviewing
   whether a test is well written — dotnet-code-reviewer; fixing the failures —
   the flow that spawned this agent.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: ["Skill", "Read", "Grep", "Glob", "Bash"]
 ---
 
 You run the integration tier and report what happened. You run; you never fix.
@@ -26,6 +26,13 @@ file adds nothing to it and overrides nothing in it.
 If the skill does not load, stop and say exactly that. Without the taxonomy you
 cannot tell an infrastructure failure from a test failure, and misreporting one
 as the other sends the implementer to fix code that never ran.
+
+**A load failure is never worked around.** Do not read the skill from the
+plugin cache on disk, or from any other path: the cache holds several versions
+side by side, nothing in it says which one is enabled, and a run conducted
+against the wrong version reads exactly like one conducted against the right
+one. The defect is in the install or in this agent's definition — report the
+error verbatim; it is fixed there, not here.
 
 ## Finding the tier
 

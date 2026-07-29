@@ -269,13 +269,33 @@ constructor from a sequential GUID generator, so the id exists the moment you
 `new` the entity — children can be wired up, and the id returned, before
 anything is saved. The generic base contributes `CreatedAt`, defaulted to
 `DateTimeOffset.UtcNow`. Reach for `BaseEntity<TId>` only if a key genuinely
-cannot be a GUID.
+cannot be a GUID — **and that rule binds every type deriving from the base, not
+entities alone.** Response families root at `BaseEntity` too (`api-surface`,
+`references/request-response-dtos.md`), so a response written `: BaseEntity<Guid>`
+where the closed `BaseEntity` exists is the same defect in a different layer —
+the generic form is never a choice when the key is a `Guid`. A reviewer of
+either layer flags it.
 
 **Text a human reads** — codes, names, plates — is `citext`, so lookups and
 uniqueness ignore case. `HasCitextUnique(x => x.Code)` sets the column type
 and the unique index together and takes an optional filter;
 `HasColumnType("citext")` alone fits a case-insensitive column that need not
 be unique.
+
+**Length and business conditions live in the validator, not the schema.** The
+request's FluentValidation rules own maximum length and every business-shaped
+condition, so the configuration does not restate them: no `HasMaxLength`, no
+`HasColumnType("varchar(n)")`, and no business check constraint — a `CK_*`
+comparing one column against another is a validator rule wearing schema
+clothes. A limit declared twice drifts twice, and the schema copy is the one
+that diverges silently. What the schema keeps is structure the database itself
+needs: keys, foreign keys, uniqueness (`HasCitextUnique`), defaults.
+
+**With `Nullable` enabled, requiredness is the type's job too.** EF derives
+required from a non-nullable property — a value type or a non-nullable
+reference — so `IsRequired()` on one restates what the model already says and
+is never written. The property's own `?` is the single source of optionality;
+a configuration line duplicating it is the line a reviewer deletes.
 
 **Open every `Configure` with `HasBaseEntity().UnderscoreTable()`** — primary
 key on `Id`, then the table name snake-cased from the type (`OrderLine`
