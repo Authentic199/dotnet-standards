@@ -69,10 +69,20 @@ file, so a controller's own attributes only ever name the verb and the tail.
 - **Bulk delete is `POST BulkDelete`**, taking a range request in the body — not
   `DELETE` with a body, which clients and proxies handle inconsistently, and not
   a repeated query parameter.
-- A sub-resource nests under its owner (`{id:guid}/Shipments`, `me/Shipments`)
-  rather than becoming a top-level controller, unless it has its own module and
-  its own full CRUD surface. The controller stays the module's; only the path
-  nests.
+- **A sub-resource nests under its owner** (`{id:guid}/Shipments`,
+  `me/Shipments`), and **the class that hosts those routes is the owner's
+  controller** — the controller named for the module whose resource that
+  leading `{id:guid}` identifies, the parent. It hosts them as a suffix
+  partial: `OrdersController.Shipments.cs`. **A full CRUD surface on the
+  sub-resource does not change this** — five nested actions are still five
+  routes beginning with the parent's id, so they stay on the parent's
+  controller. Two names are wrong here and both compile: a concatenated
+  `OrderShipmentsController`, and a top-level `ShipmentsController` hosting
+  routes that open with the parent's id.
+- **The child earns its own top-level controller only when its routes stop
+  nesting** — when it is addressable without the parent's id (`api/Shipments`,
+  `api/Shipments/{id:guid}`). That is a routing change, not a rename: decide it
+  from the route templates, never from how many actions there are.
 - Verbs are conventional: `POST` create, `GET` read/search, `PUT` full update of
   the addressed thing, `DELETE` single-id delete.
 

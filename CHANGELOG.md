@@ -8,6 +8,65 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.35] — round-2 readout: four rules that could not fire, 2026-07-29
+
+Round 2 of the blind re-trial ran on **Sonnet** (the trial's model floor from
+here on) against 0.3.34 and failed four held-back criteria. Every one traced to
+a rule that was present but unfirable as written — the recurring lesson of this
+trial, and the reason each fix below replaces judgement with a mechanical step.
+
+What the round got right, for the record: the unauthenticated controller
+family, a package advisory traced from an unauthenticated route to its
+dynamic-LINQ sink, the FluentValidation `.When()` composition bug behind the
+one red unit test, `ToLower()` defeating a citext index, a synchronous `Count()`
+on every list endpoint, plus 1.10 (redundant EF configuration), 5.15 (dangling
+`RuleFor`), 5.17 (member order) and 5.18 (property docs) all firing on their
+first outing.
+
+**Fixed:**
+
+- **Check 4.10 could not match the case it was written for.** It required *a
+  second aggregate entity*; the real defect was a module folder named `Devices`
+  whose `Entities/` holds only `DeviceType.cs` — one entity, so nothing to
+  compare. Rewritten as a three-step mechanical procedure (list the entities,
+  singularise the folder name, compare) with **two** matching shapes: (a) the
+  folder names a concept that has no entity, (b) two aggregates each with their
+  own request/response family. The settings-shapes exception is now stated as
+  *Audit coverage* material rather than a finding.
+- **`api-surface`'s sub-resource rule sent the reviewer to the wrong
+  destination.** "Unless it has its own module and its own full CRUD surface"
+  plus "the controller stays the module's" read, on a nested CRUD surface, as
+  *rename it to the child* — which is what round 2 recommended, against check
+  3.5. Rewritten: the class hosting a nested route is **the owner's controller,
+  the module whose resource the leading `{id:guid}` identifies**, as a suffix
+  partial; a full CRUD surface does not change that; the child earns a
+  top-level controller only when its **routes stop nesting**, which is a
+  routing decision read off the templates, never an action count. Check 3.5
+  now orders the reviewer to read the route templates before naming a
+  destination, and says outright that renaming to the child is the wrong fix
+  while the routes nest — plus **grade HIGH, not a naming nit**, since round 2
+  filed it MEDIUM.
+- **Check 5.19 graded backwards, and the security lens credited the defect.**
+  The decisive fact was nowhere in the plugin: **AutoMapper copies only members
+  it finds on the source**, so `Ignore` on a member the request never declared
+  changes no behaviour and prevents no mass assignment. Round 2 praised those
+  lines under *What's Good* as an anti-mass-assignment measure. 5.19 is now a
+  three-step `Find:` whose **step 2 decides the grade** — grep the *test
+  sources* for `AssertConfigurationIsValid` (with an explicit warning that a
+  `bin/`/`obj/` hit is the AutoMapper DLL and proves nothing): a hit makes every
+  `Ignore` load-bearing and closes the check; no hit means grade it. The same
+  fact lands in `automapper-mapping` and as a *do not credit this under What's
+  Good* clause in `dotnet-security-review` 6.1(b).
+- **Check 5.16 never told the reviewer how to find the helpers.** "Compare each
+  hit against the facade's `ValidatorExtension.cs`" assumes the reviewer goes
+  looking; round 2 did not, and a live hand-rolled `.Matches(...)` duplicating a
+  shipped helper went unreported. The `Find:` is now two required commands, the
+  second locating the extension file by signature
+  (`grep -rln "static.*IRuleBuilder" src/Infrastructure/Facades/`) with the
+  instruction to read its method names **before** grading any hit.
+
+---
+
 ## [0.3.34] — round-1 readout of the self-evaluating re-trial, 2026-07-29
 
 The blind re-run of the field trial (round 1, against 0.3.33) was evaluated

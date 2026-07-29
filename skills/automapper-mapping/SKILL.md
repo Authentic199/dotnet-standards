@@ -180,11 +180,22 @@ was never sent. `Ignore` is a statement, not a silence: it records that the memb
 is filled deliberately by another step, so a reviewer does not read the omission as
 an oversight.
 
-**And a statement earns its line.** A destination member with no matching source
-member and no other writer maps nothing anyway — ignoring it is noise, and noise
-buries the deliberate ignores a reviewer must trust. One exception before deleting:
-where the configuration-validation test enforces destination coverage, that
-`Ignore` is load-bearing, not noise — check first.
+**And a statement earns its line.** **AutoMapper copies only members it finds on
+the source**, so a destination member the source type does not declare is never
+written — with or without the `Ignore`. Ignoring it changes no behaviour; it is
+noise, and noise buries the deliberate ignores a reviewer must trust.
+
+Two things follow, and the second one is a trap:
+
+- **Check for the configuration test before deleting any of them.** Where
+  `AssertConfigurationIsValid` runs, every destination member must be mapped or
+  ignored, so those lines are load-bearing and none of them is noise. Grep the
+  test sources — a hit inside `bin/` or `obj/` is the AutoMapper assembly, not
+  a test, and proves nothing.
+- **An `Ignore` is not a mass-assignment control.** What stops a caller writing
+  `CreatedBy` is the request type not declaring it. Ignoring server-owned
+  members on a request map is neither a safety measure to credit nor, where it
+  is absent, an exposure to report.
 
 Delegate-based options are safe on a request map because it runs against
 materialized objects and its destination is an entity, not a projected shape. The

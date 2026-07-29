@@ -562,8 +562,12 @@ while nothing at all is enforced. Delete it, or write the rule it promised.
 
 **5.16 A hand-rolled rule the facade already ships** — *MEDIUM* ·
 `module-feature`, *The facade's rule helpers come first*
-`Find:` `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/`
-and compare each hit against the facade's `ValidatorExtension.cs`.
+`Find:` two commands, both required — the second is how you learn what the
+facade already ships, and skipping it turns this check into a silent pass:
+1. `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/`
+2. `grep -rln "static.*IRuleBuilder" src/Infrastructure/Facades/` — the
+   facade's validator-extension file, wherever it sits. Open it and read
+   every method name before grading a single hit from step 1.
 A regex or predicate re-deriving a helper is a second definition of one rule,
 and the copies drift the day the rule changes. When the helper itself is wrong
 the order is fixed — warn, fix on approval, then migrate call sites — never
@@ -586,13 +590,25 @@ whose meaning every client guesses from the name.
 
 **5.19 An `Ignore` for a member nothing would map** — *MEDIUM* ·
 `automapper-mapping`
-`Find:` `grep -rn --include=*.cs "opt.Ignore()" src/` and, per hit,
-check whether the source type has a matching member at all.
-`Ignore` is a statement — it records a member another step fills deliberately.
-Ignoring a destination member with no matching source member and no other
-writer is noise that buries the deliberate ignores. One exception: where the
-configuration-validation test enforces destination coverage, that `Ignore` is
-load-bearing — check before calling it redundant.
+`Find:` three steps, in order — do not skip step 2, it decides the grade:
+1. `grep -rn --include=*.cs "Ignore()" src/` for the mapping profiles.
+2. `grep -rn "AssertConfigurationIsValid" tests/ src/` — **source files only,
+   never a `bin/`or `obj/` hit, which is the AutoMapper DLL and proves
+   nothing.** A hit means every destination member must be mapped or ignored,
+   so **every `Ignore` is load-bearing and none of them is a finding** — say
+   so and stop. No hit: continue.
+3. For each `Ignore`d destination member, open the source type and check
+   whether it declares a member of that name.
+
+A destination member the source type does not declare is **never written by
+AutoMapper, with or without the `Ignore`** — the mapper only copies members it
+finds on the source. So the line changes no behaviour: it is noise that buries
+the `Ignore`s which do record a deliberate second writer.
+
+**And it is not a security control.** An `Ignore` on `CreatedBy`, `UpdatedAt`
+or a navigation the request never had prevents no mass assignment — the
+request type not declaring the member is what prevents it. Do not credit these
+lines as a safety measure, and do not report their absence as an exposure.
 
 ## 6. Tests
 
