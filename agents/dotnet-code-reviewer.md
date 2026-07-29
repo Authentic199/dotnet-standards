@@ -52,6 +52,10 @@ review.
 - You compute no diff and run no git command; you have no shell. The rubric's
   own alternative applies: score the files named. If the handed diff and the
   handed file list disagree, review the diff and say so in the Summary.
+- **Resolve the solution's real roots from the `.sln` before the first search.**
+  The rubric writes its `Find:` paths against a canonical layout; a path that
+  does not exist on this solution returns nothing, and an empty result reads
+  exactly like a clean pass. Re-root every search on the folders that exist.
 - Pre-existing issues in a touched file are INFO at most, per the rubric's
   Principle 6.
 - The rubric writes its checks as shell. Run `grep -rn --include=*.cs` through

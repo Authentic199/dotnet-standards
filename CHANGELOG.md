@@ -8,6 +8,51 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.34] — round-1 readout of the self-evaluating re-trial, 2026-07-29
+
+The blind re-run of the field trial (round 1, against 0.3.33) was evaluated
+against the held-back criteria. The run's beyond-rule catches were strong — a
+FluentValidation `.When()` composition bug proven by a failing unit test, an
+authorization-free controller family, verified page-size and index findings,
+one PLAUSIBLE correctly demoted after tracing an index through a shared
+extension. Two criteria failed deterministically and two soft spots showed;
+all four are fixed here.
+
+**Fixed:**
+
+- **The split test had no grader.** The 0.3.31 doctrine (a concept that fails
+  *exists-only-because-of-X* owns its own module) lived in
+  `facade-module-architecture` with no rubric check asking the question, so
+  the round-1 architecture lens never asked it. New
+  `dotnet-architecture-review` check **4.10 — two capabilities in one module
+  folder**: a second aggregate entity with its own request/response/validator
+  family (themed subfolders are the tell) triggers the split test; settings
+  shapes that pass the test are explicitly not the finding.
+- **Check 5.19 grepped a path that does not exist.** `src/Modules/` — the
+  canonical layout roots modules under `src/Infrastructure/`, so the redundant-
+  `Ignore` sweep returned empty and read as clean. 5.16 carried the same
+  defect. Both greps re-rooted to `src/`; and the code-reviewer agent gains
+  the **resolve-the-roots-from-the-`.sln`** scope bullet its three siblings
+  already had — the round-1 miss is exactly the failure mode that bullet
+  names.
+- **Check 3.5's owner was ambiguous.** Round 1 caught the two-module
+  controller but leaned toward naming it for the child concept. The rule now
+  states the owner outright: **the module whose resource roots the route — the
+  parent** (`api-surface` wording aligned).
+- **Standalone + a RED test tier shipped no review.** The flow's *Who fixes*
+  said "report the failures and stop", so a standalone audit of code with one
+  failing test would deliver zero lens output — round 1 only produced its
+  review because the invocation overrode the flow, and said so. Standalone now
+  records the RED tier and continues to REVIEW-LOOP; the after-report offer
+  covers failures alongside findings. Principle 2's economy argument does not
+  apply when nobody fixes until the user answers.
+- **The diff file must be host-readable.** Round 1 wrote the scratch diff to a
+  POSIX `/tmp` path; two reviewers could not open it and fell back to the file
+  list. Diff preparation now requires a path every agent on the host can open,
+  and names an unreachable diff a flow defect, not a fallback.
+
+---
+
 ## [0.3.33] — the delegation reversal, and the trial's remaining deterministic gaps, 2026-07-29
 
 Preparation for the self-evaluating re-run of the field trial. **The user
