@@ -535,7 +535,14 @@ tidiness issue — which is why it is a correctness finding and not slop, even
 though it surfaces during the cleanup sweep. A suppression added instead of a fix
 is the same finding: `grep -rn --include=*.cs "#pragma warning disable" src/`.
 
-## 6. Tests
+**5.14 A suspicious range in a regex character class** — *HIGH* · universal
+`Find:` `grep -rn --include=*.cs "A-z\|a-Z" src/`
+`A-z` is not `A-Za-z`: ASCII puts six characters between `Z` and `a` — `` [ \ ] ^ _ ` ``
+— so the class admits exactly the punctuation its author meant to exclude. The
+pattern compiles, matches every string a quick manual test would try, and ships
+a filter that quietly passes what it is named to block. A mixed-case range is
+always a typo: write both ranges out. Grade at the pattern's own reach — a
+shared validation helper carries every validator that calls it.
 
 Which tier a scenario belongs to is `dotnet-testing`'s Decision Guide. This pass
 asks only whether the changed behaviour is covered, and whether the tests that

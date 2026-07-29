@@ -187,6 +187,15 @@ A module is **one business capability** and the only place business meaning live
 It has **no facade-style `Startup.cs`** — the marker scan picks up its services.
 The single exception is `Settings/Startup.cs`, which binds that module's options.
 
+**The split test**, for a concept living inside another concept's module: *what
+exists only because of X and is only ever created because of X stays with X;
+anything else is its own module.* A catalogue type that other code consults in
+its own right fails the test and owns a module, however small and however much
+one consumer dominates; the typed settings shapes that one concept alone
+persists pass it, and stay beside that concept. The test is also how a reviewer
+answers a placement question instead of leaving it open — run the concept
+through it before filing "wrong folder" or waving the folder through.
+
 Create a folder when its trigger is real, never in advance:
 
 ```

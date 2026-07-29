@@ -172,6 +172,14 @@ which is the design. The reverse is the finding.
 | 2.2 | `Core` carrying a package beyond `Humanizer` and `NewId`, or a `using` reaching into `Infrastructure`. `Core` is the contract layer, not a utility bag. `Find:` open `src/Core/Core.csproj` and read every `PackageReference`; `grep -rn "using " src/Core/` | **HIGH** |
 | 2.3 | A type in `Core` that only one layer names. The rule is **"must two or more layers name this type?"**, not "is it small?". `Find:` for each type added to `Core` in the diff, `grep -rn "<TypeName>" src/` and count the layers. Same MEDIUM from the other direction: a type in `Core` or in a facade whose **name states a business concept** | **MEDIUM** |
 
+**The standard repair for 2.1's commonest shape.** The module type a facade
+reaches for is usually the principal — the user entity behind auth, permissions
+or auditing. The repair is neither moving the entity nor living with the leak:
+point the facade at the principal abstraction under `Facades/Identity/Base`,
+which the module's entity already implements. The facade keeps the concept, the
+module keeps the type, and the cycle unwinds without adding an edge. Name that
+destination in the finding — a 2.1 with no destination is deferred forever.
+
 **Three things that look like findings here and are not.** Each is house law, and
 reporting one burns the author's trust in the whole report:
 

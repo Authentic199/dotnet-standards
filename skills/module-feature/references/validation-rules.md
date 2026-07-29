@@ -365,6 +365,20 @@ When(x => x.RegionId != null && repositoryWrapper.HasArea(x.RegionId.Value), () 
   one `When` on three rules instead lets the three copies drift apart. A block holding a
   single rule is `.When(…, ApplyConditionTo.CurrentValidator)` written the long way.
 
+## The facade's rule helpers come first
+
+Before writing a `.Matches(...)` regex, an inline lambda or a one-off predicate
+into a rule chain, open `Facades/Common/Extensions/ValidatorExtension.cs` and
+look for the rule already written — `Required()`, the character-class helpers
+and their siblings. The helper is the rule's one definition; every hand-rolled
+copy is a second one, and the copies drift the day the rule changes.
+
+**When the helper itself is wrong, the order is fixed:** warn the user and
+change nothing on your own; fix the helper only once the user approves; migrate
+the hand-rolled call sites onto it only after the fix. Migrating first launders
+the helper's defect into every caller — a validator moved onto a broken helper
+is a rule that just got quietly weaker.
+
 ## Anti-example: a prefixed validation file
 
 ```
@@ -407,3 +421,5 @@ registered and never injected, so only the type name and its call sites change.
 - Two or more rules sharing a condition are inside one `When(condition, () => { … })` block.
 - No check that needs no database access has left the validator, and no computed business
   value has been written as a predicate instead of an `Expressions/` member.
+- No hand-rolled regex or predicate duplicates a `ValidatorExtension` helper — and a wrong
+  helper is reported first, fixed on approval, and only then adopted.
