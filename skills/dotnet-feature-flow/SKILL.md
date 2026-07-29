@@ -35,6 +35,7 @@ defect: it becomes a stale second source of truth the day its owner changes.
 | — | **GATE 1 — human** | The user approves design and plan |
 | 3 | Implement | `superpowers:test-driven-development` or `superpowers:subagent-driven-development` |
 | 4–5 | Test and review | `dotnet-review-flow`, embedded |
+| — | The cleanup offer — **optional, on an explicit yes only** | The user chooses; `/simplify` executes |
 | 6 | Git — **GATE 2 inside it** | `superpowers:finishing-a-development-branch` |
 
 Phases run in order. A phase is not skipped because it "looks unnecessary"; where
@@ -142,6 +143,19 @@ that does not exist.
 Those names are what PHASE 3's prompts carry. A step with an owner and no name is
 a step whose implementer works from memory.
 
+**Apply the simplicity ladder to each step as it is drafted.** Three questions, in
+that order: does the task in front of you need this step's code at all; does it
+already exist in the codebase; is the step the smallest shape the owning skills
+allow. **Those three questions are the trigger, not the rule** — what counts as
+speculative, which structures are sanctioned and where the floor sits belong to
+`dotnet-code-review`'s simplicity area (priority row 7), and this flow does not
+restate them; that same area grades these steps again after PHASE 3 either way. A
+step written for a need this task does not have is cut here, where it costs a
+sentence — after PHASE 3 the same cut costs a review round and work already
+written. **This trims the plan's own inventions and never the user's scope:** a
+step the user asked for in PHASE 1 stays in the plan; if it looks unnecessary, say
+so at GATE 1 and let them decide.
+
 ## GATE 1 — the user approves the design and the plan
 
 **STOP. Present the design and the plan. Wait for an answer.**
@@ -248,6 +262,58 @@ exists for what was just built, and ask before PHASE 6.
 **Never fork the loops into this body.** One definition, invoked twice; a copy
 diverges on the first edit and nobody notices which one the run used.
 
+## The cleanup offer — after PHASE 5, before PHASE 6
+
+**Offered once, run only on an explicit yes, and not a gate.**
+
+Take the candidates from the block's report as it wrote them: its **Unfixed MEDIUM
+and INFO** section, where the simplicity area's findings land, and any cleanup
+candidates the code lens's own report carried through under the sibling's rule that
+nothing a subagent learned is dropped. **Do not re-derive the list, do not re-rank
+it, and do not add to it from this session's own reading** — this session never
+grades its own work (principle 2), and a candidate it invented here is a verdict it
+is not allowed to reach. Then ask once:
+
+> N items in the block report are cleanup or simplicity candidates. Run `/simplify`
+> on them now? A yes edits the working tree, so PHASES 4–5 are re-entered before
+> PHASE 6.
+
+- **An explicit yes** — invoke `/simplify` on those candidates. It owns execution
+  and carries its own verification; this flow does not direct it, second-guess it,
+  or apply the cleanup itself. Then redo **diff preparation and the pre-build
+  gate** over the changed tree — those are on this flow's side of the seam — and
+  **re-enter the shared block from TEST-LOOP, carrying the reissued report: same
+  block, same caps**, which do not reset because a cleanup pass ran. Code edited
+  after a suite went green has no test evidence behind it. If the re-entry comes
+  back red or hits a cap, PHASES 4–5's rules apply unchanged: a fix takes PHASE 3's
+  route, and that halt is this flow's halt exactly as it was the first time.
+- **Anything else** — no run. Silence, "up to you", and a yes to a different
+  question are declines. The candidates travel to the closing summary as they would
+  have, and the offer is not made again later in the run.
+
+**No offer unless the block finished clean.** If a cap halted it, or a tier came
+back under *Not run*, the run is already stopped and owes the user an answer; a
+second question asked on top of the first one buries it. If the block finished
+clean and listed no candidates, there is nothing to offer: say so in one line and
+go to PHASE 6.
+
+**It is not a gate and must not act like one.** A run that cleaned up and a run
+that declined arrive at GATE 2 in exactly the same state — PHASE 6 runs the same
+way, GATE 2 asks the same question, and no severity moves either way. A yes
+authorizes one cleanup pass and nothing else; it is not early approval of the
+commit, the merge, or the publish that GATE 2 alone decides.
+
+**It does not bend the never-chased rule.** This flow still never fixes a MEDIUM or
+an INFO on its own initiative and never lets one hold the block; nothing is
+re-argued and no verdict is revisited. What changed is only that the user is asked,
+once, after the block has finished. This is also **not `dotnet-review-flow`'s
+standalone offer reopened** — that one covers CONFIRMED CRITICAL and HIGH, which
+PHASES 4–5 have already fixed here.
+
+**Nothing here is a finding of this flow's.** The candidates are the block's, the
+execution is `/simplify`'s, and the verdict on the result is the re-entered
+block's. This flow presents, waits, and invokes.
+
 ## PHASE 6 — Git, with GATE 2 inside it
 
 Invoke `superpowers:finishing-a-development-branch` and follow it.
@@ -311,11 +377,14 @@ still present and where>
 
 ### Outstanding
 <requests deferred mid-flow · anything a cap left behind · anything the user
-deferred at a gate · the count of unfixed MEDIUM and INFO, which are listed in
+deferred at a gate · the cleanup offer — declined, not reached, or accepted and
+what it changed · the count of unfixed MEDIUM and INFO, which are listed in
 full in the block report below — not repeated here>
 
 ### Review block
-<dotnet-review-flow's own final report, carried through untouched>
+<dotnet-review-flow's own final report, carried through untouched — from the last
+block that ran, so an accepted cleanup offer means the re-entered block's report,
+not the one whose candidates `/simplify` executed>
 ```
 
 Before declaring the run complete, invoke
@@ -332,7 +401,7 @@ only one copy and the two never diverge.
 **Process.** Brainstorming, plan writing, TDD, subagent-driven development,
 worktrees, finishing a branch and verification before completion belong to
 Superpowers, which this flow calls and never copies. Executing cleanup candidates
-belongs to `/simplify`.
+belongs to `/simplify`, offered once after PHASE 5 and run only on an explicit yes.
 
 **Content.** Which knowledge skill owns a convention is `choosing-a-dotnet-skill`.
 What each review lens checks lives in the four rubrics; what a test looks like
@@ -353,6 +422,8 @@ plan names them, and the implementers and agents load them.
 | Unsure whether something is one use-case or two | Two. Over-routing costs time; under-routing runs out of context mid-feature |
 | A plan step names no knowledge skill and the area has an owner | Fix the plan before PHASE 3 — that is the router's rule, not an optional nicety |
 | A plan step is in an area no shipped skill owns | Nothing to name. Say so in the step and move on |
+| A plan step exists for a need this task does not have | Cut it at PHASE 2, before GATE 1 — a sentence now, a review round after PHASE 3. What counts as speculative is `dotnet-code-review`'s simplicity area, not this flow's call |
+| A step looks unnecessary but the user asked for it | It stays. This flow trims the plan's own inventions, never the user's scope — raise it at GATE 1 and let them decide |
 | A task turns out to need a different approach | Back to the plan; back to GATE 1 if the design moves |
 | A subagent asks which convention applies | Point it at the owning skill; do not answer from this body |
 | PHASES 4–5 are about to start | Invoke the sibling and **say it is embedded**. Silence means standalone, and standalone offers instead of fixing |
@@ -360,7 +431,9 @@ plan names them, and the implementers and agents load them.
 | The urge to run a test or read the diff for a verdict | Out of bounds — that judgement is the fleet's. Fix what it CONFIRMS |
 | A cap halts the shared block | Its halt is this flow's halt. Carry the status summary to the user and wait; never proceed to PHASE 6 |
 | The shared block returns with a tier under *Not run* | Not a cap and not a red suite, so nothing halts you. Stop and ask anyway — committing a feature no test ever covered is the outcome GATE 2 exists to prevent |
-| Only MEDIUM and INFO findings remain | Proceed to PHASE 6 and carry them into the block report. They are never chased |
+| Only MEDIUM and INFO findings remain | They are never chased. Make the cleanup offer once, then proceed to PHASE 6 and carry them into the block report |
+| The user accepts the cleanup offer | Run `/simplify`, redo diff preparation and the pre-build gate, then re-enter the shared block from TEST-LOOP and carry the reissued report — same block, same caps. Never call PHASE 6 on a tree no block has seen |
+| The user declines the cleanup offer, or the block left no candidates | Nothing changes. Straight to PHASE 6; the candidates travel in the block report as they always have |
 | A CONFIRMED HIGH is real but outside this feature's scope | Ask the user; never silently demote it to clear the gate |
 | `finishing-a-development-branch` offers its integration options | That is GATE 2. Present them, wait, and let the user choose — including any force push |
 | The worktree looks finished before the merge | Leave it. Removal is post-merge only |

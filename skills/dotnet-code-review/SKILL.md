@@ -3,12 +3,12 @@ name: dotnet-code-review
 description: >-
   This skill should be used when reviewing changed .NET or C# code: a code review
   or PR review, "review my changes", scoring blast radius, ranking findings by
-  severity, writing the review report, or listing cleanup and slop candidates —
-  dead code, stale TODOs, dropped CancellationToken — before merge. Not for: the
-  review process — superpowers:requesting-code-review,
-  superpowers:receiving-code-review; executing cleanup — /simplify; layering,
-  dependency direction — dotnet-architecture-review; secrets, injection, data
-  exposure — dotnet-security-review; N+1, allocation, blocking —
+  severity, or listing cleanup, slop and simplification candidates — dead code,
+  stale TODOs, dropped CancellationToken, over-build, unnecessary complexity —
+  before merge. Not for: the review process — superpowers:requesting-code-review,
+  superpowers:receiving-code-review; executing cleanup or simplification —
+  /simplify; layering, dependency direction — dotnet-architecture-review; secrets,
+  injection, data exposure — dotnet-security-review; N+1, allocation, blocking —
   dotnet-performance-review; JWT, policies, permission internals —
   auth-and-security; profiles, CreateMap — automapper-mapping; the conventions
   checked — ef-core-data-access, module-feature, api-surface, error-handling,
@@ -119,7 +119,8 @@ exploitable — an uncancellable write inside a transaction, say.
 
 Work the areas in this order and stop descending when the review budget set by
 blast radius runs out. The order is by incident frequency: the top four are
-where production breaks, the bottom is where taste lives.
+where production breaks, the last two produce candidates for `/simplify` rather
+than merge blockers, and below them is where taste lives.
 
 | # | Area | The rubric checks | Owning skill |
 |---|---|---|---|
@@ -129,7 +130,8 @@ where production breaks, the bottom is where taste lives.
 | 4 | **Integration** | Timeouts and failure handling on outbound calls, cache invalidation after the mutation that invalidates it, index writes after the entity change, no exception swallowed into a log line | `distributed-caching`, `elasticsearch-search` |
 | 5 | **Correctness** | Guard clauses and their order, empty and null cases, the exception type chosen for the failure, catch filters that do not re-wrap an exception already carrying the right meaning, the message key attached to each outcome, dead code left in front of the real path | `error-handling`, `message-keys`, `module-feature` |
 | 6 | **Tests** | The changed behaviour has a test at the right tier, and the test asserts an outcome rather than a call | `dotnet-testing` |
-| 7 | **Cleanup / slop** | Unused usings, new analyzer warnings, dead code, stale TODO/HACK/FIXME, dropped tokens — collected as candidates, never deleted here | `references/cleanup-checklist.md` |
+| 7 | **Simplicity / over-build** | Code the change adds that the task in front of it does not need, a helper written where one already exists, a shape more elaborate than the owning skill requires — capped at MEDIUM, collected as candidates, never rewritten here | `references/review-rubric.md` area 7; each check names the skill that owns the shape |
+| 8 | **Cleanup / slop** | Unused usings, new analyzer warnings, dead code, stale TODO/HACK/FIXME, dropped tokens — collected as candidates, never deleted here | `references/cleanup-checklist.md` |
 | — | **Style and naming** | Only after all of the above, and only when a formatter or analyzer does not already own it | — |
 
 ## The report
@@ -243,4 +245,7 @@ no compiler sees).
 | A convention question the diff raises is not settled anywhere | Raise it as INFO with the question stated; do not invent the rule in the review |
 | A pre-existing problem in a touched file | INFO — unless the change makes it reachable or worse, then score it normally |
 | Cleanup candidates found | List them under Cleanup candidates; hand execution to `/simplify` |
+| The change carries more code than the task needed | Area 7 — MEDIUM at most, with `candidate for /simplify` as the fix; never a merge blocker on its own |
+| The "over-build" is structure a shipped skill mandates — the module file family, a response tier, a thin envelope, an `Infrastructure/Facades/` capability built ahead of need | Not a finding. Sanctioned structure is not over-build; say so plainly if it is raised |
+| The simpler shape is itself a shipped convention — a hand-rolled lock, a duplicated capability, a new package | Report it under the check that already owns it, at that check's severity; do not report it again under area 7 |
 | Style is the only thing left to say | Say nothing; the formatter and analyzers own it |

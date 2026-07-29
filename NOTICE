@@ -2,12 +2,14 @@ NOTICE — third-party attributions for `dotnet-standards`
 ========================================================
 
 `dotnet-standards` is a personal Claude Code plugin. It carries material derived
-from two MIT-licensed projects. Both are credited below, with the full licence
-text reproduced as the MIT licence requires.
+from three MIT-licensed projects. All three are credited below, with the full
+licence text reproduced as the MIT licence requires.
 
-Two obligations, no more: everything derived from the reference kit is covered by
-obligation 1, and the polyglot hook wrapper copied from Superpowers is covered by
-obligation 2. Nothing else in this plugin is third-party material.
+Three obligations, no more: everything derived from the reference kit is covered
+by obligation 1, the polyglot hook wrapper copied from Superpowers is covered by
+obligation 2, and the simplicity ladder distilled from ponytail — with its two
+verbatim lines — is covered by obligation 3. Nothing else in this plugin is
+third-party material.
 
 
 --------------------------------------------------------------------------------
@@ -114,6 +116,62 @@ MIT LICENCE TEXT (reproduced verbatim from Superpowers' LICENSE, version 6.2.0)
     MIT License
 
     Copyright (c) 2025 Jesse Vincent
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+3. DietrichGebert/ponytail
+--------------------------------------------------------------------------------
+
+Project:   ponytail
+Author:    DietrichGebert
+Source:    https://github.com/DietrichGebert/ponytail
+Licence:   MIT
+
+WHAT IS DERIVED FROM IT
+
+  - skills/dotnet-code-review/references/review-rubric.md — area 7 (Simplicity
+    and over-build). The three-question ladder structure — does this need to
+    exist at all, does it already exist in the codebase, is it the minimum shape
+    — is distilled from ponytail's seven-rung ladder, rewritten against this
+    plugin's own shipped conventions. The two-line blockquote at the head of the
+    area is copied verbatim from ponytail:
+
+        The ladder runs after you understand the problem, not instead of it.
+        Read fully, then be lazy.
+
+  - skills/dotnet-feature-flow/SKILL.md — the PHASE 2 three-question line derives
+    from the same ladder structure.
+
+Nothing else is taken. Ponytail's persona, intensity modes, output-brevity rules,
+marker convention, and the rungs with no owner in this plugin were examined and
+refused; the sorting of every ponytail line into COPY / POINTER / REWRITE /
+REFUSED is recorded in
+docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md (§6-§7),
+and the refusal to install ponytail itself is recorded in hooks/README.md.
+
+MIT LICENCE TEXT (reproduced verbatim from ponytail's LICENSE)
+
+    MIT License
+
+    Copyright (c) 2026 DietrichGebert
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

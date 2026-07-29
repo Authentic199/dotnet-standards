@@ -51,7 +51,7 @@ memory.
 | Keeping two requests from processing one resource at once: locks, `LockedException` | `distributed-lock` |
 | Full-text search: the search facade, documents, indexing, reindexing | `elasticsearch-search` |
 | Writing or changing tests: unit, integration, fixtures, test doubles | `dotnet-testing` |
-| Reviewing changed code: review depth and blast radius, finding severity, the review report, cleanup candidates | `dotnet-code-review` |
+| Reviewing changed code: review depth and blast radius, finding severity, the review report, cleanup and simplification candidates, over-build and unnecessary complexity | `dotnet-code-review` |
 | Reviewing a solution's architecture: dependency direction and project references, layer and namespace leaks, placement conformance, the composition root | `dotnet-architecture-review` |
 | Reviewing security posture: committed secrets and key handling, missing authorization gates, injection and mass assignment, data exposure through DTOs, logs and error responses | `dotnet-security-review` |
 | Reviewing performance: round-trip counts and N+1, page-size and index coverage, blocking calls, cache, lock and search cost | `dotnet-performance-review` |
@@ -83,6 +83,7 @@ alone picks wrong. Match the question, not the word.
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 | "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |
 | "review" | the rubric applied while reading changed code yourself — `dotnet-code-review` and its three sibling lenses; running the subagent fleet with the test loop, over a diff or over unchanged code under given paths — `dotnet-review-flow`; the whole feature process that ends in that review — `dotnet-feature-flow`; the request/receive review discipline — Superpowers |
+| "this is over-built" / "simplify this" | grading the claim in changed code — `dotnet-code-review` (its simplicity area); executing the cleanup — `/simplify`; cutting speculative steps while the plan is written — `dotnet-feature-flow`; the every-session constraint a repository carries — its own `CLAUDE.md`, built by `claude-md-builder` |
 
 ## Not yet covered
 

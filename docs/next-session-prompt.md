@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.29 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.30 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -31,7 +31,8 @@ budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21
 claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
 `dotnet-review-flow` NO-SIGNAL 0.3.25 · `claude-md-builder` contradictions
 0.3.26 · `router-nudge` / mechanism E 0.3.27 · `dotnet-review-flow`'s standing-code
-path scope 0.3.28 · the router's entry trigger 0.3.29.
+path scope 0.3.28 · the router's entry trigger 0.3.29 · write-simple-code
+(rubric area 7, flow carriers, static rule R24) 0.3.30.
 
 **The three defects behind the 2026-07-29 no-trigger failure are now all
 closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's
@@ -224,8 +225,13 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   row only forbids moving a severity because the code is old. Needs a
   `dotnet-code-review`-owning session.
 
-- [solo, 2026-07-29] **"Write simple code" — ownership DECIDED, implementation
-  pending.** Decision doc
+- [solo, 2026-07-29] **"Write simple code" — SHIPPED at 0.3.30** (same day, the
+  implementation session ran the design below to completion; full rulings and
+  Known seams in CHANGELOG 0.3.30 — including two live checks logged unrun: the
+  R24 micro-test and the cleanup offer's soft-yes test; the Facades control test
+  WAS run pre-merge and passed both directions). Original decision entry kept
+  for the record: ownership DECIDED, implementation
+  pending. Decision doc
   `docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md`.
   (A) install `DietrichGebert/ponytail` REFUSED — its `SessionStart` mechanism
   is the one 0.3.27 measured being ignored, and a generic YAGNI voice cannot

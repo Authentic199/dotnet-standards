@@ -169,3 +169,14 @@ enough to be followed at all.
 **R21** — `Do not change the tech stack: do not swap, remove or replace an existing library, framework or storage engine. Propose it and wait.`
 *Prevents:* a runtime broken by a substitution nobody asked for. Distinct from
 R16, which is about *adding*.
+
+**R24** — `Before writing a new helper, service or extension, search the solution for one that already does the job: call it instead, or say why it does not fit. Add nothing the current task does not need — no extra parameter, branch, type or file — beyond what this file's conventions already require.`
+*Prevents:* the three shapes over-build takes in this stack — code written for a
+need that has not arrived, a second implementation of something the solution
+already has, and a shape more elaborate than the task called for. All three were
+observed in real sessions, including sessions where the plugin was installed and
+never entered — the context no skill and no flow reaches, and the reason this
+line carries the constraint instead of a skill.
+*Note:* R17 bounds the diff outward — do not touch what the task did not name.
+This one bounds it inward — do not inflate what it did. R16 is the same
+search-first move at package scale.

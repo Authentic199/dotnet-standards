@@ -1,6 +1,6 @@
 # Cleanup checklist — the slop taxonomy and the safe-delete checks
 
-Priority row 7 of `review-rubric.md`. This file collects **candidates** and
+Priority row 8 of the order in `SKILL.md`. This file collects **candidates** and
 nothing else: the review lists what is safe to remove and why, and `/simplify`
 executes with its own verification. A review never deletes.
 
@@ -18,14 +18,15 @@ body states bans assuming an analysis *server*, not reading compiler output. Two
 categories below rely on it, and they are the two where grep genuinely cannot
 answer the question.
 
-Slop is reviewed **last**, after the six areas. Nothing in this file may be
+Slop is reviewed **last**, after the seven areas. Nothing in this file may be
 raised above a finding from any of them.
 
 ## The slop taxonomy
 
 Five categories. Anything not on this list is either a real finding for one of
-the six areas or a preference — and preferences belong to the formatter and the
-analyzers.
+the seven areas or a preference — and preferences belong to the formatter and the
+analyzers. Code that works but is more than the task needed is neither: it is
+`review-rubric.md` area 7, and it is graded there, not here.
 
 **1. Unused usings** — *INFO* · universal
 `Find:` build the solution and read the `IDE0005` diagnostics; the compiler is
@@ -62,7 +63,10 @@ under correctness — not here as slop.**
 **Qualifies:** code nothing reaches, once all four safe-delete checks pass.
 **Does not qualify:** anything failing even one of them. A symbol with one
 compile-time reference is a *candidate*, not a conclusion — and a class
-registered by an assembly scan is not dead because nothing constructs it.
+registered by an assembly scan is not dead because nothing constructs it. Nor
+code the change under review *added*: something introduced by this diff that
+nothing calls is `review-rubric.md` 7.1 *(Code written for a need the task does
+not have)*, reported there once.
 
 Four shapes recur, and each is easier to recognise than to find by counting
 references:
