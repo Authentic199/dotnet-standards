@@ -168,6 +168,27 @@ area's check number from the one rubric. `/simplify` remains the sole
 execution owner — the area produces candidates for it, exactly as
 Cleanup/slop already does.
 
+**Rejected carriers — asked and answered (user question, this session):**
+- **The 14 knowledge skills.** A simplicity line sprinkled per skill is 14
+  drifting copies of one doctrine — the exact defect the one-owner law exists
+  to prevent (`dotnet-code-review` principle 5; `dotnet-feature-flow`
+  principle 3). And each knowledge skill already *is* the simplicity floor for
+  its area: rung 3 defines simple as "the smallest shape the owning skills
+  allow", so the skills are the standard the rule points at, not places the
+  rule is restated. Cost check: 14 skills × one-session-one-deliverable ×
+  three-way loop, for negative value.
+- **The six specialist agents.** None writes code
+  (`dotnet-feature-flow:193-195`); injecting build-less pressure into them
+  touches only the review phase, where `dotnet-code-reviewer` already
+  receives area 7 through the rubric it loads — and for the other five it is
+  the contamination test 6 scored FAIL against (A).
+- **How the doctrine still reaches code-writing time:** PHASE 2 vets the plan
+  before GATE 1; PHASE 3 prompts carry the owning-skill pointers
+  (`:182-184`); and the static rule rides the repository `CLAUDE.md`, which
+  loads every turn of every session **including fresh-context implementer
+  subagents** — the one channel that constrains code written by a session or
+  subagent that never loads a skill.
+
 ### 5.2 When it fires — named, per the mandate
 
 | Moment | Site |
