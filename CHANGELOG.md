@@ -8,6 +8,166 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.28] — `dotnet-review-flow` reviews standing code, not only diffs, 2026-07-29
+
+The second defect from the 2026-07-29 observation, and the one the user actually
+asked about. 0.3.27 got the plugin entered; this gets the request served.
+
+**The flow only reviewed diffs.** PHASE 0 STOPped without a resolvable base, the
+spawn contract derived every subagent input from a computed diff, and the
+changed-file list came from `git diff --name-only`. So *"review these modules,
+excluding these three"* — against code written long before the plugin existed —
+could not be served at all. A perfectly-triggered session stopped at an empty
+diff. Both PHASE 0 and the `/dotnet-review` argument hint already promised *"a
+named scope"*; the machinery behind the promise did not exist.
+
+**Scope, narrowed by the user before drafting.** *"Write the report to a file,
+change nothing"* was a point-in-time need — validate the plugin's review quality
+against pre-plugin code while keeping that code intact as evidence — **not a
+permanent read-only mode**. Two apparent gaps were therefore not gaps: standalone
+mode already changes nothing until the user accepts the offer, and the
+never-write-inside-the-repository rule binds the **diff file**, not the report.
+Exactly one thing was missing: **a scope that is a set of paths instead of a
+diff.** No third mode was added.
+
+**Changed:**
+
+- **A path scope.** Paths with optional exclusions expand through `git ls-files
+  -- <paths> :(exclude)<excluded>` to every **tracked** file, reviewed whether or
+  not anything changed. Tracked-only is a stated guarantee, not an accident:
+  build output and untracked scratch cannot enter a review.
+- **Standing code reaches the fleet as a diff against the empty tree**, so the
+  four spawn-contract inputs keep their exact shape and **the six agent files
+  were not touched**. Chosen over a second input shape because of the contract's
+  own rule — two lenses handed different inputs produce two reports nobody can
+  compare.
+- **The empty tree comes from `git hash-object -t tree /dev/null`, never the
+  literal `4b825dc…`**, which is the SHA-1 empty tree and wrong in a SHA-256
+  repository. Both authors reached this independently.
+- **Count, state, then chunk.** PHASE 0 counts the expansion and states the
+  count, the scope label, every exclusion **and any path that expanded to
+  nothing** before anything is spawned. **An empty expansion is a STOP.**
+- **Chunking bounds on files *or* bytes, whichever comes first** — ~100 files or
+  ~250 KB of patch. The count is what a user can defer by name; the bytes are
+  what actually breaks. **More than one chunk means state the plan and wait** —
+  one chunk is the ordinary run, several is a bill the user did not name.
+- **Chunking splits the fleet, not the suite.** TEST-LOOP is not chunked, so only
+  REVIEW-LOOP's cap counts per chunk. Findings merge into one report; `### Run`
+  now carries `Chunks <n>`, where an unchunked run is `1`.
+- ***Not run* is now tagged**, because it carries three different kinds of thing:
+  **not examined** (excluded paths, declined chunks, a layer no coverage line
+  reached) versus **attempted, no result** (a lens that failed twice, a tier with
+  no signal, a chunk a cap halted). Untagged, "chose not to look" reads as "found
+  nothing".
+- **`Base:` never goes blank.** For a path scope it reads `the empty tree
+  (standing code)`, reusing the spawn contract's string rather than inventing a
+  second one.
+- **New Decision Guide row: "Every line in the diff reads as added."** An
+  artifact of the empty-tree base, not a fact about the code. A reviewer's
+  "newly introduced" is wording, and *"outside this change's scope"* has no
+  referent when the scope **is** the file set — never move a severity for either.
+- **The description was rebalanced, not extended.** It was already at 90 words
+  against a 100-word cap, and it said *"over one diff"* — narrow, and for a path
+  scope simply false. It now carries the failing sentence nearly verbatim plus a
+  second verb (`audit`), and it is **shorter** than what it replaced: 88 words,
+  same 9 lines.
+- **Router rows `:58` and `:85` rebalanced in the same commit**, per the
+  alignment rule. Both said "diff"; both now carry the scope shape.
+
+**Measured, in real repositories, before any of it was written:**
+
+| | |
+|---|---|
+| The motivating scope, 76 files | 149,071 bytes of patch — one run, no chunking |
+| The same repository, whole | 4,782,492 bytes — **32×**, must chunk |
+| Bytes per file across three sibling modules | 1659 / 2042 / 1756 — tight, so a file count is a serviceable proxy **only** for hand-written code |
+| `git ls-files` vs `git diff <empty-tree> HEAD`, same pathspec | 76 and 76 — the two consumers of one pathspec agree |
+| `git diff --name-only <empty-tree>...HEAD` | **exit 128**, *"is a tree, not a commit"* — see below |
+
+**Rulings — the three-way loop, three pieces, three MERGE verdicts:**
+
+- **The three-dot landmine.** The shipped contract wrote `git diff --name-only
+  <base>...HEAD`. Substituting the empty tree into that form **errors on first
+  use**. The arbiter found it before the drafts arrived and the coordinator
+  reproduced it; neither author stepped on it, but the file would have invited
+  the next reader to.
+- **Author A's file-list relocation was rejected on verified evidence.** A moved
+  the derivation into PHASE 0 check 4. `dotnet-feature-flow:88` states that
+  embedded mode **skips check 4 entirely**, while `:207` names *"derive the
+  changed-file list"* as a step of the section A was emptying — so embedded mode
+  would have reached the spawn contract with no file list. This decided the
+  structure.
+- **A's confirmation-gate rationale rested on a false premise.** A argued a
+  universal gate would deadlock embedded mode "where `dotnet-feature-flow` drives
+  PHASES 4–5 unattended". `dotnet-feature-flow:238-240` already stops and waits
+  on the user at a cap halt. The gate survives, **keyed to cost rather than to
+  scope shape** — more than one chunk — which needs no exemption clause.
+- **The cap-multiplication question was dissolved, not compromised.** One author
+  asserted per-chunk caps without addressing the total; the other computed 25
+  possible TEST-LOOP rounds and declined to resolve it. The suite is not scoped
+  to a chunk, so re-running it per chunk buys nothing.
+- **`references/` was NOT overturned, unlike 0.3.27's refusal.** `CHANGELOG.md`
+  0.3.21 settled single-body for both flow skills — *"one control-flow graph has
+  no long tail"*. That reason is about the **shape** of the content, not its
+  size, and a scope mechanism creates no long tail. A refusal is reversible only
+  when its stated reason stops holding; this one still holds, so the entire
+  change was funded by compression. The file lands at **496 lines**, four under
+  the hard bar, having started at 483.
+- **Angle-bracket placeholders were rejected from the description.** One author
+  proposed `"review the modules under <path>"`. The arbiter scanned every
+  sibling description: **zero use the form.** And it fails that author's own
+  test — a description matches literal user phrasings, and `<path>` is not a
+  literal anybody types.
+- **Two independent methodologies condemned the same 23 words.** Both authors cut
+  *spawning the tester and reviewer agents in parallel*, *verifying findings
+  against the code before any fix*, and *or looping tests and review to green* —
+  one from the house description law, one from `superpowers:writing-skills`'
+  *"never summarize the skill's process"*. That convergence funded the whole
+  rebalance.
+
+**Coordinator catches, recorded because two of them corrected the arbiter:**
+
+- **A deleted Decision Guide row took a rule with it.** Cutting *"A cap is hit |
+  … Never raise the cap …"* removed the only statement of that rule reaching
+  REVIEW-LOOP: TEST-LOOP carries "Never a sixth" in its own paragraph,
+  REVIEW-LOOP carried nothing equivalent. Folded back at zero line cost —
+  *"Never a fourth, never lower a severity to clear the gate."* The arbiter
+  endorsed the correction and withdrew the cut.
+- **An arbiter instruction said "replace" where its own arithmetic said
+  "append".** Replacing the chunking paragraph's last sentence would have deleted
+  the merge-into-one-report and *Not run* rules. Appended instead; the arbiter
+  confirmed that was its intent, and paid back the redundancy the append created.
+- **The coordinator garbled the user's own decision and said so.** The user chose
+  *"count, **ask**, then chunk"*; the context package rendered it as "state the
+  count", and the arbiter — reading what it was given — rejected the gate
+  entirely. Modality drift introduced by the coordinator, caught by the
+  coordinator, returned to the user, who chose the cost-keyed form.
+
+**Known seams:**
+
+- **`git ls-files` reads the index; `git diff <empty-tree> HEAD` reads HEAD.** A
+  file staged but never committed appears in the file list and not in the patch,
+  so a reviewer would see a path with no content. Narrow, and the trade is
+  deliberate: the count the user approves must be the count that runs.
+- **`dotnet-code-review` still ranks by blast radius, which assumes a change.**
+  The new Decision Guide row forbids moving a severity because the code is old,
+  but nothing yet re-ranks a standing audit, and pre-plugin code violates
+  conventions it never knew about. Expect volume. Belongs to a
+  `dotnet-code-review`-owning session.
+- **The description is untested.** A description only participates in matching
+  once installed, so neither draft could be probed before merge. **The real trial
+  is the original failing sentence, retyped in the same consumer repository
+  against the installed 0.3.28** — and if it still misses, the next lever is the
+  `existing`/`audit` coverage, not further wordsmithing of the clause structure.
+- **`or unchanged code` is the arbiter's own phrase**, proposed by neither
+  author, and the arbiter flagged it as the line to challenge.
+- **The em-dash word-count convention was ruled** — count them, `wc -w`, because
+  a convention a future session cannot re-derive with one command is not a
+  convention — but it is **not yet recorded** in `02-repo-structure.md` §5. Solo
+  chore.
+
+---
+
 ## [0.3.27] — mechanism E: a hook names the router, once per session, 2026-07-29
 
 The first hard evidence that skill descriptions alone do not get this plugin
