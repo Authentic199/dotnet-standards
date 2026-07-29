@@ -32,6 +32,19 @@
 > sessions running at once can pick the **same version number with no git
 > conflict**, because identical strings in both manifests merge silently; read
 > the version off `main` at merge time, never off your own branch.
+>
+> **Third pass, 2026-07-29 evening — the tree now ships v0.3.31.** Landed since
+> the second pass: `dotnet-review-flow`'s standing-code path scope 0.3.28 · the
+> router's entry trigger 0.3.29 (the two open defects above are now **closed**)
+> · write-simple-code 0.3.30 (another lane, mid-session — the same-number
+> collision above nearly happened again; this session renumbered at merge time)
+> · **the first field trial's 15-item feedback 0.3.31**. Headline from the
+> trial: all six agents commanded a Skill-tool load their `tools` frontmatter
+> did not grant — 2 of 12 spawns failed outright, the rest self-healed by
+> reading the plugin cache unverifiably. Fixed, plus a cache-read ban, a
+> deterministic-vs-transient failure split in the flow, and 12 rule additions
+> across 9 skills, all traceable to the trial's approved conventions. Full
+> rulings CHANGELOG 0.3.31; readout on the board.
 
 > **OPENER — 2026-07-28, S17 close (Lane C).** `mediatr-messaging` SHIPPED at
 > **v0.3.16 (15 skills)**. **Lane C's queue is now empty of unblocked work** —

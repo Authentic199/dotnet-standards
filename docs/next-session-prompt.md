@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.30 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.31 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -32,7 +32,10 @@ claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
 `dotnet-review-flow` NO-SIGNAL 0.3.25 · `claude-md-builder` contradictions
 0.3.26 · `router-nudge` / mechanism E 0.3.27 · `dotnet-review-flow`'s standing-code
 path scope 0.3.28 · the router's entry trigger 0.3.29 · write-simple-code
-(rubric area 7, flow carriers, static rule R24) 0.3.30.
+(rubric area 7, flow carriers, static rule R24) 0.3.30 · the first field
+trial's 15-item feedback (E1 agents lacked the Skill tool + cache-read ban,
+E2 failure classification, 12 rule additions across 9 skills, C4 declined)
+0.3.31.
 
 **The three defects behind the 2026-07-29 no-trigger failure are now all
 closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's
@@ -49,6 +52,19 @@ cleanly isolate "does the description alone fire" — see PENDING log entry
 below. This does not mean 0.3.29 failed: the observed outcome (router loaded,
 request served) is the one that matters operationally; only the specific
 question "would the description have fired without the hook" stays open.
+
+**Second readout from the same trial, landed as 0.3.31 (2026-07-29, maintenance
+session):** the consumer repo's full 15-item feedback report was verified
+against the tree and shipped — headline defect **E1**: all six agents
+commanded a Skill-tool load their `tools` list did not grant (2 of 12 spawns
+failed outright; 10 self-healed by reading the plugin cache, unverifiable
+version). The four `[CẦN XÁC NHẬN]` items shipped only after the user answered
+the report's five questions; C4 (XML `<summary>` on properties) was declined —
+stays with the analyzer, remedy is `error` severity by rule group. Trial
+limits worth remembering: one project, one commit, `/dotnet-review` only —
+`dotnet-feature-flow` and 12 knowledge skills remain unexercised, and the
+package-vulnerability layer has still never run (reviewers have no shell).
+Full rulings CHANGELOG 0.3.31.
 
 ## Lane status
 
