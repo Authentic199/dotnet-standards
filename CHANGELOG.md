@@ -8,6 +8,104 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.27] — mechanism E: a hook names the router, once per session, 2026-07-29
+
+The first hard evidence that skill descriptions alone do not get this plugin
+entered — and the reason a component refused in S6 ships anyway.
+
+**What was observed.** A session in a consumer .NET repository was asked, in
+Vietnamese, to review a set of modules and write the report to a file. It went
+straight to `find`. The user interrupted, said *"không load skill gì à"*, and the
+session agreed and then did the same thing again. It loaded no skill, no command
+and no agent, across two attempts.
+
+Nothing was misinstalled. `installed_plugins.json` recorded the plugin at
+**project** scope bound to that exact repository, version 0.3.26, `gitCommitSha`
+equal to the merge commit; the repository's own `.claude/settings.json` enabled
+it; the cache carried all 21 skills, 2 commands and 6 agents. The descriptions
+were loaded and were declined. Superpowers' own emphatic `SessionStart` block
+was present in that session and was ignored on turn 1 — which is the measurement
+that decided where this hook attaches.
+
+**Two defects were found. This release fixes one.**
+
+*Defect 1 — the plugin had no way in.* The only entry mechanisms were a skill
+description matching, or the user typing a slash command. There was no hook on
+the prompt, and a consumer repository has no `CLAUDE.md` unless someone writes
+one. Every path into the plugin depended on the model spontaneously choosing it.
+
+*Defect 2 — the router could only be found by someone already looking for it.*
+`choosing-a-dotnet-skill`'s description triggers on *"it is unclear which
+dotnet-standards skill owns the question — two skills seem plausible, no skill
+self-triggered on the convention"*. That is a condition about the reader's own
+confusion. A session that never considered this plugin is not confused; it is
+oblivious, and obliviousness matches nothing. **Not fixed here** — see Known
+seams.
+
+**Changed:**
+
+- **New hook `router-nudge` (`UserPromptSubmit`).** On the first prompt of a
+  session whose `cwd` looks like a .NET solution, it emits one
+  `additionalContext` line naming `dotnet-standards:choosing-a-dotnet-skill` and
+  nothing else. Registered in `hooks/hooks.json`; extensionless and invoked
+  through `run-hook.cmd`, per the Windows rule.
+- **It names the router and no destination.** A hook script that named a
+  concrete skill would become a second source of truth for routing the day the
+  router's tables move. The router routes; the hook only points at the router.
+- **Once per session, not once per prompt** — a marker keyed by `session_id`
+  under `${TMPDIR:-/tmp}/dotnet-standards/`, swept after seven days. Emitted
+  context persists in the conversation, so re-emitting buys nothing and costs
+  every turn. This is what answers S6's token objection instead of dismissing it.
+- **Gated on a solution file, by glob and never by `find`.** A recursive walk of
+  an arbitrary repository on every prompt is precisely the tax S6 was right
+  about. Root `*.sln`/`*.slnx`/`*.csproj` first, then `*.csproj` at depth 2–3.
+- **Every failure direction is silence.** No `session_id`, no writable temp
+  directory, no bash, a solution nested past the cap — each yields no output and
+  the session behaves exactly as it did before this release. The hook guards
+  nothing, so it cannot fail open; that is what lets it pass the wrapper rule
+  that killed the guard candidates.
+- **`hooks/README.md`: the refusal row for this exact component is rewritten,
+  not deleted.** It now carries the S6 verdict verbatim, the observation that
+  falsified it, and how the token objection was answered. The two-hook counts
+  (four places), the section heading, the files table and the `ships one hook`
+  line are corrected; `README.md`'s roster row and `run-hook.cmd`'s stale
+  one-hook comment are corrected with them.
+
+**Ruling — a refusal is reversible, and reversing it belongs in the file that
+recorded it.** S6 refused this component for a stated reason. The reason was
+falsified by observation, not out-argued. Shipping the component while leaving
+`hooks/README.md` declaring it refused would have put a contradiction into the
+tree; deleting the row would have destroyed the record of why it was ever
+refused. Both verdicts and the evidence between them now sit in one row.
+
+**Verified before ship**, by observation rather than inspection — the failure
+mode here is silent by design: five stdin payloads (.NET repo first call → JSON;
+same `session_id` again → nothing; non-.NET `cwd` → nothing; missing
+`session_id` → nothing; empty stdin → nothing) plus both halves of
+`run-hook.cmd`, POSIX and `cmd.exe`, and a parse check of `hooks.json` showing
+all three events registered.
+
+**Known seams:**
+
+- **Defect 2 is untouched.** `choosing-a-dotnet-skill`'s description still
+  triggers on confusion rather than on entry. The hook now names the router
+  directly, so entry no longer depends on that description — but the description
+  is still wrong on its own terms. Next in the queue, and it is a skill piece, so
+  it needs the three-way loop.
+- **The whole review surface is diff-anchored, and the request that exposed all
+  of this cannot be served by it.** `dotnet-review-flow` hard-stops without a
+  diffable base (`SKILL.md:99-101`) and derives every subagent input from the
+  diff; `dotnet-code-review`'s description says *"reviewing **changed** .NET or
+  C# code … before merge"*. "Audit these folders of standing code, change
+  nothing, write the report to a file" has no owner in this plugin. Even a
+  perfectly-triggered session would have stopped at an empty diff. Parked for a
+  `dotnet-review-flow`-owning session.
+- **The board header's roster is wrong** and was corrected in this change: it
+  read "23 skills", the tree has **21 skills + 2 commands + 6 agents**; the two
+  commands appear to have been counted as skills.
+
+---
+
 ## [0.3.26] — `claude-md-builder`: contradictions are reported, never cut, 2026-07-29
 
 Second real run, same consumer repository, this time in update mode. It worked —

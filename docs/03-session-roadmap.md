@@ -341,7 +341,7 @@ re-validated against a plugin that actually exists.
 | Item | Why deferred |
 |---|---|
 | Per-project `CLAUDE.md` template (tier 3) | Considered in S0 and declined; tier 3 stays hand-written |
-| `UserPromptSubmit` hook injecting a skill index (mechanism E) | Stronger than the router skill, but Group B — needs S4 conflict check first |
+| ~~`UserPromptSubmit` hook injecting a skill index (mechanism E)~~ | **Shipped at 0.3.27** as `hooks/router-nudge` — it points at the router rather than injecting an index, and fires once per session. Do not rebuild it; see CHANGELOG 0.3.27 |
 | Blazor, modular monolith / microservices, CI/CD, Docker, K8s, Aspire skills | Out of scope for v1 |
 | Promoting `from-kit` skills to `adapt` | Once exemplars exist — tracked via the `upgrade candidate` flag |
 

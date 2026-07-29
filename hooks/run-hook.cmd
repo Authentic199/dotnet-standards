@@ -15,10 +15,12 @@ REM Referencing another plugin's internal path would couple the two plugins,
 REM which the triage rules forbid; so dotnet-standards ships its own copy.
 REM
 REM DELIBERATE FAILURE MODE: when no bash is found this exits 0 in SILENCE.
-REM The hook simply never runs and nothing reports it. That is accepted here
-REM because dotnet-standards ships exactly one hook (post-edit-format) whose
-REM absence is benign -- code stays correct, only unformatted, and
-REM `dotnet format --verify-no-changes` catches the drift before review.
+REM The hook simply never runs and nothing reports it. That is accepted because
+REM every hook shipped through this wrapper has a benign silent absence:
+REM post-edit-format leaves code correct but merely unformatted (and
+REM `dotnet format --verify-no-changes` catches the drift before review),
+REM superpowers-check is only the early warning for a PHASE 0 hard-stop that
+REM runs with or without it, and router-nudge guards nothing at all.
 REM Any future hook whose silent absence would FAIL OPEN must not be shipped
 REM through this wrapper. See hooks/README.md.
 

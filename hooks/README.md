@@ -1,15 +1,18 @@
 # Hooks
 
-`dotnet-standards` ships **exactly two hooks**: `post-edit-format` and
-`superpowers-check`.
+`dotnet-standards` ships **exactly three hooks**: `post-edit-format`,
+`superpowers-check` and `router-nudge`.
 
 That is not an accident of scope. Nine hook components were triaged against
 Superpowers and against the Windows failure mode described below; eight were
 refused. `superpowers-check` was added later (Lane D, spec
 `docs/superpowers/specs/2026-07-27-process-integration-design.md` §5) and was
-admitted only because it passes the same test the eight failed. If a future
-session thinks another hook is needed, read
-[Why only these hooks](#why-only-these-hooks) first.
+admitted only because it passes the same test the eight failed. `router-nudge`
+(0.3.27) is one of the original eight, **readmitted because the reason it was
+refused was later falsified by observation** — the table row in
+[Why only these hooks](#why-only-these-hooks) now carries both verdicts and the
+evidence between them. If a future session thinks another hook is needed, read
+that section first.
 
 ---
 
@@ -26,11 +29,11 @@ all:
 | **Utility script** | Nowhere — invoked by a workflow or piped by hand | A human or a skill runs it |
 
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
-ships two hooks of the first kind and zero of the other two.**
+ships three hooks of the first kind and zero of the other two.**
 
 ---
 
-## The two hooks
+## The three hooks
 
 **`post-edit-format`** — after Claude edits or writes a file, format it.
 
@@ -102,6 +105,49 @@ enforcement lives in each flow skill's PHASE 0 hard-stop, which runs with or
 without this hook. A machine with no bash loses the courtesy warning and
 nothing else.
 
+**`router-nudge`** — on the first prompt of a session in a .NET repository, name
+the router.
+
+| | |
+|---|---|
+| Event | `UserPromptSubmit` |
+| Command | `"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" router-nudge` |
+| Mode | synchronous (`"async": false`) |
+
+Reads `session_id` and `cwd` from the `UserPromptSubmit` stdin JSON and emits one
+`additionalContext` line pointing at `dotnet-standards:choosing-a-dotnet-skill`
+— and at nothing else — then stays silent for the rest of that session. Naming a
+concrete destination here would make a hook script a second source of truth for
+routing the day the router's tables change.
+
+Two gates, in this order, both must pass:
+
+1. **`cwd` looks like a .NET solution** — a `*.sln`, `*.slnx` or `*.csproj` at
+   the root, or a `*.csproj` at depth 2 or 3. Globs, never `find`: this runs on
+   every prompt, and a recursive walk of an arbitrary repository is exactly the
+   per-turn tax the refusal below was right about.
+2. **This session has not been told yet** — a marker under
+   `${TMPDIR:-/tmp}/dotnet-standards/` keyed by `session_id`, swept after seven
+   days. Emitted context persists in the conversation, so repeating the line
+   every turn would buy nothing and cost every turn.
+
+A missing `session_id`, an unwritable temp directory, or a solution nested
+deeper than the cap each mean **no output**. Under-firing is the safe direction
+and the script prefers it at every branch.
+
+Why it passes the rule below: this hook **guards nothing**. If it silently never
+runs, the session is exactly the session that shipped before 0.3.27 — every
+skill still reachable by name, every command by slash. That is the whole
+difference between it and the guard candidates, whose silent absence invites a
+reliance they cannot support.
+
+**Why the pointer hangs off the prompt and not off `SessionStart`.** Because a
+session-start pointer was measured failing. In the 2026-07-29 observation that
+prompted this hook, Superpowers' own emphatic `SessionStart` block was present
+and was ignored on turn 1, while this plugin sat installed and enabled with all
+its skill descriptions loaded. Adjacency to the request is the only thing this
+hook adds over a slot that was already available and already occupied.
+
 Nothing else in this plugin registers a Claude Code event.
 
 ---
@@ -166,11 +212,14 @@ hook* — the code is still correct, merely unformatted, and
 `post-edit-format` passes: unformatted-but-correct code is a cosmetic loss with a
 later net to catch it.
 
+`router-nudge` passes more cheaply still: it guards nothing, so its silence
+hands back exactly the behaviour that shipped before it existed.
+
 A guard hook fails: a `pre-bash-guard` that silently stops guarding **fails
 open**. The user keeps believing destructive commands are being blocked while
 nothing is blocking them, which is strictly worse than never having installed a
 guard — it invites the reliance it cannot support. That asymmetry, not the effort
-of writing the wrapper, is why this plugin ships one hook and no guards.
+of writing the wrapper, is why this plugin ships no guards at all.
 
 **How to tell whether the hook is actually running.** Because the failure is
 silent by design, verify it by observation, not by inspection: edit a `.cs` file
@@ -193,7 +242,7 @@ The other eight candidates, and why each was refused:
 | `pre-build-validate` | **Refused as a script.** Its six solution-hygiene checks survive as a checklist Claude performs natively; the script form buys nothing. |
 | `pre-commit-antipattern` | **Refused as a gate.** Its four detection patterns survive as knowledge; the blocking form told the user to bypass it with `--no-verify`. |
 | `pre-commit-format` | **Refused.** A third layer on a concern `post-edit-format` prevents and `dotnet format --verify-no-changes` verifies. |
-| `UserPromptSubmit` skill index | **Refused.** Fires on every prompt — a permanent per-turn token tax against a routing problem solved at zero runtime cost by skill-description discipline. |
+| `UserPromptSubmit` skill index | **Refused in S6 — shipped at 0.3.27 as `router-nudge`.** The S6 verdict read: *"Fires on every prompt — a permanent per-turn token tax against a routing problem solved at zero runtime cost by skill-description discipline."* Observation falsified the premise, not the arithmetic. On 2026-07-29, a session in a consumer .NET repository — this plugin installed and enabled at project scope, every skill description loaded — answered a review request by going straight to `find`, twice, and loaded no skill at all. The token objection was then answered rather than waved off: the shipped hook emits **once per session**, behind a solution-file check, not once per prompt. **Refusing a component is not permanent. Refusing it for a reason that later stops holding is a defect, and correcting it belongs in this file, in the same change that ships the component.** |
 | The kit's `hooks.json` as shipped | **Rebuilt, not carried.** Its command form is unusable on Windows and it registers two scripts this plugin does not ship. |
 
 **Adding a hook is not a small change.** It costs a per-event tax on every
@@ -210,3 +259,4 @@ not "is this useful?" but "if this silently never runs, is the user still safe?"
 | `run-hook.cmd` | The polyglot CMD/POSIX wrapper. Copied from Superpowers (MIT — see `NOTICE`). |
 | `post-edit-format` | The formatting hook. Extensionless. Derived from the reference kit (MIT — see `NOTICE`). |
 | `superpowers-check` | The dependency warning hook. Extensionless. Warn-only by design (spec §5). |
+| `router-nudge` | The routing pointer hook. Extensionless. Once per session, .NET repositories only (0.3.27). |

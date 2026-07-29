@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# UserPromptSubmit hook: name the router, once per session, in a .NET repository.
+#
+# Derived from nothing — this is a dotnet-standards component (mechanism E,
+# docs/00-brainstorm.md row E, endorsed by the user at S15).
+#
+# WHY THIS EXISTS, AND WHY hooks/README.md USED TO REFUSE IT
+#
+# S6 refused a UserPromptSubmit skill index on the grounds that routing was
+# "solved at zero runtime cost by skill-description discipline". On 2026-07-29
+# that premise was falsified by observation: a session in a consumer .NET
+# repository — dotnet-standards installed and enabled at project scope, all
+# skill descriptions loaded — answered a review request by going straight to
+# `find`, twice, and never loaded a skill. Superpowers' own SessionStart block
+# was present in that session and was ignored on turn 1. That last fact is the
+# whole argument for attaching the pointer to the PROMPT instead of to session
+# start: session-start context is already there and already ignorable, while
+# this arrives adjacent to the request itself.
+#
+# COST
+#
+# It emits ONCE per session — a marker keyed by session_id — and only when the
+# working directory looks like a .NET solution. Every other prompt costs a few
+# globs and exits 0 with no output. Repeating the line every turn would buy
+# nothing: the injected context persists in the conversation once emitted.
+#
+# SILENT ABSENCE IS BENIGN — the binding rule in hooks/README.md
+#
+# With no bash, no session_id, no writable temp directory, or a repository
+# shaped differently from the depth cap below, this hook does nothing and the
+# session behaves exactly as it did before the hook existed. Nothing fails
+# open, because this hook guards nothing: every skill remains reachable by
+# name and every command by slash. Under-firing is the safe direction and the
+# script is written to prefer it.
+#
+# IT NAMES THE ROUTER AND NOTHING ELSE
+#
+# Naming a concrete destination here would make this file a second source of
+# truth for routing the day the router's tables change.
+#
+# Usage: registered in hooks/hooks.json as
+#   "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" router-nudge
+# Extensionless on purpose — Claude Code on Windows prepends `bash` to any
+# command containing ".sh". See hooks/README.md.
+
+set -euo pipefail
+shopt -s nullglob
+
+# ---------------------------------------------------------------------------
+# Read the UserPromptSubmit payload
+# ---------------------------------------------------------------------------
+
+STDIN=""
+if [[ ! -t 0 ]]; then
+    STDIN=$(cat)
+fi
+
+if [[ -z "$STDIN" ]]; then
+    exit 0
+fi
+
+# `jq` is NOT installed in the author's environment (measured S6), so the sed
+# fallback is the path that actually runs here — it is not decoration.
+json_string_field() {
+    local key="$1" out=""
+    if command -v jq >/dev/null 2>&1; then
+        out=$(printf '%s' "$STDIN" | jq -r --arg k "$key" '.[$k] // empty' 2>/dev/null) || out=""
+    fi
+    if [[ -z "$out" ]]; then
+        out=$(printf '%s' "$STDIN" | sed -n "s/.*\"$key\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1) || out=""
+        # sed sees raw JSON escapes — collapse \\ to \ so Windows paths are usable
+        out="${out//\\\\/\\}"
+    fi
+    printf '%s' "$out"
+}
+
+SESSION_ID=$(json_string_field session_id)
+CWD=$(json_string_field cwd)
+
+if [[ -z "$CWD" ]]; then
+    CWD="$PWD"
+fi
+
+# Normalize Windows backslash paths so the globs below work under Git Bash
+CWD="${CWD//\\//}"
+CWD="${CWD%/}"
+
+# ---------------------------------------------------------------------------
+# Gate 1 — does this working directory look like a .NET solution?
+# ---------------------------------------------------------------------------
+#
+# Globs, not `find`: this runs on every prompt, and a recursive walk of an
+# arbitrary repository is exactly the per-turn tax S6 was right to refuse.
+# The root check short-circuits almost every real repository on its first
+# iteration. The depth cap is 3 (`src/Project/Project.csproj`); a solution
+# nested deeper than that loses the nudge and nothing else.
+
+looks_like_dotnet() {
+    local candidate
+    for candidate in "$CWD"/*.sln "$CWD"/*.slnx "$CWD"/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    for candidate in "$CWD"/*/*.csproj "$CWD"/*/*/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+if ! looks_like_dotnet; then
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 2 — emit once per session
+# ---------------------------------------------------------------------------
+#
+# No session id means no way to tell a first prompt from a fiftieth. Emitting
+# anyway would reinstate the per-turn tax, so this exits instead: under-fire,
+# never over-fire.
+
+if [[ -z "$SESSION_ID" ]]; then
+    exit 0
+fi
+
+STATE_DIR="${TMPDIR:-/tmp}/dotnet-standards"
+if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+    exit 0
+fi
+
+SAFE_ID=$(printf '%s' "$SESSION_ID" | tr -c 'A-Za-z0-9._-' '_')
+MARKER="$STATE_DIR/router-nudge-$SAFE_ID"
+
+if [[ -e "$MARKER" ]]; then
+    exit 0
+fi
+
+if ! : > "$MARKER" 2>/dev/null; then
+    exit 0
+fi
+
+# Sweep week-old markers so the directory cannot grow without bound. Runs at
+# most once per session, on the prompt that already paid for the emit.
+find "$STATE_DIR" -maxdepth 1 -type f -name 'router-nudge-*' -mtime +7 -delete 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
+# Emit
+# ---------------------------------------------------------------------------
+
+cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "UserPromptSubmit",
+    "additionalContext": "dotnet-standards is installed and this working directory looks like a .NET solution. Before exploring, reviewing, testing or changing C# code in it, load the skill `dotnet-standards:choosing-a-dotnet-skill` and route the task from its tables rather than from memory. Ignore this note for any request that is not about the code in this directory. Emitted once per session."
+  }
+}
+JSON
+
+exit 0

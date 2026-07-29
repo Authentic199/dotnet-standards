@@ -6,4 +6,5 @@
 # cmd.exe handles LF fine.
 hooks/post-edit-format  text eol=lf
 hooks/superpowers-check text eol=lf
+hooks/router-nudge      text eol=lf
 hooks/run-hook.cmd      text eol=lf
