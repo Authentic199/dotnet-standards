@@ -188,7 +188,8 @@ API names (S17: `LogExtension.Error`) are also sanitized out.
 - **Carried from S15:** rubric-worthy principles ("a Not for: entry is a
   disclaimer, not an ownership assignment"; "a pointer earns its place only
   when it restates a boundary a shipped Not for: itself draws"); mechanism E
-  (UserPromptSubmit hook → router) endorsed as small solo follow-up.
+  (UserPromptSubmit hook → router) — **SHIPPED at 0.3.27 as
+  `hooks/router-nudge`** by a solo session; no longer a follow-up.
 - **Carried from S14:** anti-example candidates banked for rubrics (Pattern-3
   catch filter; semaphore cleanup race); harvest lane logs + CHANGELOG before
   re-mining source when rubrics run.

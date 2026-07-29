@@ -100,9 +100,13 @@ all three events registered.
   nothing, write the report to a file" has no owner in this plugin. Even a
   perfectly-triggered session would have stopped at an empty diff. Parked for a
   `dotnet-review-flow`-owning session.
-- **The board header's roster is wrong** and was corrected in this change: it
-  read "23 skills", the tree has **21 skills + 2 commands + 6 agents**; the two
-  commands appear to have been counted as skills.
+- **"23 skills" versus 21 — both numbers are right, about different things.**
+  The board header read "23 skills" while `skills/` holds 21. The 23 comes from
+  `claude plugin details` itself: its inventory line lists the two commands
+  (`dotnet-feature`, `dotnet-review`) among the skills. The header now carries
+  both and names which tool reports which, because the prove-it rule tells a
+  session to read that count off `details` — a session comparing 23 against a
+  directory count of 21 would conclude the install had failed.
 
 ---
 

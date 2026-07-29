@@ -10,9 +10,12 @@ returning session reads.
 Shipped through **v0.3.27 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
-stale roster. **The skill count was wrong here too**: this line read "23 skills"
-while `skills/` held 21 — the two commands had been counted as skills. Count the
-directory before writing a number on this line.
+stale roster. **On the skill count — 23 and 21 are both right.** This line used
+to read "23 skills"; `skills/` holds **21**. The 23 comes from `claude plugin
+details`, whose inventory line lists the two commands (`dotnet-feature`,
+`dotnet-review`) among the skills. Say which number you mean, and **expect 23
+from `details`** at prove-it time — a session comparing it against 21 will think
+the install failed.
 Earlier: 0.3.21 = process-integration v1, Lane D session D1:
 `dotnet-feature-flow`, `dotnet-review-flow`, `/dotnet-feature`,
 `/dotnet-review`, six specialist agents, SessionStart `superpowers-check`,

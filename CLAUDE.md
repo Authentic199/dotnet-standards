@@ -1,16 +1,29 @@
-> **CORRECTION BANNER — 2026-07-29.** The opener below is **Lane C's** brief and
-> its numbers are stale. The tree ships **v0.3.25 (23 skills)**, not v0.3.16 (15).
-> Everything else in the opener still stands for a Lane C session; a Lane D
-> maintenance session added this banner rather than rewriting another lane's
-> brief out from under it. **Open `docs/next-session-prompt.md` (LANE BOARD)
-> first — it is authoritative for versions, lanes and parked work; this file is
-> not.**
+> **CORRECTION BANNER — 2026-07-29, second pass.** The opener below is **Lane
+> C's** brief and its numbers are stale. The tree ships **v0.3.27** — 21 skills
+> (`claude plugin details` says 23; it counts the 2 commands), 6 agents, 3 hooks
+> — not v0.3.16 (15). Everything else in the opener still stands for a Lane C
+> session; maintenance sessions append to this banner rather than rewriting
+> another lane's brief out from under it. **Open `docs/next-session-prompt.md`
+> (LANE BOARD) first — it is authoritative for versions, lanes and parked work;
+> this file is not.**
 >
 > What landed since the opener was written: rubrics #2–4
 > (`dotnet-architecture-review` 0.3.17, `dotnet-security-review` 0.3.18/0.3.19,
 > `dotnet-performance-review` 0.3.20) · process-integration v1 0.3.21 ·
 > `claude-md-builder` 0.3.22–0.3.24 · `dotnet-review-flow`'s NO-SIGNAL branch
-> 0.3.25.
+> 0.3.25 · `claude-md-builder` contradictions 0.3.26 · **mechanism E's
+> `router-nudge` hook 0.3.27**.
+>
+> **A process fact added at 0.3.27, and it outranks the version numbers.** Skill
+> descriptions do not reliably get this plugin entered. Measured, not feared: in
+> the consumer repository this plugin is installed into, a session with every
+> description loaded answered a review request by going straight to `find` —
+> twice — and loaded no skill, command or agent. `hooks/router-nudge` now names
+> the router on the first prompt of a .NET session. **Two defects behind that
+> failure are still open**, queued in this order by the user: the router's own
+> description triggers on confusion rather than on entry, and the entire review
+> surface is diff-anchored, so "audit these folders, change nothing" has no
+> owner. Both sit in the board's PENDING log with the evidence.
 >
 > **Two process facts worth more than the version numbers.** The plugin installs
 > from the **GitHub** repo, not from this checkout, and at **project** scope
