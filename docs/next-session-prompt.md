@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.32 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.33 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -38,7 +38,10 @@ E2 failure classification, 12 rule additions across 9 skills, C4 declined)
 0.3.31 · the two-module-name rule (no `OrderShipmentsController` /
 `OrderShipmentService` — owning module's suffix part + `Send`; architecture
 check 3.5) and the reviewers' knowledge-layer loads (citation-counted lists
-per lens) 0.3.32.
+per lens) 0.3.32 · the delegation reversal (member order + property XML docs
+are house rules now — checks 5.17/5.18) plus checks 1.10, 5.15, 5.16, 5.19
+and the `## 6. Tests` heading restore 0.3.33 — the self-evaluating re-run of
+the field trial runs against this version.
 
 **The three defects behind the 2026-07-29 no-trigger failure are now all
 closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's

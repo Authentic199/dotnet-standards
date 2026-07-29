@@ -50,7 +50,13 @@
 > parts of the owning module's controller and service, foreign reach by `Send`
 > only; architecture check 3.5) and the four reviewers now load the knowledge
 > skills their rubric cites most, plus any other cited skill before writing a
-> finding that cites it.
+> finding that cites it. Then **0.3.33**: the user reversed the Q5 delegation —
+> member order and property XML docs are named findings now (checks 5.17/5.18)
+> — plus checks 1.10/5.15/5.16/5.19 and doctrine in module-feature,
+> api-surface, ef-core-data-access, automapper-mapping; formatting/using-order/
+> nullable stay analyzer-delegated with the D5 readout. 0.3.31–0.3.33 are
+> **pushed**; the consumer project runs the self-evaluating trial against
+> 0.3.33.
 
 > **OPENER — 2026-07-28, S17 close (Lane C).** `mediatr-messaging` SHIPPED at
 > **v0.3.16 (15 skills)**. **Lane C's queue is now empty of unblocked work** —
