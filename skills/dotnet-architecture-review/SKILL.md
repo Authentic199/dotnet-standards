@@ -200,7 +200,7 @@ reporting one burns the author's trust in the whole report:
 | 3.2 | Anything under `Web/Controllers/` that is not `BaseController.cs` or a folder named after a module that exposes endpoints. A helper, filter or attribute parked there is a technical capability — `src/Infrastructure/Facades/Common/`. `Find:` `ls src/Web/Controllers/` | **MEDIUM** |
 | 3.3 | A registration inside `Web`. `Web` registers nothing itself; the only two decisions it owns are controller JSON behaviour and the shape of the invalid-model response. Everything else belongs in a facade's or module's `AddX()`. `Find:` `grep -rn "Services.Add" src/Web/` | **HIGH** |
 | 3.4 | A facade `Startup` that is not `internal static class Startup`. Only `Infrastructure/Startup.cs` composes facades; a `public` one invites composition from anywhere. `Find:` `grep -rn "class Startup" src/Infrastructure/Facades/`. **Escalate to HIGH** when something outside `Infrastructure` already calls it | **MEDIUM** |
-| 3.5 | A controller named for two modules — `OrderShipmentsController`. Neither module owns it, so its route family sits outside both modules' surfaces. The family belongs to the owning module's controller as a suffix part (`OrdersController.Shipments.cs`), its operations to that module's service part whose only foreign reach is a `Send`. `Find:` `ls src/Web/Controllers/*/` and read every controller name against audit 4's module list — a name concatenating two module names is the hit · `api-surface`, *Controller partials* + `module-feature`, *Call the service, or send a message?* | **HIGH** |
+| 3.5 | A controller named for two modules — `OrderShipmentsController`. Neither module owns it, so its route family sits outside both modules' surfaces. **The owner is the module whose resource roots the route — the parent**: an order's shipments route through `OrdersController`, so the family belongs there as a suffix part (`OrdersController.Shipments.cs`), its operations in that module's service part whose only foreign reach is a `Send` — never a controller named for the child concept. `Find:` `ls src/Web/Controllers/*/` and read every controller name against audit 4's module list — a name concatenating two module names is the hit · `api-surface`, *Controller partials* + `module-feature`, *Call the service, or send a message?* | **HIGH** |
 
 Route shapes, casing, attributes and `ProducesResponseType` are **not** this
 rubric's — `api-surface` owns what a controller looks like; this audit asks only
@@ -251,6 +251,21 @@ computed value in the module's `Expressions/`, a reusable technical mechanism on
 the Facades axis, a bag of records into `Requests/`/`Responses/` or `Settings/`,
 and logic extracted "to keep the service small" is a suffix-named partial, not a
 new type.
+
+**4.10 — Two capabilities in one module folder** — *HIGH* ·
+`facade-module-architecture`, *the split test*
+
+`Find:` per module, `ls Entities/` plus the themed subfolders under
+`Requests/`, `Responses/` and `Validations/`.
+
+A second aggregate entity carrying its own full request/response/validator
+family — themed subfolders named for it are the tell — is a second capability
+living in the first one's folder. Apply the split test: *what exists only
+because of X and is only ever created because of X stays with X; anything
+created or consulted in its own right is its own module.* A type catalogue
+with its own CRUD surface fails the test however much one consumer dominates,
+and owns a module; the typed settings shapes only one concept persists pass
+the test and stay beside that concept — flag the first, never the second.
 
 **Two more things that are not findings.** A **big `Facades/Common/` capability** —
 reach decides, not size; a niche integration can grow to dozens of files and still

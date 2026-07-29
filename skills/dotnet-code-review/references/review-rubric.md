@@ -562,8 +562,8 @@ while nothing at all is enforced. Delete it, or write the rule it promised.
 
 **5.16 A hand-rolled rule the facade already ships** — *MEDIUM* ·
 `module-feature`, *The facade's rule helpers come first*
-`Find:` `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/Modules/`
-and compare each hit against `Facades/Common/Extensions/ValidatorExtension.cs`.
+`Find:` `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/`
+and compare each hit against the facade's `ValidatorExtension.cs`.
 A regex or predicate re-deriving a helper is a second definition of one rule,
 and the copies drift the day the rule changes. When the helper itself is wrong
 the order is fixed — warn, fix on approval, then migrate call sites — never
@@ -586,7 +586,7 @@ whose meaning every client guesses from the name.
 
 **5.19 An `Ignore` for a member nothing would map** — *MEDIUM* ·
 `automapper-mapping`
-`Find:` `grep -rn --include=*.cs "opt.Ignore()" src/Modules/` and, per hit,
+`Find:` `grep -rn --include=*.cs "opt.Ignore()" src/` and, per hit,
 check whether the source type has a matching member at all.
 `Ignore` is a statement — it records a member another step fills deliberately.
 Ignoring a destination member with no matching source member and no other

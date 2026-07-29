@@ -151,6 +151,9 @@ the two testers have one only to build and test.
    arrives as wholly added lines, exclusions riding inside the pathspec.
 2. Write the diff to a file **under the session's scratch area, never inside the
    repository** — a diff file committed by accident is a defect this flow caused.
+   Use a path every spawned agent on this host can open — on Windows a real
+   Windows path, never a POSIX `/tmp` — and treat an agent reporting the diff
+   unreachable as a flow defect to fix, not a fallback to normalize.
 3. Derive the changed-file list — a diff target with `git diff --name-only
    <base>...HEAD`, a path scope with check 4's expansion, already counted.
 4. Hand every spawned agent these four items, verbatim and identical:
@@ -239,9 +242,14 @@ Each tester ends on one of six verdict strings. Branch on them:
 | `RED — environment` | **Enter NO-SIGNAL. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
 | `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt the loop — **the report is still owed.** This does not enter NO-SIGNAL: unlike a blocked or absent tier, a timeout can be the code's own fault |
 
-**Who fixes:** embedded mode, the calling flow's implementer. Standalone mode,
-**nobody** — report the failures and stop; fixing is offered after the report,
-never before.
+**Who fixes:** embedded mode, the calling flow's implementer — the loop reruns
+to green. Standalone mode, **nobody**: record the failing tier and **continue
+to REVIEW-LOOP**, carrying the RED verdict into the report — the offer after
+the report covers the failures alongside the findings. Principle 2 still held:
+the tiers ran first, and its economy argument — don't spend review on code
+about to change — has no force when nothing changes until the user answers. A
+standalone run that stopped at a red tier would ship no review of exactly the
+code that most needs one.
 
 **Cap: 5 rounds.** On the fifth, halt with a status summary — which tier, which
 tests, what changed between rounds, how many rounds ran — and ask the user. Never
@@ -317,8 +325,9 @@ goes into *Not run* with what was attempted and what the user chose.
 ### REVIEW-LOOP
 
 Entered **only with both tiers green** — or with a tier that produced no signal,
-once NO-SIGNAL has recorded it. A blocked tier is not a failing tier, and the
-lenses never depended on either.
+once NO-SIGNAL has recorded it, or, standalone, with a RED tier recorded per
+*Who fixes* above. A blocked tier is not a failing tier, and the lenses never
+depended on either.
 
 **Spawn all four reviewers in parallel**, in one message, with the same spawn
 contract:

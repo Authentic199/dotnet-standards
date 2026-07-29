@@ -226,8 +226,9 @@ Terminals/
 
 **A controller is named for one module; a two-module name is a defect.** There
 is no `OrderShipmentsController`: a route family about another module's concept
-under this module's resource — an order's shipments — belongs to the owning
-module's controller as a suffix part, `OrdersController.Shipments.cs`. The
+under this module's resource — an order's shipments — belongs to **the parent's
+controller**, the module whose resource roots the route, as a suffix part:
+`OrdersController.Shipments.cs`, never a controller named for the child. The
 operations behind it live in that module's service the same way — a suffix
 part, `OrderService.Shipments.cs`, whose only reach into the foreign module is
 a `Send` of that module's envelope; the shipment logic itself stays in the
