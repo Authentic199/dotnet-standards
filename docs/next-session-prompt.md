@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.28 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.29 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -31,7 +31,13 @@ budget-fix) · dotnet-performance-review 0.3.20 · process-integration v1 0.3.21
 claude-md-builder 0.3.22 (0.3.23 Vietnamese, 0.3.24 delta-not-doctrine) ·
 `dotnet-review-flow` NO-SIGNAL 0.3.25 · `claude-md-builder` contradictions
 0.3.26 · `router-nudge` / mechanism E 0.3.27 · `dotnet-review-flow`'s standing-code
-path scope 0.3.28.
+path scope 0.3.28 · the router's entry trigger 0.3.29.
+
+**The three defects behind the 2026-07-29 no-trigger failure are now all
+closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's
+own description. **Nothing has been measured yet.** Two description trials are
+outstanding at once; the next real session in the consumer repository exercises
+both. Read CHANGELOG 0.3.29 "Known seams" before assuming any of it works.
 
 ## Lane status
 
@@ -168,10 +174,15 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   question … no skill self-triggered"* — a condition about the reader's own
   confusion, which a session that never considered this plugin does not meet.
   0.3.27's hook now names the router directly, so entry no longer depends on
-  this description; the description is still wrong on its own terms. **This is
-  now the next deliverable** — the user reordered on 2026-07-29 to put the
-  standing-code scope first, and that shipped at 0.3.28. It is a skill piece →
-  the three-way loop is mandatory. Detail: CHANGELOG 0.3.27 "Defect 2".
+  this description; the description was still wrong on its own terms.
+  **SHIPPED at 0.3.29** — three-way loop, one piece, MERGE. 97 words in, 97 out.
+  The decisive finding was the arbiter's and neither author nor the coordinator
+  raised it: one draft's guard clause made its own retained trigger unreachable,
+  because a `Not for:` pointer can only be followed from a skill already loaded.
+  Full rulings and two unlabelled anti-example candidates in CHANGELOG 0.3.29.
+  **Open follow-up:** the body's `## How to use these tables` (`:14-18`) does not
+  state the entry condition the description now carries — one sentence, for a
+  session that owns the body.
 - [solo, 2026-07-29] Two small chores banked at 0.3.28, neither blocking: record
   the em-dash word-count convention (`wc -w`, count them) in
   `02-repo-structure.md` §5 — it was ruled at 0.3.28 but never written down; and

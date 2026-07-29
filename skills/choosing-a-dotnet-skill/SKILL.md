@@ -2,11 +2,11 @@
 name: choosing-a-dotnet-skill
 description: >-
   This skill should be used when working in a .NET, C# or ASP.NET Core codebase
-  and it is unclear which dotnet-standards skill owns the question — two skills
-  seem plausible, no skill self-triggered on the convention, a "Not for" pointer
-  led to a skill that does not load, or the task spans several areas. Also when
-  brainstorming, writing a spec or plan, or composing subagent prompts, to name
-  the skill each step requires. Not for:
+  with no dotnet-standards skill chosen — before reading, searching or listing
+  files — or when the owning skill is unclear: two skills seem plausible, a
+  "Not for" pointer led to nothing to load, or the task spans several areas.
+  Also when brainstorming, writing a spec or plan, or composing subagent
+  prompts, to name the skill each step requires. Not for:
   the process skills themselves — brainstorming, planning, TDD — Superpowers;
   a question already matched to one skill — load that skill directly.
 ---
