@@ -143,6 +143,13 @@ that does not exist.
 Those names are what PHASE 3's prompts carry. A step with an owner and no name is
 a step whose implementer works from memory.
 
+**Record the `references/` file too, not just the skill.** A skill's body closes
+each section with the condition under which its reference file must be opened —
+the validator anti-examples, the request/response families, the service-growth
+rules and the envelope shapes all live in those files, not in the skill body. A
+step naming `module-feature` and nothing else sends the implementer to the
+summary and past the file where the rule it needs is actually written.
+
 **Apply the simplicity ladder to each step as it is drafted.** Three questions, in
 that order: does the task in front of you need this step's code at all; does it
 already exist in the codebase; is the step the smallest shape the owning skills
@@ -195,6 +202,26 @@ State the count and the route to the user before starting.
 **pointers to the owning knowledge skills** that PHASE 2 recorded for that step. A
 fresh-context subagent has no knowledge of this stack's conventions until a prompt
 names the skill that holds them — that is the entire reason the plan records them.
+
+**And naming a skill is not carrying it. Every task prompt must order the load,
+in these words or their equivalent:**
+
+> Before writing a single line of code, load `dotnet-standards:<skill>` with the
+> Skill tool — and every `references/` file that skill's own text tells you to
+> open for this kind of work. Write nothing from memory of .NET conventions.
+
+A prompt that lists skill names without that instruction is incomplete, and the
+failure it produces is silent: the implementer recognises the names, believes it
+knows the conventions, and writes plausible generic .NET. What comes back
+compiles, passes tests, and violates house rules the skill states outright — an
+enum declared inside its entity file, a `Global`-prefixed validation type, a
+superseded message form, a configuration line restating the model. Every one of
+those is settled in a shipped body the implementer never opened.
+
+**The same requirement binds this session on the TDD route.** ≤ 3 use-cases
+means *you* are the implementer, so *you* load the skills the plan named before
+writing the first test — the route changes who implements, never whether the
+conventions are read.
 
 Two rules survive both routes:
 
