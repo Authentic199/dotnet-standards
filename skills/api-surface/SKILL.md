@@ -224,13 +224,24 @@ Terminals/
   constructor takes it.
 - The route never changes, so the split is invisible to API consumers.
 
-Three anti-patterns, all of which compile:
+**A controller is named for one module; a two-module name is a defect.** There
+is no `OrderShipmentsController`: a route family about another module's concept
+under this module's resource — an order's shipments — belongs to the owning
+module's controller as a suffix part, `OrdersController.Shipments.cs`. The
+operations behind it live in that module's service the same way — a suffix
+part, `OrderService.Shipments.cs`, whose only reach into the foreign module is
+a `Send` of that module's envelope; the shipment logic itself stays in the
+shipment module's service (`module-feature`, *Call the service, or send a
+message?*).
+
+Four anti-patterns, all of which compile:
 
 | Anti-pattern | Why it is wrong |
 |---|---|
 | `Profile.TerminalsController.cs` (prefix-named) | Sorts away from its own controller; the core file is no longer first or identifiable by name |
 | Base list on a role part instead of the core file | The core file stops being the one declaration point; reviewers cannot tell which file is core |
 | Base list repeated on every part | Legal C# — the compiler merges them silently — but now every part claims to be the core file |
+| `OrderShipmentsController` (two-module name) | Neither module owns it. The route family is `OrdersController.Shipments.cs`; its operations are `OrderService.Shipments.cs`, reaching the foreign module only by `Send` |
 
 ## Request DTOs
 
