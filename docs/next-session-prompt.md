@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.31 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
+Shipped through **v0.3.32 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
 2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
@@ -35,7 +35,10 @@ path scope 0.3.28 · the router's entry trigger 0.3.29 · write-simple-code
 (rubric area 7, flow carriers, static rule R24) 0.3.30 · the first field
 trial's 15-item feedback (E1 agents lacked the Skill tool + cache-read ban,
 E2 failure classification, 12 rule additions across 9 skills, C4 declined)
-0.3.31.
+0.3.31 · the two-module-name rule (no `OrderShipmentsController` /
+`OrderShipmentService` — owning module's suffix part + `Send`; architecture
+check 3.5) and the reviewers' knowledge-layer loads (citation-counted lists
+per lens) 0.3.32.
 
 **The three defects behind the 2026-07-29 no-trigger failure are now all
 closed** — 0.3.27 the hook, 0.3.28 the standing-code scope, 0.3.29 the router's

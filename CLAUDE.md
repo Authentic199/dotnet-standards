@@ -44,7 +44,13 @@
 > reading the plugin cache unverifiably. Fixed, plus a cache-read ban, a
 > deterministic-vs-transient failure split in the flow, and 12 rule additions
 > across 9 skills, all traceable to the trial's approved conventions. Full
-> rulings CHANGELOG 0.3.31; readout on the board.
+> rulings CHANGELOG 0.3.31; readout on the board. The same conversation then
+> shipped **0.3.32**: the two-module-name rule (no `OrderShipmentsController`,
+> no `OrderShipmentService` — the route family and its operations are suffix
+> parts of the owning module's controller and service, foreign reach by `Send`
+> only; architecture check 3.5) and the four reviewers now load the knowledge
+> skills their rubric cites most, plus any other cited skill before writing a
+> finding that cites it.
 
 > **OPENER — 2026-07-28, S17 close (Lane C).** `mediatr-messaging` SHIPPED at
 > **v0.3.16 (15 skills)**. **Lane C's queue is now empty of unblocked work** —
