@@ -200,7 +200,7 @@ reporting one burns the author's trust in the whole report:
 | 3.2 | Anything under `Web/Controllers/` that is not `BaseController.cs` or a folder named after a module that exposes endpoints. A helper, filter or attribute parked there is a technical capability — `src/Infrastructure/Facades/Common/`. `Find:` `ls src/Web/Controllers/` | **MEDIUM** |
 | 3.3 | A registration inside `Web`. `Web` registers nothing itself; the only two decisions it owns are controller JSON behaviour and the shape of the invalid-model response. Everything else belongs in a facade's or module's `AddX()`. `Find:` `grep -rn "Services.Add" src/Web/` | **HIGH** |
 | 3.4 | A facade `Startup` that is not `internal static class Startup`. Only `Infrastructure/Startup.cs` composes facades; a `public` one invites composition from anywhere. `Find:` `grep -rn "class Startup" src/Infrastructure/Facades/`. **Escalate to HIGH** when something outside `Infrastructure` already calls it | **MEDIUM** |
-| 3.5 | A controller named for two modules — `OrderShipmentsController`. Neither module owns it, so its route family sits outside both modules' surfaces. **The owner is the module whose resource roots the route — the parent**: an order's shipments route through `OrdersController`, so the family belongs there as a suffix part (`OrdersController.Shipments.cs`), its operations in that module's service part whose only foreign reach is a `Send` — never a controller named for the child concept. `Find:` `ls src/Web/Controllers/*/` and read every controller name against audit 4's module list — a name concatenating two module names is the hit · `api-surface`, *Controller partials* + `module-feature`, *Call the service, or send a message?* | **HIGH** |
+| 3.5 | A controller named for two modules — `OrderShipmentsController`. `Find:` `ls src/Web/Controllers/*/`; a class name that concatenates two module names from audit 4's list is the hit. **Then read that controller's route templates to name the destination — do not guess it from the class name.** Every action's route opening with the parent's `{id:guid}` means the parent owns the family: it moves to `OrdersController` as a suffix part (`OrdersController.Shipments.cs`), its operations to that module's service part whose only foreign reach is a `Send`. **Renaming it to the child (`ShipmentsController`) is the wrong fix while the routes still nest**, and a full CRUD surface on the sub-resource does not make it a top-level controller. **Grade HIGH, not a naming nit:** the route family currently sits outside both modules' surfaces, so neither module's controller enumerates it · `api-surface`, *Route shapes* and *Controller partials* + `module-feature`, *Call the service, or send a message?* | **HIGH** |
 
 Route shapes, casing, attributes and `ProducesResponseType` are **not** this
 rubric's — `api-surface` owns what a controller looks like; this audit asks only
@@ -252,20 +252,37 @@ the Facades axis, a bag of records into `Requests/`/`Responses/` or `Settings/`,
 and logic extracted "to keep the service small" is a suffix-named partial, not a
 new type.
 
-**4.10 — Two capabilities in one module folder** — *HIGH* ·
-`facade-module-architecture`, *the split test*
+**4.10 — A module folder that does not name the capability inside it** —
+*HIGH* · `facade-module-architecture`, *the split test*
 
-`Find:` per module, `ls Entities/` plus the themed subfolders under
-`Requests/`, `Responses/` and `Validations/`.
+`Find:` run this for **every** module folder in scope, and write the answer
+down before moving on:
 
-A second aggregate entity carrying its own full request/response/validator
-family — themed subfolders named for it are the tell — is a second capability
-living in the first one's folder. Apply the split test: *what exists only
-because of X and is only ever created because of X stays with X; anything
-created or consulted in its own right is its own module.* A type catalogue
-with its own CRUD surface fails the test however much one consumer dominates,
-and owns a module; the typed settings shapes only one concept persists pass
-the test and stay beside that concept — flag the first, never the second.
+1. `ls src/Infrastructure/Modules/<Module>/Entities/` — list the entity files.
+2. Singularise the folder name (`Devices` → `Device`, `Orders` → `Order`).
+3. Compare that word against every entity file name in step 1.
+
+Exactly two comparisons are findings, and both are mechanical:
+
+| Shape | What you will see | Verdict |
+|---|---|---|
+| **(a) The folder names a concept that has no entity** | `Modules/Devices/Entities/` holds only `DeviceType.cs` — no `Device.cs` | The module is named for something it does not implement, and the aggregate it *does* hold is a capability with no module of its own. **Finding** |
+| **(b) Two or more aggregate entities, each with its own request/response/validator family** | `Modules/Orders/Entities/` holds `Order.cs` **and** `Carrier.cs`, with `Requests/Carriers/`, `Validations/Carriers/` beside the order's own | The second one is a capability living in the first one's folder. **Finding** |
+
+Then state the split test in the finding — *what exists only because of X and
+is only ever created because of X stays with X; anything created or consulted
+in its own right is its own module* — and name the destination:
+`Modules/<Aggregate>/`, a module named for the aggregate itself.
+
+**A type catalogue with its own CRUD surface is its own capability** however
+much one consumer dominates it: "it is only used by devices" is not the test,
+"it is only ever created because a device is created" is, and a catalogue
+administered on its own screens fails that.
+
+**Not a finding — the settings shapes.** Typed classes that exist only to be
+persisted by one aggregate (a JSON settings column's shape, one per enum
+member) pass the split test and stay beside that aggregate. Say so under
+*Audit coverage* rather than reporting it.
 
 **Two more things that are not findings.** A **big `Facades/Common/` capability** —
 reach decides, not size; a niche integration can grow to dozens of files and still

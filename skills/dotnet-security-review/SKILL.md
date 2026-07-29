@@ -279,6 +279,12 @@ Two shapes, and their grounding differs — say which you found.
   shape; the fix is a narrower request type — not ignoring the property in the profile,
   which leaves the next author's `CreateMap` to re-introduce it, and not a downstream
   guard, which the next author will forget.
+  **And do not credit the mirror image under *What's Good*.** A profile that
+  `Ignore`s `CreatedBy`, `UpdatedAt` or a navigation the request never declared has
+  prevented nothing: AutoMapper writes only members it finds on the source, so the
+  narrow request type is the whole control and the `Ignore` lines are decoration.
+  Reporting them as a mass-assignment defence teaches the author to keep writing
+  them and to trust them on a request type that *does* declare the member.
 
 **6.2 A response property hidden by a comment** — *HIGH; CRITICAL when the value is a
 credential, a token or another caller's data* · universal + `api-surface`
