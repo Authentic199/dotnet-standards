@@ -214,6 +214,25 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   row only forbids moving a severity because the code is old. Needs a
   `dotnet-code-review`-owning session.
 
+- [solo, 2026-07-29] **"Write simple code" — ownership DECIDED, implementation
+  pending.** Decision doc
+  `docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md`.
+  (A) install `DietrichGebert/ponytail` REFUSED — its `SessionStart` mechanism
+  is the one 0.3.27 measured being ignored, and a generic YAGNI voice cannot
+  distinguish sanctioned structure (Facades-axis ahead-of-need code is a USER
+  RULING, recorded in the doc §1) from slop; reversal conditions in §4. (C)
+  do-nothing REFUSED — over-build observed by the user in sessions with the
+  plugin ACTIVE (three shapes, three contexts, 2026-07-29), and the slop
+  taxonomy has no complex-where-simpler-works category. (B) CHOSEN: new
+  `dotnet-code-review` priority area 7 (severity cap MEDIUM; cleanup renumbers
+  to 8), a `dotnet-feature-flow` PHASE 2 ladder instruction, a new
+  `claude-md-builder` static rule; two ponytail lines COPY (MIT → `NOTICE`
+  obligation 3); router rows named in §5.6; the (A) refusal to be mirrored
+  into `hooks/README.md`'s table. Unblocks: one implementation session,
+  three-way loop, 3 pieces — **constrained: do not touch the two on-trial
+  descriptions (`dotnet-review-flow`, `choosing-a-dotnet-skill`) until the
+  consumer-repo trial session runs.**
+
 ## Standing rules (unchanged, summarized)
 
 - One session, one deliverable **+ the mandatory router merge-time edits in
