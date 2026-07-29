@@ -8,6 +8,46 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.33] — the delegation reversal, and the trial's remaining deterministic gaps, 2026-07-29
+
+Preparation for the self-evaluating re-run of the field trial. **The user
+reversed one 0.3.31 ruling**: member order and property documentation are no
+longer delegated to the analyzer — the review must name them as findings. The
+other rule families (formatting, using ordering, nullable flow) stay delegated,
+and the analyzer-enforcement preflight readout stays for them; the flow's
+example list is corrected accordingly.
+
+**Added:**
+
+- **Member order is a house rule now** — fields, the constructor, then members;
+  a static member may sit above the non-private methods, never above the
+  constructor. Doctrine in `module-feature` (*The service file*), graded by new
+  rubric check **5.17**.
+- **Property documentation is a house rule now** — every public property of a
+  request, response and entity carries an XML `<summary>`;
+  `IncludeXmlComments` publishes it into the schema. Doctrine in `api-surface`
+  (*Request DTOs*, with an entity pointer in `ef-core-data-access`), graded by
+  new rubric check **5.18**.
+- **Rubric check 1.10** — a configuration restating what the model or the
+  validator already says (`IsRequired()` under `Nullable`, `HasMaxLength`,
+  `varchar(n)`, business check constraints): the 0.3.31 doctrine now has a
+  grep-able check, not only a knowledge-skill paragraph.
+- **Rubric check 5.15** — a `RuleFor(x => x.P);` ending at the selector: reads
+  as validated, enforces nothing.
+- **Rubric check 5.16** — a hand-rolled regex or predicate the facade's
+  `ValidatorExtension` already ships (the 0.3.31 helper-first doctrine's
+  check), carrying the fixed warn → approve → migrate order.
+- **Rubric check 5.19 and `automapper-mapping` doctrine** — an `Ignore` for a
+  destination member nothing would map is noise that buries the deliberate
+  ignores; with the explicit exception that where the configuration-validation
+  test enforces destination coverage the `Ignore` is load-bearing — check
+  before calling it redundant.
+
+**Fixed:** the 0.3.31 insertion of check 5.14 accidentally swallowed the
+`## 6. Tests` heading in the rubric — restored.
+
+---
+
 ## [0.3.32] — cross-module ownership, and the reviewers' knowledge layer, 2026-07-29
 
 Second batch from the same field-trial conversation as 0.3.31; both items are

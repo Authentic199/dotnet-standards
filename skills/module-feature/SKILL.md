@@ -98,6 +98,12 @@ public class OrderService : IOrderService
   from three files to see what it does. (A precondition guard may delegate to the
   module's static validation type — see *Where a validation rule lives*.)
 
+**Inside the class the order is fixed: fields, the constructor, then members.**
+A static member may sit above the non-private methods; it never sits above the
+constructor. The constructor is the type's signature — its parameters say what
+the type needs — and burying it under other members makes every reader scroll
+for the one declaration that explains the class.
+
 ## When a service outgrows one file
 
 Split it into **partial parts of the same type, named by suffix** —

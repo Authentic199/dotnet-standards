@@ -213,6 +213,8 @@ One entity lives in one file, together with its `IEntityTypeConfiguration<T>`
 and any enums it owns. The configuration sits beside the class it configures,
 so a reviewer reads the shape and its mapping without opening a second file,
 and `ApplyConfigurationsFromAssembly` finds it with no registration step.
+Every public property carries an XML `<summary>` — the documentation law lives
+in `api-surface` and covers entities alongside the DTOs they feed.
 
 ```csharp
 public class Order : BaseEntity

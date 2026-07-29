@@ -180,6 +180,12 @@ was never sent. `Ignore` is a statement, not a silence: it records that the memb
 is filled deliberately by another step, so a reviewer does not read the omission as
 an oversight.
 
+**And a statement earns its line.** A destination member with no matching source
+member and no other writer maps nothing anyway — ignoring it is noise, and noise
+buries the deliberate ignores a reviewer must trust. One exception before deleting:
+where the configuration-validation test enforces destination coverage, that
+`Ignore` is load-bearing, not noise — check first.
+
 Delegate-based options are safe on a request map because it runs against
 materialized objects and its destination is an entity, not a projected shape. The
 gate is still principle 3's reachability test, not the map's direction.

@@ -123,6 +123,16 @@ startup when the initialisation flag is on, so the review is the gate that
 actually exists. Read the generated SQL, not just the builder calls. A migration
 is Critical blast radius by definition.
 
+**1.10 A configuration restating what the model or the validator already says**
+— *MEDIUM* · `ef-core-data-access`
+`Find:` `grep -rn --include=*.cs "IsRequired()\|HasMaxLength(\|HasColumnType(\"varchar" src/`;
+also flag a check constraint encoding a business condition.
+With `Nullable` on, `IsRequired()` restates the property's own type; length and
+business conditions belong to the request's validator, and the schema does not
+repeat them. Keys, foreign keys, uniqueness (`HasCitextUnique`) and defaults
+stay. A limit declared twice drifts twice, and the schema copy is the one that
+diverges silently.
+
 ## 2. Security posture
 
 **2.1 An action with no explicit authorization decision** — *CRITICAL* ·
@@ -543,6 +553,48 @@ pattern compiles, matches every string a quick manual test would try, and ships
 a filter that quietly passes what it is named to block. A mixed-case range is
 always a typo: write both ranges out. Grade at the pattern's own reach — a
 shared validation helper carries every validator that calls it.
+
+**5.15 A rule chain with no rule** — *MEDIUM* · `module-feature`
+`Find:` `grep -rn --include=*Validator*.cs "RuleFor(.*);" src/` and read each
+hit — a `RuleFor(x => x.P);` that ends at the selector attaches nothing.
+Worse than dead code: it tells every reader that the property is validated
+while nothing at all is enforced. Delete it, or write the rule it promised.
+
+**5.16 A hand-rolled rule the facade already ships** — *MEDIUM* ·
+`module-feature`, *The facade's rule helpers come first*
+`Find:` `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/Modules/`
+and compare each hit against `Facades/Common/Extensions/ValidatorExtension.cs`.
+A regex or predicate re-deriving a helper is a second definition of one rule,
+and the copies drift the day the rule changes. When the helper itself is wrong
+the order is fixed — warn, fix on approval, then migrate call sites — never
+silently adopt a broken helper.
+
+**5.17 A member above the constructor** — *MEDIUM* · `module-feature`
+`Find:` read each added or changed class top-to-bottom: fields, the
+constructor, then members. A static member may precede the non-private
+methods; it never precedes the constructor.
+The constructor is the type's signature — its parameters say what the type
+needs. Burying it under other members makes every reader scroll for the one
+declaration that explains the class.
+
+**5.18 An undocumented property on a contract type** — *MEDIUM* · `api-surface`
+`Find:` for each added or changed request, response and entity, check every
+public property for an XML `<summary>`.
+`IncludeXmlComments` publishes property docs into the OpenAPI schema exactly
+as it publishes operation docs; a bare property ships an undocumented field
+whose meaning every client guesses from the name.
+
+**5.19 An `Ignore` for a member nothing would map** — *MEDIUM* ·
+`automapper-mapping`
+`Find:` `grep -rn --include=*.cs "opt.Ignore()" src/Modules/` and, per hit,
+check whether the source type has a matching member at all.
+`Ignore` is a statement — it records a member another step fills deliberately.
+Ignoring a destination member with no matching source member and no other
+writer is noise that buries the deliberate ignores. One exception: where the
+configuration-validation test enforces destination coverage, that `Ignore` is
+load-bearing — check before calling it redundant.
+
+## 6. Tests
 
 Which tier a scenario belongs to is `dotnet-testing`'s Decision Guide. This pass
 asks only whether the changed behaviour is covered, and whether the tests that

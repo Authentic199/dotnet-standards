@@ -187,8 +187,8 @@ test failure and costs little against warm outputs — the gate's second benefit
 since two agents compiling the same cold tree in parallel collide on artifacts.
 
 **Read the gate's warning count while it is on the screen.** The knowledge
-skills deliberately delegate whole rule families — member ordering, XML-doc
-presence, nullable flow — to the analyzers, and that delegation holds only
+skills deliberately delegate whole rule families — formatting, using ordering,
+nullable flow — to the analyzers, and that delegation holds only
 where an analyzer finding can fail a build. A green gate with analyzer warnings
 raises one question: what enforces them? Check `TreatWarningsAsErrors` in the
 build props and per-rule severity in `.editorconfig`. When neither is set and

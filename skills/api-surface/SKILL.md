@@ -245,6 +245,12 @@ Four anti-patterns, all of which compile:
 
 ## Request DTOs
 
+**Every public property of a request, a response — and the entity behind them —
+carries an XML `<summary>`.** `IncludeXmlComments` publishes property docs into
+the OpenAPI schema exactly as it publishes operation docs, so a bare property
+ships an undocumented field whose meaning every client guesses from the name.
+This is the property-level face of the endpoint's own `<summary>` law above.
+
 **Look up the module's existing requests before defining one.** Requests are a
 mandatory inheritance chain, not a flat set: shared shape moves into a base
 class, and `Create`/`Update` derive from it. Creating that base, or lightly
