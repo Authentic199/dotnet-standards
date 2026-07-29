@@ -170,15 +170,29 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   this description; the description is still wrong on its own terms. **Next
   deliverable by user direction.** It is a skill piece → the three-way loop is
   mandatory. Detail: CHANGELOG 0.3.27 "Defect 2".
-- [solo, 2026-07-29] **The review surface is diff-anchored — a folder audit has
-  no owner.** `dotnet-review-flow` hard-stops without a diffable base
-  (`SKILL.md:99-101`) and derives every subagent input from the diff;
-  `dotnet-code-review`'s description says *"reviewing **changed** … code …
-  before merge"*. The request that exposed all of 0.3.27 — *"audit these
-  modules, change nothing, write the report to a file"* — cannot be served by
-  it: even a perfectly-triggered session stops at an empty diff. **Queued third
-  by user direction**; needs a `dotnet-review-flow`-owning session and a real
-  design call on how a standing-code scope is bounded, chunked and reported.
+- [solo, 2026-07-29 — scope narrowed by the user the same day] **The review
+  surface is diff-anchored; reviewing standing code has no owner.**
+  `dotnet-review-flow` hard-stops without a diffable base (`SKILL.md:99-101`)
+  and derives every subagent input from the diff; `dotnet-code-review`'s
+  description says *"reviewing **changed** … code … before merge"*.
+
+  **Exactly one thing is missing: a scope that is a set of paths instead of a
+  diff.** Do not build more than that. The user has since explained the request
+  that exposed this: *"write the report to a file, change nothing"* was a
+  point-in-time need — validate the plugin's review quality against code written
+  before the plugin existed, keeping that code untouched as evidence to compare
+  the report against — **not a permanent read-only mode**. Two things that
+  looked like gaps are not: standalone mode already changes nothing until the
+  user accepts the offer, and the never-write-inside-the-repository rule at
+  `SKILL.md:135-136` binds the **diff file**, not the report.
+
+  **Queued next by user direction.** Real design calls that remain: how a path
+  scope is bounded and chunked (a diff is ~20 files, a module tree is hundreds);
+  what replaces blast-radius ranking when nothing changed; and how a first audit
+  of legacy code avoids returning a useless flood — pre-plugin code violates
+  conventions it never knew about, so raw finding counts will be enormous and
+  ranking is the whole product. Router alignment: the base map has no row for
+  reviewing standing code, and that row ships in the same commit.
 
 ## Standing rules (unchanged, summarized)
 
