@@ -8,6 +8,53 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.36] — the generation side never loaded the knowledge layer, 2026-07-29
+
+The second trial loop — `/dotnet-feature` building three features from scratch
+on a branch where they do not exist — was killed by the host partway through
+its first feature, but the Events module it had already committed is enough to
+grade, and it fails on its own plugin's rules. The brainstorming was strong:
+the session read the BA sheet, self-answered eleven scoped questions with
+reasons, and recorded them in the design document. The code it then wrote
+contains, in one small module:
+
+- an enum declared inside the entity file (`facade-module-architecture`:
+  every enum lives in `Enums/`, never inside an entity);
+- enum members numbered from `0` (`ef-core-data-access`: int-backed, explicit,
+  starting at 1);
+- `Validations/GlobalEventValidation.cs` — the `Global`-prefixed validation
+  type that `module-feature`'s `references/validation-rules.md` carries as its
+  named anti-example;
+- `IsRequired()` on a non-nullable string and an enum (0.3.31 doctrine, check
+  1.10);
+- `WithMessage(MessagesType.X)` written new, the form `message-keys` calls
+  superseded and the rubric says to recognise but never write.
+
+Each is settled in a shipped body. None of those bodies was open.
+
+**Fixed:**
+
+- **PHASE 3 now orders the load, not just the name.** The flow already required
+  every task prompt to carry *pointers to the owning knowledge skills*; a
+  pointer is a name, and a name is what an implementer recognises without ever
+  opening the file. Task prompts must now carry the instruction verbatim —
+  *before writing a single line of code, load `dotnet-standards:<skill>` with
+  the Skill tool, and every `references/` file that skill tells you to open;
+  write nothing from memory of .NET conventions* — with the failure it prevents
+  spelled out, since the output of a memory-written task compiles and passes
+  tests while violating house law. The requirement binds this session on the
+  TDD route too: the route decides who implements, never whether the
+  conventions get read.
+- **PHASE 2 records the `references/` file, not only the skill.** The rules the
+  Events module broke live in reference files, not in skill bodies — a step
+  naming `module-feature` alone sends the implementer to the summary and past
+  the file where the anti-example is actually written.
+
+This is the same defect class 0.3.32 fixed for the four reviewers, on the half
+of the plugin that writes code rather than grading it.
+
+---
+
 ## [0.3.35] — round-2 readout: four rules that could not fire, 2026-07-29
 
 Round 2 of the blind re-trial ran on **Sonnet** (the trial's model floor from
