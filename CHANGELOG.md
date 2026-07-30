@@ -8,6 +8,39 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.47] — soft delete joins `ef-core-data-access`, 2026-07-31
+
+**First deliverable of the common-extensions batch** (three-way loop, run by a
+delegated background coordinator; first run blocked on the skill-creator roster
+defect, re-run clean — arbiter loaded `skill-creator:skill-creator` live).
+Verdicts: SECTION — MERGE · REFERENCES — MERGE · DESCRIPTION DELTA — B (99
+words, roster untouched).
+
+**Added:** `## Soft delete` section (SKILL.md, final section) — the two
+independent stamp axes (`ISoftDelete.DeleteAt` permanent, `IHidden.HiddenAt`
+reversible via the entity's fluent setter), repository-level automatic
+injection into `Find`/`Count`/`CountAsync`/`Any`/`AnyAsync` (no EF
+`HasQueryFilter` anywhere — "global query filter" names the composed
+predicate), by-key/raw-SQL members outside the filter by construction, delete
+= stamp + `UpdateAsync`, `IgnoreGlobalQueryFilter` escape-hatch semantics
+(property-matched — it clears caller-written conditions on the same stamp
+too), partial unique indexes via `ISoftDelete.SqlFilter`, root-set-only scope.
+New `references/soft-deletes.md`: all four files verbatim + repository wiring
++ opt-in entity example + checklist. Description gains the soft-delete nouns
+(99 words). Router: new `soft delete / hidden rows` disambiguation row.
+Cross-reference sentence added in `### The surface` (arbiter + both authors
+recommended). SKILL.md lands at 493 lines — inside the <500 bar.
+
+**Rulings recorded:** automatic injection ratified as the canonical shape
+under the standing pick-the-best delegation (the only functional wiring in the
+corpus). Both authors' shared ungrounded restore claim (`DeleteAt = null`)
+REFUSED per provenance law; migration/backfill guidance deliberately absent
+(not corpus-demonstrable). Banked, unlabelled (R8): seven anti-example
+candidates, strongest the live no-op `.IgnoreQueryFilters()` call; detail in
+the coordinator report.
+
+---
+
 ## [0.3.46] — review reports become files; the NuGet rule gains its exception; R25, 2026-07-31
 
 Three user rulings from the same conversation, wordings shown before editing:
