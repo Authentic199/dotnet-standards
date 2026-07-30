@@ -8,6 +8,38 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.39] — round-5 readout: the last check that asked for unbounded work, 2026-07-30
+
+Round 5 (Sonnet, 0.3.38) scored **14 of 15 again, and missed the same single
+criterion** — which makes it a defect, not variance. `Check coverage` reached a
+report for the first time: the merged *Not run* section now names a check by
+number (*code-review check 5.13 — requires a build, reported not-run rather than
+clean*), which is exactly what the section was added to force.
+
+The round was the strongest yet on defects no rule anticipates — four CRITICAL,
+including two nobody had found in four previous rounds: a validator that
+dereferences `x.EndAt!.Value` and so **crashes on an ordinary partial update**,
+and per-request principal verification that **fails open** when the principal
+type does not resolve by name.
+
+**Fixed:**
+
+- **5.17's `Find:` was still unbounded work in disguise.** 0.3.38 replaced
+  *read each class top-to-bottom* with two line-numbered greps — but *per
+  changed class file*, across a fifty-file scope, which is a hundred commands
+  and so, in practice, none. It is now **one repo-wide grep** over the two
+  folders where these types live, followed by a second grep on **only the
+  handful of files that first grep names**, and a comparison of two integers.
+  Files the first grep does not name cannot hold the defect, so the work is
+  bounded by the result rather than by the scope.
+
+The rule this trial keeps re-teaching, now in its sharpest form: a check fires
+when its cost is bounded by *what it finds*, and gets skipped when its cost is
+bounded by *how big the scope is* — regardless of how mechanical each individual
+step looks.
+
+---
+
 ## [0.3.38] — round-4 readout: 14 of 15, and the section that never shipped, 2026-07-30
 
 Round 4 (Sonnet, 0.3.37) caught **fourteen of the fifteen held-back criteria**,
