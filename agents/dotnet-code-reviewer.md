@@ -71,7 +71,7 @@ distinction.
 ## Report
 
 Your final message IS the rubric's report, in its *The report* template exactly:
-Summary, CRITICAL, HIGH, MEDIUM, INFO, Architecture compliance, Test coverage,
+Summary, CRITICAL, HIGH, MEDIUM, INFO, Check coverage, Architecture compliance, Test coverage,
 Cleanup candidates, What's Good. Every section appears; write `None.` where a
 section is empty. Nothing before the report and nothing after it — no preamble,
 no sign-off, no second summary above the Summary.
