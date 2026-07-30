@@ -235,6 +235,34 @@ Implementation subagents are **ordinary** Superpowers subagents. The six special
 agents are test and review agents only: never spawn a reviewer or a tester to write
 code, and never ask an implementation subagent to review its own output.
 
+### The conformance sweep — before PHASE 4, on the files this phase created
+
+**This session runs these commands over the new files and fixes every hit before
+the testers and reviewers are spawned.** It is not a review and it forms no
+opinion: each line is one of `dotnet-code-review`'s own checks, cited by number,
+run as a command whose output either is empty or is a defect.
+
+| Command over the new files | Any hit means | Check |
+|---|---|---|
+| `grep -rn "enum " <module>/Entities/ <module>/Requests/ <module>/Responses/` | an enum declared outside `Enums/` | arch 4.5 |
+| `grep -rn "enum " -A3 <module>/Enums/ \| grep "= 0"` | enum numbering starts at 0, not 1 | `ef-core-data-access` |
+| `ls <module>/Validations/` | a `Global`-prefixed or otherwise prefixed validation type | `module-feature`, `references/validation-rules.md` |
+| `grep -rn "IsRequired()\|HasMaxLength(\|HasColumnType(\"varchar" <module>/` | configuration restating the model or the validator | 1.10 |
+| `grep -rn "MessagesType\." <module>/` | the superseded message form written new | 5.6 |
+| `grep -rn "BaseEntity<Guid>" <module>/` | the generic base closed by hand | 5.20 |
+| `grep -rLn "<summary>" <module>/Entities/ <module>/Requests/ <module>/Responses/` | a contract type with undocumented properties | 5.18 |
+| `grep -rn "\.Matches(" <module>/` | a regex literal where a facade helper belongs | 5.16 |
+
+**Why this exists, and why it is not duplicated review.** Every one of these
+defects has shipped from a task whose prompt named the owning skill: an enum
+inside its entity file, a `Global`-prefixed validation type, `IsRequired()` on a
+non-nullable property, the superseded message form. They are decisions made in
+the first minute of writing a file, they are invisible in a passing test suite,
+and they cost a full review round each when a lens finds them instead. The
+commands are the rubric's — **cite the check number in the fix, add no rule of
+your own here**, and where a hit is deliberate, say so in the report rather than
+silently leaving it.
+
 ## PHASES 4–5 — Test and review, embedded
 
 **Invoke `dotnet-standards:dotnet-review-flow` with the Skill tool, stating
