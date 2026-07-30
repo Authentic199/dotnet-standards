@@ -1,7 +1,7 @@
 # Hooks
 
-`dotnet-standards` ships **exactly three hooks**: `post-edit-format`,
-`superpowers-check` and `router-nudge`.
+`dotnet-standards` ships **exactly four hooks**: `post-edit-format`,
+`superpowers-check`, `router-nudge` and `test-report-nudge`.
 
 That is not an accident of scope. Nine hook components were triaged against
 Superpowers and against the Windows failure mode described below; eight were
@@ -9,8 +9,11 @@ refused. `superpowers-check` was added later (Lane D, spec
 `docs/superpowers/specs/2026-07-27-process-integration-design.md` §5) and was
 admitted only because it passes the same test the eight failed. `router-nudge`
 (0.3.27) is one of the original eight, **readmitted because the reason it was
-refused was later falsified by observation** — the table row in
-[Why only these hooks](#why-only-these-hooks) now carries both verdicts and the
+refused was later falsified by observation**. `test-report-nudge` (0.3.44)
+descends from another of the eight — `post-test-analyze` — **reshaped so the
+refusal's reason keeps holding**: the script summarizes nothing; it nudges the
+model to write the report a human reads. The table rows in
+[Why only these hooks](#why-only-these-hooks) carry both verdicts and the
 evidence between them. If a future session thinks another hook is needed, read
 that section first.
 
@@ -29,11 +32,11 @@ all:
 | **Utility script** | Nowhere — invoked by a workflow or piped by hand | A human or a skill runs it |
 
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
-ships three hooks of the first kind and zero of the other two.**
+ships four hooks of the first kind and zero of the other two.**
 
 ---
 
-## The three hooks
+## The four hooks
 
 **`post-edit-format`** — after Claude edits or writes a file, format it.
 
@@ -148,6 +151,43 @@ and was ignored on turn 1, while this plugin sat installed and enabled with all
 its skill descriptions loaded. Adjacency to the request is the only thing this
 hook adds over a slot that was already available and already occupied.
 
+**`test-report-nudge`** — after a `dotnet test` run, have the model keep a
+human-readable test report current.
+
+| | |
+|---|---|
+| Event | `PostToolUse` |
+| Matcher | `Bash` |
+| Command | `"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" test-report-nudge` |
+| Mode | synchronous (`"async": false`) |
+
+Extracts `.tool_input.command` from the `PostToolUse` stdin JSON (`jq` if
+available, a sed extraction if not); exits 0 unless it contains a
+`dotnet test` invocation. On the first match of the session — a marker under
+`${TMPDIR:-/tmp}/dotnet-standards/` keyed by `session_id`, swept after seven
+days, exactly router-nudge's mechanism — it emits one `additionalContext`
+block: a **standing instruction** to write `test-report.md` at the repository
+root whenever a test run settles, overwriting the previous version, in the
+**user-approved format** (date/time + command + pass/fail/skip totals, one
+section per test class, one plain-language line per test case with PASS/FAIL
+and a one-line reason on FAIL, written in the language the user is conversing
+in). The instruction persists in the conversation, so later runs in the same
+session need no re-emit.
+
+**The script parses no test output — deliberately.** The S6 refusal of the
+kit's `post-test-analyze` ("a shell summariser of output the model already
+reads in full") is still correct, and this hook is shaped around it: turning
+`Name_Should_Not_Exceed_200_Characters` into "tên user không vượt quá 200 ký
+tự — PASS" in the user's own language is exactly the work a sed script cannot
+do and the model can. The report wording inside the emit is a report rule —
+changing it needs the user's approval before it ships (ruling 2026-07-28,
+reaffirmed 2026-07-31).
+
+Why it passes the rule below: it guards nothing and parses nothing. If it
+silently never runs, test output still appears in the conversation in full —
+the session is exactly the session that shipped before 0.3.44; the only loss
+is the courtesy report file.
+
 Nothing else in this plugin registers a Claude Code event.
 
 ---
@@ -238,7 +278,7 @@ The other eight candidates — plus one later proposal — and why each was refu
 |---|---|
 | `pre-bash-guard` | **Refused.** Fails open under the silent exit-0 above; the permission gate already interposes on every Bash call. |
 | `post-scaffold-restore` | **Refused.** A synchronous whole-solution `dotnet restore` on every `.csproj` write, for a restore `dotnet build` and `dotnet add package` already perform. |
-| `post-test-analyze` | **Refused.** A shell summariser of `dotnet test` output the model already reads in full, with more context. |
+| `post-test-analyze` | **Refused — a changed form shipped at 0.3.44 as `test-report-nudge`.** The S6 verdict read: *"A shell summariser of `dotnet test` output the model already reads in full, with more context."* That reason was never falsified and the shipped hook preserves it: the script still summarises nothing. What changed is the deliverable — on 2026-07-31 the user asked for a persistent plain-language report **file for a human reader**, which raw test output is not and a shell parser cannot write in the user's language. The shipped form nudges the model to write that file (format user-approved the same day) instead of parsing anything in shell. |
 | `pre-build-validate` | **Refused as a script.** Its six solution-hygiene checks survive as a checklist Claude performs natively; the script form buys nothing. |
 | `pre-commit-antipattern` | **Refused as a gate.** Its four detection patterns survive as knowledge; the blocking form told the user to bypass it with `--no-verify`. |
 | `pre-commit-format` | **Refused.** A third layer on a concern `post-edit-format` prevents and `dotnet format --verify-no-changes` verifies. |
@@ -261,3 +301,4 @@ not "is this useful?" but "if this silently never runs, is the user still safe?"
 | `post-edit-format` | The formatting hook. Extensionless. Derived from the reference kit (MIT — see `NOTICE`). |
 | `superpowers-check` | The dependency warning hook. Extensionless. Warn-only by design (spec §5). |
 | `router-nudge` | The routing pointer hook. Extensionless. Once per session, .NET repositories only (0.3.27). |
+| `test-report-nudge` | The test-report instruction hook. Extensionless. Once per session, `dotnet test` Bash calls only (0.3.44). |
