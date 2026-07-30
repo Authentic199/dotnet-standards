@@ -177,6 +177,51 @@ ways to ask the same question and the service two things to reconcile.
 
 ### Bulk requests
 
+**Every request whose body is a list of ids derives from `RangeItemRequest<T>`**
+— a delete-range above all, but also any bulk action addressed at a set of
+records. The base lives in `Infrastructure/Facades/Common/Requests/`; if the
+project does not have it yet, recreate it exactly:
+
+```csharp
+// Infrastructure/Facades/Common/Requests/RangeItemRequest.cs
+public class RangeItemRequest<T>
+{
+    public ICollection<T>? Items { get; set; }
+}
+
+public class RangeGuidRequest : RangeItemRequest<Guid>
+{
+}
+
+public class RangeItemValidator<TEntity, TId> : AbstractValidator<RangeItemRequest<TId>>
+    where TEntity : BaseEntity<TId>
+{
+    public RangeItemValidator(IRepositoryWrapper repositoryWrapper, Expression<Func<TEntity, bool>>? filter = null)
+    {
+        RuleFor(x => x.Items)
+        .NotEmpty().WithMessage(Messages<TEntity>.Required(nameof(RangeItemRequest<TId>.Items)))
+        .NotDuplicate().WithMessage(Messages<TEntity>.Repeated(x => x.Id))
+        .Must(items => repositoryWrapper.IsExistByIds(items!, filter))
+        .WithMessage(Messages<TEntity>.NotFound());
+    }
+}
+
+public class RangeGuidValidator<TEntity> : RangeItemValidator<TEntity, Guid>
+    where TEntity : BaseEntity
+{
+    public RangeGuidValidator(IRepositoryWrapper repositoryWrapper, Expression<Func<TEntity, bool>>? filter = null)
+        : base(repositoryWrapper, filter)
+    {
+    }
+}
+```
+
+The collection property is **`Items`** — older trees carry an `Ids` property (or
+a legacy `DeleteRangeRequest<TId>` base); `Items` is the standard, and a bespoke
+`List<Guid>` property on a one-off request is drift, not a variant.
+
+A module then subclasses and validates in one `Include`:
+
 ```csharp
 public class DeleteRangeOrderRequest : RangeGuidRequest
 {
@@ -193,10 +238,8 @@ public class DeleteRangeOrderValidator : AbstractValidator<DeleteRangeOrderReque
 }
 ```
 
-`RangeGuidRequest` is `RangeItemRequest<Guid>` — one `Ids` collection.
-`RangeGuidValidator<TEntity>` derives from `RangeItemValidator<TEntity, Guid>`
-and checks, in a single `Include`, that `Ids` is non-empty, contains no
-duplicates, and that every id exists.
+`RangeGuidValidator<TEntity>` checks, in a single `Include`, that `Items` is
+non-empty, contains no duplicates, and that every id exists.
 
 **The optional filter expression is the ownership gate**, and it is the security
 boundary of every bulk endpoint. It is passed straight into the existence check,

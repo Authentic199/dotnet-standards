@@ -8,6 +8,25 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.43] — the id-list request base is `RangeItemRequest<T>` with `Items`, 2026-07-31
+
+**User ruling.** The canonical base for every id-list request (delete-range
+above all) is the class/property naming of the newest corpus tree —
+`RangeItemRequest<T>` with an `Items` collection — combined with the validator
+chain the older trees carry (`NotEmpty` + `NotDuplicate` + `IsExistByIds` with
+the optional ownership filter). Older variants (`Ids` property, legacy
+`DeleteRangeRequest<TId>` base) are named as drift.
+
+**Changed:** `api-surface/references/request-response-dtos.md` "Bulk requests"
+— the section now carries the full recreatable base implementation
+(request + `RangeItemValidator` + Guid convenience pair, property renamed
+`Items` throughout) and the rule that any request whose body is a list of ids
+derives from it; the module-level example is unchanged apart from the prose.
+`module-feature`'s families file needed no edit — it names no property and its
+hand-rolled-`List<Guid>` drift warning still stands.
+
+---
+
 ## [0.3.42] — MediatR anchors on the root Startup, not an invented marker, 2026-07-31
 
 **User ruling (reverses part of 0.3.16).** A consumer-repo report showed
