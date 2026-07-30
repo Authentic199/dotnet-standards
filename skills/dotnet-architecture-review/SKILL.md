@@ -339,6 +339,10 @@ Three calibrations settle the arguments this rubric actually gets:
 
 ## The report
 
+If this review produces a report, write it to a file under `docs/code-review/`
+in the reviewed repository (create the folder if absent) — the file, not the
+chat copy, is the deliverable.
+
 One report, the severity words as headings, always in this order. **Every section
 appears every time**; write `None.` when a section is empty, because an absent
 section is ambiguous between *checked, found nothing* and *did not check* — and in

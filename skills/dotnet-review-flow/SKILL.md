@@ -474,7 +474,7 @@ TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · Chunks <n> · NO-SIGNAL <attempted
 what the user chose, or "not entered"> · <cap hit? say so> · <commands the flow ran>
 ```
 
-Three rules for the report:
+Four rules for the report:
 
 1. **A green run reports the numbers.** "All clean" with no counts is
    indistinguishable from a suite that discovered nothing and a fleet that never
@@ -486,6 +486,10 @@ Three rules for the report:
 3. **Nothing a subagent learned is dropped.** The user paid for six fresh-context
    passes; a summary that keeps only the blockers throws away most of what was
    bought.
+4. **The report is written to a file, not only to the chat.** Write it to
+   `docs/code-review/<yyyy-MM-dd>-<scope-label>.md` inside the reviewed
+   repository, creating the folder if absent. The chat shows the same content;
+   the file is the durable copy.
 
 ## Standalone mode — the offer
 
