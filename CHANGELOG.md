@@ -8,6 +8,33 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.41] — a long command is waited for, not abandoned, 2026-07-30
+
+The feature-flow trial's fourth attempt ended mid-run, and this time the cause
+was the flow's own gap rather than the host: the session issued `dotnet ef
+migrations add`, found it slow on a cold tree, and **ended its turn intending to
+check back** — which in a non-interactive run ends the run, with a half-written
+migration in the tree.
+
+**Added:**
+
+- **`ef-core-data-access`, migrations workflow** — both EF CLI commands build the
+  solution first, so they take an explicit generous timeout, and a run abandoned
+  mid-command leaves a partial migration pair the next `add` builds on top of.
+- **`dotnet-feature-flow`, PHASE 3** — a long-running command (cold build, EF
+  migration, first container pull) is waited for with an explicit timeout and
+  never abandoned; ending a turn mid-command ends a non-interactive run. The two
+  tester agents have carried this rule since they shipped; the implement phase
+  never did.
+
+Recorded from the same trial, not a code change: **`/dotnet-feature` is a
+single-feature flow** — its own description says *idea to commit in one run* —
+so a trial asking one session for three features was testing a shape the flow
+does not claim. Features are chained one session each, and the trial harness
+now does that.
+
+---
+
 ## [0.3.40] — the generation side gets a conformance sweep, 2026-07-30
 
 The feature-flow trial finally ran far enough to grade: on 0.3.37 it built the

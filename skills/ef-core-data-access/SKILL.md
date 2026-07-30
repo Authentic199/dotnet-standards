@@ -169,6 +169,12 @@ dotnet ef migrations add <Name> -p src/Migrators/Migrators.PostgreSql -s src/Web
 dotnet ef database update -p src/Migrators/Migrators.PostgreSql -s src/Web -c ApplicationDbContext
 ```
 
+**Both commands build the solution first, so give them an explicit, generous
+timeout** — on a cold tree the build alone outruns a default one, and the
+command is then killed halfway through writing a migration. Wait for it rather
+than moving on: a run abandoned mid-command leaves a partial migration pair
+that the next `add` builds on top of.
+
 Deployed environments never run the CLI. With `SqlSettings.UseAutoMigration`
 set, startup asks `GetPendingMigrationsAsync` and applies anything outstanding
 with `MigrateAsync`; with the flag off it applies nothing and logs a warning.
