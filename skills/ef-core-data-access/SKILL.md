@@ -2,12 +2,13 @@
 name: ef-core-data-access
 description: >-
   This skill should be used when working the data layer of a .NET API:
-  querying or saving through IRepositoryWrapper and RepositoryBase,
+  querying or saving through IRepositoryWrapper/RepositoryBase,
   Find(isAsNoTracking:), ProjectTo, includes, pagination, SaveChangesAsync per
   operation, Begin/Commit/RollbackTransactionAsync, ApplicationDbContext,
   adding an entity or IEntityTypeConfiguration — BaseEntity,
-  HasBaseEntity, UnderscoreTable, HasCitextUnique, citext, OnDelete —
-  DatabaseSettings and connection strings, a migration under
+  HasBaseEntity, UnderscoreTable, HasCitextUnique, citext, OnDelete, soft
+  delete via ISoftDelete/IHidden, DeleteAt/HiddenAt, IgnoreGlobalQueryFilter —
+  DatabaseSettings, connection strings, a migration under
   Migrators.PostgreSql or Migrators.MySql, or DbInitializer seeding. Not for:
   services, validators, computed-value expressions — module-feature; file
   placement — facade-module-architecture; endpoints, DTOs — api-surface;
@@ -45,6 +46,10 @@ service received rather than letting it default, including on
 `BeginTransactionAsync`. The raw-SQL pair is the exception in both senses: the
 parameter array comes *first* and neither takes a token, so a call to it is a
 deliberate, reviewed choice.
+
+When `T` implements a soft-delete interface, the repository composes the stamp
+check into `Find`, `Count`, `CountAsync`, `Any` and `AnyAsync` before EF sees
+the query — see `## Soft delete`.
 
 ### Saving is the repository's job
 
@@ -339,3 +344,150 @@ inserted around it.
 Small fluent setters like `SetCustomer` that assign and `return this` are as
 far as entity behaviour goes here; anything that makes a decision belongs to
 domain-modeling.
+
+## Soft delete
+
+Some rows are marked as removed rather than actually deleted. Two interfaces
+carry the mark, and an entity opts in by implementing one or both:
+
+| Interface | Property | Means |
+|---|---|---|
+| `ISoftDelete` | `DateTimeOffset? DeleteAt` | Deleted. Nothing clears the stamp. |
+| `IHidden` | `DateTimeOffset? HiddenAt` | Withheld for now — set and cleared as a workflow moves. |
+
+They are independent axes. Reach for `ISoftDelete` when the row is gone but its
+history is still wanted, and for `IHidden` when concealment is a state the same
+workflow will reverse. Only hiding has a reversal, and it is written as a fluent
+setter on the entity rather than at a call site. Both stamps are nullable
+timestamps rather than booleans — null is live, a value is the flag and the
+moment at once.
+
+**`BaseEntity` carries neither stamp, and it never gains one.** Deletability is
+declared per entity, so an entity that is genuinely removable stays removable
+and no table pays for a column it does not use. That boundary belongs to
+facade-module-architecture (`references/core-contracts.md`); what follows is
+what an entity does once it opts in.
+
+**A project that soft-deletes at all recreates the canonical implementation** —
+four files under `Infrastructure.Facades.Common.SoftDeletes` plus the repository
+wiring that applies them. A `bool IsDeleted` on the entity, or an
+`x.DeleteAt == null` typed by hand at a call site, is the drift this pattern
+exists to remove: the first is unfilterable without touching every query, the
+second is correct exactly until the query someone forgets. Read
+`references/soft-deletes.md` and recreate the files from it when the project
+lacks them; do not write a local variant.
+
+### The filter belongs to the repository
+
+`Find`, `Count`, `CountAsync`, `Any` and `AnyAsync` each compose both stamps
+into the predicate before touching the `DbSet`, so every read is filtered
+whether or not its author thought about deletion:
+
+```csharp
+public virtual async Task<int> CountAsync(Expression<Func<T, bool>>? expression = default, CancellationToken cancellationToken = default)
+    => await dbContext.Set<T>().CountAsync(ApplySoftDelete(expression).HiddenObject(), cancellationToken);
+```
+
+Both helpers test `typeof(T)` against the interface and hand the predicate
+straight back when it does not implement it, so the wiring is written once in
+the generic base and costs nothing for entities that never opted in.
+`IRepositoryBase<T>` does not change — the signatures are identical and the
+filtering is invisible from the outside. `ExpressionExtension.Join` is what ANDs
+the stamp check onto the caller's predicate; `common-extensions` owns it.
+
+**The injected condition is an ordinary `Where`, not an EF query filter.** No
+`HasQueryFilter` is registered anywhere in this standard, so "global query
+filter" names this composed predicate and nothing else.
+
+> **Documentation-derived** — not corpus-verified. EF Core's own
+> `IgnoreQueryFilters()` clears filters registered through `HasQueryFilter`.
+> With none registered it has nothing to clear, so it is not the escape hatch
+> for this pattern and a call to it here changes nothing.
+
+**By-key and raw-SQL members sit outside the filter by construction.**
+`GetById`/`GetByIdAsync` go through `DbSet.Find`, and `FromSqlRaw` /
+`ExecuteSqlRawAsync` reach the database directly; none of them composes a
+predicate, so each returns marked rows. Reach for `Find(x => x.Id == id)`
+whenever the stamp has to be honoured.
+
+### Deleting is an update
+
+Stamp the entity, then save it the ordinary way. `DeleteAsync` still issues a
+real `Remove`, so it is not the delete path for a stamped entity:
+
+```csharp
+order.DeleteAt = DateTimeOffset.UtcNow;
+await repositoryWrapper.Repository<Order>().UpdateAsync(order, cancellationToken);
+```
+
+For a set, stamp each entity and call `UpdateRangeAsync` once; when the delete
+also touches rows other modules own, it belongs in the wrapper's transaction
+like any other multi-step mutation.
+
+Hiding is reversed through a fluent setter on the entity — `Hidden(bool enable)`
+assigning `HiddenAt = enable ? DateTimeOffset.UtcNow : null` and returning
+`this`, the `SetCustomer` shape above — so both directions live on the entity
+and neither is spelled out at a call site.
+
+### Reading past the filter
+
+`IgnoreGlobalQueryFilter(params Type[])` walks the query built so far and
+replaces every comparison on a property the named interface declares with
+`true`:
+
+```csharp
+Order? order = await repositoryWrapper.Repository<Order>()
+    .Find(x => x.Id == orderId)
+    .IgnoreGlobalQueryFilter(typeof(IHidden))
+    .Include(x => x.Lines)
+    .FirstOrDefaultAsync(cancellationToken);
+```
+
+**Compose it directly after `Find`, before includes and projections.** It
+rewrites the tree that exists at the moment it runs, so anything composed after
+it is untouched — and anything composed before it is fair game, including a
+condition on `DeleteAt` or `HiddenAt` you wrote yourself in the `Find`
+predicate: the rewrite matches the property, not who put it there. Pass the
+interface type, never the entity type, and name only the axis you need.
+
+Reaching for it is the deliberate, reviewed choice that raw SQL is, and the axis
+it is reached for is the hidden one — the ordinary reason to want a withheld row
+is to finish the workflow that withheld it. `typeof(ISoftDelete)` is the shape
+to argue about before writing: a deleted row is meant to stay gone.
+
+### Uniqueness must ignore deleted rows
+
+`ISoftDelete.SqlFilter` is a constant on the interface holding the predicate
+`"DeleteAt" is null`, so every partial index is written the same way:
+
+```csharp
+builder.HasBaseEntity().UnderscoreTable();
+
+builder.HasCitextUnique(x => x.Code, ISoftDelete.SqlFilter);
+
+builder.HasIndex(x => new { x.CustomerId, x.Number })
+    .IsUnique()
+    .HasFilter(ISoftDelete.SqlFilter);
+```
+
+Without the filter the unique index still counts deleted rows, so a code
+released by a delete can never be reused and the next attempt fails against a
+row nobody can see — a soft delete that is a hard one from the client's side.
+This is what `HasCitextUnique`'s optional filter parameter is for, and it
+applies to plain and composite indexes alike; keeping the SQL in one `const`
+means one place to check when the provider changes. `IHidden` has no such
+constant and no index excludes `HiddenAt`, because hiding is reversible and the
+value has to still be there when it comes back.
+
+### The filter covers the root set only
+
+It is built for `T` and joined onto the predicate over `T`, so it reaches no
+`Include`, no child collection aggregated inside a computed expression, and no
+navigation filtered by hand. Those write the stamp check themselves:
+
+```csharp
+.Include(x => x.Lines.Where(line => line.DeleteAt == null))
+
+public static Expression<Func<Order, long>> LineTotalExpr =>
+    src => src.Lines.Where(x => x.DeleteAt == null).Sum(x => x.Quantity);
+```

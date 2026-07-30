@@ -73,6 +73,7 @@ alone picks wrong. Match the question, not the word.
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature`; dispatching that envelope and the handler that receives it — `mediatr-messaging` |
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
 | a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
+| soft delete / hidden rows | the stamps, the repository filter and the escape hatch — `ef-core-data-access`; why `BaseEntity` carries no flag — `facade-module-architecture` |
 | placement / project references / the composition root | deciding where a file, project or registration goes — `facade-module-architecture`; checking whether what is already there conforms — `dotnet-architecture-review` |
 | a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature`; dispatching it and its handler — `mediatr-messaging` |
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
