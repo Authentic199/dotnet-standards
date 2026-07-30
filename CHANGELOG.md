@@ -58,6 +58,41 @@ outputs parse-checked.
 
 ---
 
+## [0.3.44] — the integration tier cannot be quietly narrowed to subcutaneous, 2026-07-31
+
+**Field failure, user-reported.** A consumer-repo session built 152 unit + 14
+"integration" tests where the integration tests were subcutaneous only — real
+components, service-layer calls, transport skipped — after rationalizing that
+the real host drags in heavy externals. The session's own security-relevant
+changes (authorization attributes, merged permission handlers, response-shape
+change, binding, status mapping, nested routes) were therefore never proven at
+the layer where they live. The tier definition named WebApplicationFactory, but
+nothing forbade counting the tier done without it.
+
+**Added (three files, six surgical edits):**
+- `dotnet-testing/SKILL.md` Core Principle 6: the integration tier is not
+  satisfiable without the factory host; subcutaneous is a complement, never a
+  substitute — counting one as the tier is scope-narrowing. Names the five
+  pipeline-only change classes (authorization attributes/permission handlers,
+  model binding, routing, exception-middleware status mapping, wire JSON shape)
+  for which a transport-skipping tier is INCOMPLETE, never green; routes an
+  unbootable host to the flows' `RED — environment` / *Not run* machinery. Plus
+  a read-trigger line and two Decision Guide rows.
+- `dotnet-testing/references/integration-testing.md`: the escape recipe as
+  imperative instructions — settings to the containers, the test auth scheme,
+  hosted services disabled (a new fixture bullet shows where) — try all three
+  before concluding the host cannot boot; then report blocked, never narrow.
+- `agents/dotnet-integration-tester.md`: the one-line mirror of the rule, and
+  the rationalization table's **first observed-in-the-field row** ("the real
+  host drags in heavy externals → the service-layer tests are the tier") — all
+  prior rows were predicted; this one is baselined from a real run.
+
+**Flagged, not changed:** the skill description lacks the noun "subcutaneous";
+the observed failure happened with the taxonomy already loaded, so triggering
+was not the defect — candidate insertion parked in the hardening report.
+
+---
+
 ## [0.3.43] — the id-list request base is `RangeItemRequest<T>` with `Items`, 2026-07-31
 
 **User ruling.** The canonical base for every id-list request (delete-range
