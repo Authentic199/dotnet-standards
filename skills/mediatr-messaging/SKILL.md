@@ -202,27 +202,25 @@ plain `Task Handle`.
 
 ### Registering handlers: the `AddMediatR` call
 
-One call, at the composition root, scanning the assembly that holds the handlers:
+One call, in the root `Infrastructure/Startup.cs` — the composition root the
+architecture already prescribes — scanning its own assembly:
 
 ```csharp
+// Infrastructure/Startup.cs
 services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssemblyContaining<MessagingAssemblyMarker>());
+    cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly));
 ```
 
-```csharp
-// Infrastructure/MessagingAssemblyMarker.cs
-namespace Infrastructure;
+**Do not invent a dedicated marker type as the anchor** — the root `Startup`
+class is the anchor. The call is safe precisely because of where it lives:
+written inside `Infrastructure/Startup.cs`, `typeof(Startup)` binds to the
+containing class, and no `using` directive can rebind it. Two hazards this
+placement guards:
 
-// Anchors assembly scanning. Deliberately empty; do not add members.
-internal sealed class MessagingAssemblyMarker;
-```
-
-Prefer this over `typeof(SomeClass).Assembly`, for two reasons:
-
-- **A class name you reach for is rarely unique.** `Startup` is declared dozens
-  of times across facades and modules of one assembly, so `typeof(Startup)` binds
-  through whatever `using` directives are in the file — and when it later binds
-  elsewhere, nothing fails loudly.
+- **`Startup` is unique nowhere else.** The name is declared dozens of times
+  across the facades and modules of one assembly, so an anchor written in any
+  other file binds through whatever `using` directives that file carries — and
+  when it later binds elsewhere, nothing fails loudly.
 - **A missing handler is silent, not loud.** Scanning the wrong assembly produces
   no startup error; a notification with zero handlers is legal and no-ops. The
   symptom surfaces later as work that never happened.
