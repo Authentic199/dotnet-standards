@@ -562,12 +562,17 @@ while nothing at all is enforced. Delete it, or write the rule it promised.
 
 **5.16 A hand-rolled rule the facade already ships** — *MEDIUM* ·
 `module-feature`, *The facade's rule helpers come first*
-`Find:` two commands, both required — the second is how you learn what the
-facade already ships, and skipping it turns this check into a silent pass:
-1. `grep -rn --include=*Validator*.cs "\.Matches(\|\.Must(" src/`
-2. `grep -rln "static.*IRuleBuilder" src/Infrastructure/Facades/` — the
-   facade's validator-extension file, wherever it sits. Open it and read
-   every method name before grading a single hit from step 1.
+`Find:` **one grep decides the finding** — `grep -rn "\.Matches(" src/` — plus
+the same sweep for `.Must(` chains that test a string's shape rather than
+querying the database.
+**A regex literal inside a module validator is the finding, on its own.**
+Character-class and format rules live in the facade's validator extensions so
+one definition serves every module; a pattern written at a call site is a
+second definition by construction. Raise it from the grep alone — do **not**
+make the finding conditional on first reading the facade's extension file,
+because that lookup is the step reviewers skip, and skipping it has silently
+turned this check into a pass. Name the fix by what you find afterwards: an
+existing helper if there is one, a new facade helper if there is not.
 A regex or predicate re-deriving a helper is a second definition of one rule,
 and the copies drift the day the rule changes. When the helper itself is wrong
 the order is fixed — warn, fix on approval, then migrate call sites — never
@@ -582,23 +587,28 @@ needs. Burying it under other members makes every reader scroll for the one
 declaration that explains the class.
 
 **5.18 An undocumented property on a contract type** — *MEDIUM* · `api-surface`
-`Find:` for each added or changed request, response and entity, check every
-public property for an XML `<summary>`.
+`Find:` `grep -rLn "<summary>" src/Infrastructure/Modules/*/Entities/*.cs
+src/Infrastructure/Modules/*/Requests/ src/Infrastructure/Modules/*/Responses/ -r`
+— **`-L` lists the files that do NOT contain the pattern**, which is the list
+you want; a file with one `<summary>` still needs every property checked by
+eye, so open the hits from a plain `grep -rc "<summary>"` that come back low.
 `IncludeXmlComments` publishes property docs into the OpenAPI schema exactly
 as it publishes operation docs; a bare property ships an undocumented field
 whose meaning every client guesses from the name.
 
 **5.19 An `Ignore` for a member nothing would map** — *MEDIUM* ·
 `automapper-mapping`
-`Find:` three steps, in order — do not skip step 2, it decides the grade:
-1. `grep -rn --include=*.cs "Ignore()" src/` for the mapping profiles.
-2. `grep -rn "AssertConfigurationIsValid" tests/ src/` — **source files only,
-   never a `bin/`or `obj/` hit, which is the AutoMapper DLL and proves
-   nothing.** A hit means every destination member must be mapped or ignored,
-   so **every `Ignore` is load-bearing and none of them is a finding** — say
-   so and stop. No hit: continue.
-3. For each `Ignore`d destination member, open the source type and check
-   whether it declares a member of that name.
+`Find:` two greps, no file-by-file reading:
+1. `grep -rn "AssertConfigurationIsValid" tests/ src/ --include=*.cs` —
+   **source files only; a `bin/` or `obj/` hit is the AutoMapper DLL and
+   proves nothing.** A hit means every destination member must be mapped or
+   ignored, so **every `Ignore` is load-bearing, none of them is a finding** —
+   record that under *Check coverage* and stop. No hit: continue.
+2. `grep -rn "Ignore())" src/ | grep -i "CreatedBy\|UpdatedBy\|CreatedAt\|UpdatedAt\|DeletedAt\|\.Id,"`
+   on the request-to-entity maps. **These members are never on a request**, so
+   every hit is a redundant line — that is the finding, straight from the grep.
+   Widen by eye to navigation properties (`opt.Ignore()` on a member whose type
+   is another entity) only after writing up the certain ones.
 
 A destination member the source type does not declare is **never written by
 AutoMapper, with or without the `Ignore`** — the mapper only copies members it
@@ -609,6 +619,16 @@ the `Ignore`s which do record a deliberate second writer.
 or a navigation the request never had prevents no mass assignment — the
 request type not declaring the member is what prevents it. Do not credit these
 lines as a safety measure, and do not report their absence as an exposure.
+
+**5.20 A type closing the generic base by hand** — *MEDIUM* ·
+`ef-core-data-access` + `api-surface`
+`Find:` `grep -rn "BaseEntity<Guid>" src/`
+The closed `BaseEntity` already **is** `BaseEntity<Guid>`, and it exists so no
+deriving type re-picks the key type. Writing the generic form where the key is
+a `Guid` is the defect wherever the type lives — an entity, a response, any
+DTO in the family — and it is not excused by other types in the tree already
+doing it. **A pre-existing count is context for the fix's size, never a reason
+to withhold the finding**; say how many sites the grep returned.
 
 ## 6. Tests
 
