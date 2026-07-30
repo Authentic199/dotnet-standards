@@ -7,8 +7,12 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.34 (21 skills + 2 commands + 6 agents + 3 hooks)** as of
-2026-07-29. The board header sat at 0.3.21 for four releases, then at 0.3.25
+Shipped through **v0.3.44 (21 skills + 2 commands + 6 agents + 4 hooks)** as of
+2026-07-31 — 0.3.35–0.3.43 were maintenance/ruling releases (see CHANGELOG);
+0.3.44 added the fourth hook, `test-report-nudge` (the parked
+`dotnet-test-report` roadmap row, redesigned: nudges the model to write a
+human-readable `test-report.md` instead of shell-parsing TRX; format
+user-approved 2026-07-31). The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
 to read "23 skills"; `skills/` holds **21**. The 23 comes from `claude plugin
@@ -114,8 +118,13 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   0.3.13 + `next-session-prompt-A.md` Lane log.
 - [C, 2026-07-27] `observability`, `background-worker`, `http-resilience` —
   user-PENDING since S14 — unblocked only by user direction.
-- [roadmap, 2026-07-27] `dotnet-test-report` hook (Group B, post-rubrics) and
-  the architecture-tests roadmap row — detail in `docs/03-session-roadmap.md`.
+- [roadmap, 2026-07-27 → hook CLOSED 2026-07-31] `dotnet-test-report` hook
+  (Group B, post-rubrics) — **SHIPPED at 0.3.44 as `hooks/test-report-nudge`**,
+  redesigned by user direction: no shell parsing, the hook nudges the model to
+  keep a plain-language `test-report.md` current (format + overwrite behaviour
+  user-approved; R5 five-item check in CHANGELOG 0.3.44). The
+  architecture-tests roadmap row remains open — detail in
+  `docs/03-session-roadmap.md`.
 - [C, 2026-07-28] `api-surface` reciprocal `Not for:` route to
   `automapper-mapping` (its description claims "colocated validator and
   mapping profile" but routes nothing back) — detail in CHANGELOG 0.3.12

@@ -8,6 +8,56 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.44] — `test-report-nudge`: a human-readable test report after `dotnet test`, 2026-07-31
+
+**The parked `dotnet-test-report` hook (PENDING log / roadmap row added at
+S15's close) shipped, redesigned per the user's 2026-07-31 direction.** The
+roadmap sketch said "parses TRX/console output"; the user's actual requirement
+— a persistent report **a human reads**, one plain-language line per test case
+("tên user không vượt quá 200 ký tự — PASS"), short, no filler — is exactly
+what a shell parser cannot produce and the model can. So the hook follows the
+`router-nudge` precedent instead of the kit's `post-test-analyze.sh`: it
+parses nothing and nudges the model.
+
+**Added: `hooks/test-report-nudge`** — `PostToolUse`, matcher `Bash`. Gate 1:
+`.tool_input.command` contains a `dotnet test` invocation (jq, sed fallback;
+extraction failure falls back to matching the raw payload — over-firing is the
+benign direction). Gate 2: once per session (session-keyed marker under
+`${TMPDIR:-/tmp}/dotnet-standards/`, 7-day sweep — router-nudge's mechanism).
+Emits one standing `additionalContext` instruction: whenever a test run
+settles (not between red-green iterations), write `test-report.md` at the
+repository root, **overwriting** the previous version — date/time, command,
+pass/fail/skip totals, one section per test class, one plain-language line per
+test case with PASS/FAIL and a one-line reason on FAIL, in the language the
+user is conversing in.
+
+**User approvals (2026-07-31):** the report format sample and the
+overwrite-not-append behaviour were both shown and approved before the build,
+per the standing report-rule ruling (2026-07-28). The wording inside the emit
+is a report rule; changing it needs approval.
+
+**R5 conflict check (Group B, all five):** (1) hook events — Superpowers
+registers only `SessionStart`; no other plugin here registers `PostToolUse`
+`Bash`; (2) no slash-command name; (3) no skill name; (4) instructions — does
+not contradict brainstorm → plan → TDD → review: the emit explicitly defers to
+the red-green loop and asks for the report only when a run settles; (5) no
+agent name.
+
+**Changed:** `hooks/hooks.json` (second `PostToolUse` entry, matcher `Bash`);
+`hooks/README.md` (four hooks now; new section; the `post-test-analyze`
+refusal row carries both verdicts and what changed between them — the S6
+reason was never falsified, the deliverable changed); roadmap row and PENDING
+log entry closed.
+
+**Verified pre-ship:** six-payload gate matrix by hand (non-test command
+silent; `dotnet test` emits; same-session repeat silent; `dotnet test`
+appearing only in `tool_response.stdout` silent — the sed extraction isolates
+the command field; `dotnet.exe test` emits; missing `session_id` silent), plus
+an end-to-end run through `run-hook.cmd` under `cmd.exe` with both JSON
+outputs parse-checked.
+
+---
+
 ## [0.3.43] — the id-list request base is `RangeItemRequest<T>` with `Items`, 2026-07-31
 
 **User ruling.** The canonical base for every id-list request (delete-range
