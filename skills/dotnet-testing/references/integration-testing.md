@@ -108,11 +108,28 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 - **A Redis container is added the same way, and only when the path under test
   touches the cache.** Every container is start-up time paid by every run of the
   suite, including the runs that never use it.
+- **Disable the hosted services the tests do not exercise.** In
+  `ConfigureTestServices`, remove the background-worker and job-scheduler
+  registrations — remove each `IHostedService` registration by its
+  implementation type, or turn each off through the same settings keys the
+  application reads. A worker polling a broker or a job store is start-up cost
+  and noise every run pays for and no HTTP test asserts.
 
 `WebApplicationFactory<Program>` needs `Program` to be a nameable type, so the
 host project's `Program.cs` ends with the sentinel `public partial class Program
 { }`. (An `[assembly: InternalsVisibleTo]` on the host works too, but it is
 invisible at the call site; prefer the sentinel.)
+
+A host that appears to drag in heavy externals — a message-broker worker, job
+storage, a cache, a search index, blob storage — is booted with exactly three
+moves, in this order: point the settings at the containers, swap the
+authentication scheme for the test handler, and disable the hosted services the
+tests do not exercise. Try all three before concluding the host cannot boot;
+disable nothing beyond the hosted services until a boot attempt has failed and
+named the service that failed it. If the host still cannot boot, report the tier
+blocked — the flows' `RED — environment` and *Not run* machinery exists for
+exactly this — and never narrow the tier to service-layer tests and call it done
+(Principle 6 in the skill body).
 
 ## Sharing containers and resetting state
 

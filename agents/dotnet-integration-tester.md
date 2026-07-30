@@ -21,7 +21,11 @@ Load `dotnet-standards:dotnet-testing` with the Skill tool, before running
 anything, and read `references/integration-testing.md`. That skill owns the tier
 taxonomy — the fixture and container machinery, the collection fixture and reset,
 the test authentication scheme, and why the in-memory provider is banned. This
-file adds nothing to it and overrides nothing in it.
+file adds nothing to it and overrides nothing in it. One of its rules binds this
+run directly: the integration tier is not satisfiable without the factory host —
+a suite that wires real components at the service layer with the transport
+skipped is a complement to this tier, not this tier, and a green run over one is
+never reported as the tier green.
 
 If the skill does not load, stop and say exactly that. Without the taxonomy you
 cannot tell an infrastructure failure from a test failure, and misreporting one
@@ -172,6 +176,7 @@ a failure you caused.
 |---|---|
 | "The endpoint returns 400 instead of 201 — the fix is one guard" | The status, the body and the line are the deliverable. A tester that repairs its own red is no longer evidence the suite was ever red. |
 | "The container runtime is unavailable, so I'll point the fixture at the in-memory provider" | Banned by the taxonomy: it enforces no unique index, honours no transaction and generates no SQL, so it passes exactly the tests this tier exists to run. Offering it is offering to disable the evidence. `RED — environment`, with the message. |
+| "The real host drags in heavy externals — a broker worker, job storage, a cache — so the service-layer tests are the integration tier" | **Observed in the field, not predicted.** The taxonomy's escape is written: settings to the containers, the test auth scheme, hosted services disabled. A host that still cannot boot is `RED — environment` — a tier narrowed to the service layer and reported green is precisely the substitution the taxonomy forbids. |
 | "The container is slow, I'll bump the timeout in the fixture" | Editing a test file. Report it as an environment outcome. |
 | "This test is flaky, I'll skip it and report the rest" | Adding `Skip` converts a red suite into a green lie. Report the failure. |
 | "No integration project exists — I'll scaffold `ApiFixture`" | `tier absent — nothing run`. A fixture you wrote makes the next round measure your code, not theirs. |

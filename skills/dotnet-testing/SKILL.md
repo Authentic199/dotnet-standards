@@ -74,6 +74,25 @@ lives in `superpowers:test-driven-development`.
    the developer's git email address to a remote service, and a package with that
    history stays flagged in dependency review regardless of later removal.
 
+6. **The integration tier is not satisfiable without the factory host.** A suite
+   of subcutaneous tests — real components wired together, called at the service
+   layer, transport skipped — is a legitimate *complement*, never a substitute:
+   counting one as the integration tier is scope-narrowing, not completion. Five
+   change classes live only in the ASP.NET pipeline and cannot be proven
+   subcutaneously: authorization attributes and permission handlers, model
+   binding (`[FromBody]`/`[FromQuery]`), routing and route templates,
+   exception-middleware status-code mapping, and response serialization shape —
+   what the wire JSON actually contains, and leaks. For a change in any of these
+   classes, a tier that skipped the transport is INCOMPLETE and is reported as
+   such, never green. "The real host drags in heavy externals" is a solved
+   problem, not a dead end — `references/integration-testing.md` gives the
+   escape: point the settings at the containers, swap in the test authentication
+   scheme, disable the hosted services the tests do not exercise. If the host
+   genuinely cannot boot after that, the honest verdict is a blocked tier,
+   reported through the flows' existing not-run machinery (`RED — environment`,
+   *Not run*) — never a tier quietly narrowed to the service layer and reported
+   done.
+
 ## Patterns
 
 The patterns live in two files, split by tier — a unit test and an integration
@@ -90,8 +109,8 @@ returned by `Find` throws on `FirstOrDefaultAsync`.
 `ApiFixture`, starting a container, wiring Respawn or the collection fixture,
 getting a test request past authentication, deciding which body shape a response
 carries, seeding or reading state through the host, writing a flow test that
-walks a lifecycle or crosses a module boundary, or adding packages to either test
-project.
+walks a lifecycle or crosses a module boundary, deciding what to do when the real
+host seems too heavy to boot, or adding packages to either test project.
 
 ## Anti-patterns
 
@@ -230,3 +249,5 @@ guarantee something it does not.
 | A third-party HTTP dependency | An `HttpMessageHandler` stub on the typed client |
 | Arranging state for an integration test | `SeedAsync` through the host's own scope — never by calling another endpoint |
 | Snapshot testing a response | **Not used in this stack.** Responses are a versionless DTO ladder, so additive properties — the normal change here — would churn every snapshot |
+| An authorization attribute, model binding, a route template, exception status mapping, or the response JSON shape changed | Integration test through the fixture — these live only in the pipeline, and a service-layer test cannot prove them (Principle 6) |
+| The real host looks too heavy to boot for the fixture | The escape in `references/integration-testing.md`: settings to the containers, the test auth scheme, hosted services disabled. Still will not boot → a blocked tier, reported not-run — never narrowed to service-layer tests |
