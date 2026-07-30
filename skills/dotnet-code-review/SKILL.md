@@ -141,6 +141,13 @@ order. **Every section appears every time**; write `None.` when a section is
 empty. An absent section is ambiguous between *checked, found nothing* and *did
 not check*, and a report whose shape varies cannot be compared with the last one.
 
+**`Check coverage` is the section that keeps the rest honest.** The three sibling
+rubrics each carry one — *Audit*, *Layer*, *Area* coverage — and this one is
+theirs: it names the check numbers that ran. Fill it from the checks you
+actually executed, not from the areas you meant to cover; a check silently
+skipped because it needed a second file opened is the single most common way a
+long rubric ships a clean-looking report over an unexamined defect.
+
 ```markdown
 ## Code review: <scope>
 
@@ -159,6 +166,12 @@ not check*, and a report whose shape varies cannot be compared with the last one
 
 ### INFO
 - **<title>** — `<file>:<line>` …
+
+### Check coverage
+<one row per rubric area: the area, the check numbers you actually ran, and any
+check number you skipped with the reason — `1: 1.1-1.10, all run`, `5: 5.1-5.19,
+5.9 not applicable (no partial classes touched)`. A check that cost more effort
+than the others is exactly the one that goes missing here.>
 
 ### Architecture compliance
 PASS / FAIL — <placement and dependency direction; deep dive: dotnet-architecture-review>

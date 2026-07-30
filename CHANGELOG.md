@@ -8,6 +8,52 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.37] — round-3 readout: the effortful checks are the ones that vanish, 2026-07-30
+
+Round 3 (Sonnet, 0.3.36) **passed the two criteria round 2 failed** — the split
+test fired on a module folder whose only entity names something else, correctly
+proposing `Modules/DeviceTypes/`, and the two-module controller was sent to the
+right destination this time (a suffix partial of the parent's controller, not a
+rename to the child). It also kept every beyond-rule catch: the FluentValidation
+`.When()` composition bug, the unauthenticated controller family, the reachable
+package advisory, the missing indexes.
+
+But four criteria still missed, and **two of them are regressions** — property
+XML documentation (5.18) and the hand-closed generic base were both reported in
+earlier rounds and absent here. Reading the four together gives the shape: 5.16
+required opening the facade's extension file first, 5.19 required opening each
+source type, 5.18 said "check every public property" with no command at all, and
+the base-class rule had no check number of its own. **The checks that vanish are
+the ones that cost a second lookup**, and a rubric that has grown to nineteen
+checks in one area gives a mid-tier model room to lose them quietly.
+
+**Fixed — every change makes a check cheaper or its absence visible:**
+
+- **The code rubric gains a `Check coverage` section**, the one thing its three
+  sibling rubrics all had and it did not (*Audit*, *Layer* and *Area coverage*).
+  One row per area, naming the check numbers actually run and any skipped with
+  the reason. A silently skipped check now has to be written down or the report
+  is malformed.
+- **5.16 raises the finding from one grep.** A regex literal inside a module
+  validator is the finding on its own — the facade lookup that reviewers kept
+  skipping now names the *fix*, not the *finding*, so skipping it can no longer
+  turn the check into a pass.
+- **5.19 is two greps and no file-by-file reading.** Step 1 is the
+  `AssertConfigurationIsValid` probe that closes the check when the
+  configuration test exists; step 2 greps the `Ignore`s for member names a
+  request never carries (`CreatedBy`, `UpdatedAt`, `DeletedAt`, `Id`…), so the
+  certain hits come straight out of the grep.
+- **5.18 gains a command** — `grep -rL "<summary>"` to list the files that lack
+  it — replacing "check every public property", which is an instruction to do
+  unbounded manual work and therefore an instruction to skip.
+- **New check 5.20** — `grep -rn "BaseEntity<Guid>" src/`. The rule existed as
+  doctrine in two knowledge skills and as no check anywhere, which is why it
+  fired in two rounds and not the third. It also states outright that a
+  pre-existing count sizes the fix and never withholds the finding: round 2 had
+  named it and then excused it as an established convention.
+
+---
+
 ## [0.3.36] — the generation side never loaded the knowledge layer, 2026-07-29
 
 The second trial loop — `/dotnet-feature` building three features from scratch
