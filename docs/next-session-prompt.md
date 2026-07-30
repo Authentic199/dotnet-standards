@@ -19,7 +19,11 @@ to read "23 skills"; `skills/` holds **21**. The 23 comes from `claude plugin
 details`, whose inventory line lists the two commands (`dotnet-feature`,
 `dotnet-review`) among the skills. Say which number you mean, and **expect 23
 from `details`** at prove-it time — a session comparing it against 21 will think
-the install failed.
+the install failed. **Same trap for hooks since 0.3.44: `details` prints
+`Hooks (3)` because it counts EVENTS** (SessionStart, UserPromptSubmit,
+PostToolUse) — the PostToolUse event carries two scripts (`post-edit-format`,
+`test-report-nudge`), so 4 scripts ship; the script list in the cache's
+`hooks/` dir is the number to verify.
 Earlier: 0.3.21 = process-integration v1, Lane D session D1:
 `dotnet-feature-flow`, `dotnet-review-flow`, `/dotnet-feature`,
 `/dotnet-review`, six specialist agents, SessionStart `superpowers-check`,
