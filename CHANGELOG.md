@@ -8,6 +8,38 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.38] — round-4 readout: 14 of 15, and the section that never shipped, 2026-07-30
+
+Round 4 (Sonnet, 0.3.37) caught **fourteen of the fifteen held-back criteria**,
+including all four the 0.3.37 fixes targeted, each on its first outing: the
+hand-rolled regex duplicated across two modules (5.16), the redundant audit-field
+`Ignore`s (5.19), the undocumented contract properties (5.18), and the responses
+re-closing the generic base by hand (5.20). Both hard architecture criteria held
+from round 3 and landed at HIGH with verified evidence — the two-module
+controller identified by reading its route templates (*every action opens with
+the parent's `eventId`*, and a full CRUD surface does not change that), and the
+module folder named for a concept it does not implement, confirmed with a
+solution-wide `find` for the entity that does not exist.
+
+**Fixed:**
+
+- **`Check coverage` never reached a report.** 0.3.37 added the section to the
+  rubric's template, but `agents/dotnet-code-reviewer.md` enumerates the report
+  sections in its own sentence and that list is what the agent follows — it
+  still said *Summary, CRITICAL, HIGH, MEDIUM, INFO, Architecture compliance,
+  Test coverage, Cleanup candidates, What's Good*. The section is now in the
+  agent's enumeration too. A template and an agent that disagree resolve in
+  favour of the agent, silently.
+- **5.17 was the last check still asking for unbounded reading**, and it is the
+  one criterion round 4 missed — after round 3 had caught it, so it is variance
+  a command removes. *Read each class top-to-bottom* became two line-numbered
+  greps and a comparison: `grep -n "static "` against `grep -n "public
+  <TypeName>("`, and any static line number below the constructor's is the
+  finding. This completes the sweep 0.3.37 started; no check in area 5 now asks
+  for judgement where a command will do.
+
+---
+
 ## [0.3.37] — round-3 readout: the effortful checks are the ones that vanish, 2026-07-30
 
 Round 3 (Sonnet, 0.3.36) **passed the two criteria round 2 failed** — the split

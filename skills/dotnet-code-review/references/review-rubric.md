@@ -579,9 +579,14 @@ the order is fixed — warn, fix on approval, then migrate call sites — never
 silently adopt a broken helper.
 
 **5.17 A member above the constructor** — *MEDIUM* · `module-feature`
-`Find:` read each added or changed class top-to-bottom: fields, the
-constructor, then members. A static member may precede the non-private
-methods; it never precedes the constructor.
+`Find:` two line-numbered greps per changed class file, then compare the
+numbers — no reading the file top-to-bottom, which is the instruction
+reviewers skip:
+1. `grep -n "static " <file>` — the static members' line numbers.
+2. `grep -n "public <TypeName>(" <file>` — the constructor's line number.
+**Any static line number smaller than the constructor's is the finding.** A
+static member may precede the non-private methods; it never precedes the
+constructor.
 The constructor is the type's signature — its parameters say what the type
 needs. Burying it under other members makes every reader scroll for the one
 declaration that explains the class.
