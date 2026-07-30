@@ -223,6 +223,13 @@ means *you* are the implementer, so *you* load the skills the plan named before
 writing the first test — the route changes who implements, never whether the
 conventions are read.
 
+**A long-running command is waited for, never abandoned.** A cold-tree build,
+`dotnet ef migrations add`, a first container pull: each outruns a default
+timeout, so pass an explicit generous one and stay with the command until it
+returns. Ending a turn mid-command — "this is slow, I will check back" — ends
+the run in a non-interactive session and leaves the tree half-written, which
+costs more than the wait ever did.
+
 Two rules survive both routes:
 
 - **The plan is the contract.** A task that turns out to need a different approach
