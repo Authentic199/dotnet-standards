@@ -136,6 +136,10 @@ than merge blockers, and below them is where taste lives.
 
 ## The report
 
+If this review produces a report, write it to a file under `docs/code-review/`
+in the reviewed repository (create the folder if absent) — the file, not the
+chat copy, is the deliverable.
+
 One report, the severity words from the ladder as its headings, always in this
 order. **Every section appears every time**; write `None.` when a section is
 empty. An absent section is ambiguous between *checked, found nothing* and *did

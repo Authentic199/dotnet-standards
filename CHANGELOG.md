@@ -8,6 +8,34 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.46] — review reports become files; the NuGet rule gains its exception; R25, 2026-07-31
+
+Three user rulings from the same conversation, wordings shown before editing:
+
+**Review reports are files.** `dotnet-review-flow`'s "Three rules for the
+report" became four: the report is written to
+`docs/code-review/<yyyy-MM-dd>-<scope-label>.md` inside the reviewed
+repository (folder created if absent) — the chat copy is not the deliverable.
+Each of the four review rubric skills (`dotnet-code-review`,
+`dotnet-architecture-review`, `dotnet-security-review`,
+`dotnet-performance-review`) carries the standalone one-sentence form under its
+`## The report` heading.
+
+**R16 exception (claude-md-builder).** The no-new-NuGet rule was over-tight:
+when a house pattern or skill the project follows requires a specific library
+and the project lacks it, adding that library is permitted — named with the
+pattern it serves, no approval stall.
+
+**R25 (claude-md-builder, new).** The lookup-first law over
+`Infrastructure/Facades/Common/` — reuse an existing extension; promote
+reusable logic to a new extension there; inline only the genuinely one-off;
+recreate a missing house extension from its canonical form instead of inlining
+a bespoke copy. Applies when the scan found `Infrastructure/Facades/Common/`;
+noted as R24's search-first move with the address filled in. Catalogue now
+holds 23 rules; no count enumeration existed to go stale.
+
+---
+
 ## [0.3.45] — the integration tier cannot be quietly narrowed to subcutaneous, 2026-07-31
 
 **Renumbered at merge time from 0.3.44** — a parallel session shipped

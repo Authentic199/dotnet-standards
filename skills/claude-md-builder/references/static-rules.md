@@ -145,9 +145,10 @@ not the scan can detect Superpowers in the repository.
 *Prevents:* a self-started commit that skips review, or a push that cannot be
 taken back.
 
-**R16** — `Do not add a new NuGet package without first explaining why the packages already referenced cannot do the job.`
+**R16** — `Do not add a new NuGet package without first explaining why the packages already referenced cannot do the job. Exception: when a house pattern or skill this project follows requires a specific library and the project lacks it, add that library — name the pattern it serves in the same message; do not stall the task waiting for approval.`
 *Prevents:* dependencies accumulating by convenience, widening the security and
-licensing surface.
+licensing surface — without the over-tight reading that stalls a house pattern
+because its named library is missing (user ruling, 2026-07-31).
 
 **R17** — `Do not refactor code outside the scope of the current task. Note improvements you spot; act on them only when explicitly asked.`
 *Prevents:* a diff that outgrows its task and can no longer be reviewed.
@@ -180,3 +181,10 @@ line carries the constraint instead of a skill.
 *Note:* R17 bounds the diff outward — do not touch what the task did not name.
 This one bounds it inward — do not inflate what it did. R16 is the same
 search-first move at package scale.
+
+**R25** — `Before writing a helper yourself, look in Infrastructure/Facades/Common/ — Common/Extensions/ first: reuse what is there; if the logic is reusable and no extension exists, add it there as an extension so other modules can call it; write inline code only when it is genuinely one-off. If a house extension this situation calls for is missing from this project, recreate it in Common/Extensions/ from its canonical form instead of inlining a bespoke copy.`
+**Applies when** the scan found `Infrastructure/Facades/Common/`.
+*Prevents:* the accumulated extension layer being bypassed — the same utility
+rewritten per module; regexes and serializer settings scattered instead of
+centralized.
+*Note:* R24's search-first move, with the address filled in.
