@@ -579,13 +579,18 @@ the order is fixed — warn, fix on approval, then migrate call sites — never
 silently adopt a broken helper.
 
 **5.17 A member above the constructor** — *MEDIUM* · `module-feature`
-`Find:` two line-numbered greps per changed class file, then compare the
-numbers — no reading the file top-to-bottom, which is the instruction
-reviewers skip:
-1. `grep -n "static " <file>` — the static members' line numbers.
-2. `grep -n "public <TypeName>(" <file>` — the constructor's line number.
-**Any static line number smaller than the constructor's is the finding.** A
-static member may precede the non-private methods; it never precedes the
+`Find:` **one repo-wide grep, then a second grep on only the files it named** —
+never a per-file sweep of the whole scope, which is unbounded work and
+therefore work that gets skipped:
+1. `grep -rn --include=*.cs "static " src/Infrastructure/Modules/*/Services/ src/Web/Controllers/`
+   — static members are rare in these types, so this returns a handful of
+   files, and files absent from it cannot hold this defect.
+2. For **each file that grep named**, one more:
+   `grep -n "public <TypeName>(" <file>` — the constructor's line.
+3. **Static line number below the constructor's line number is the finding.**
+   No file reading, no judgement: compare two integers.
+
+A static member may precede the non-private methods; it never precedes the
 constructor.
 The constructor is the type's signature — its parameters say what the type
 needs. Burying it under other members makes every reader scroll for the one
