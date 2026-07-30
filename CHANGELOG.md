@@ -8,6 +8,36 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.40] — the generation side gets a conformance sweep, 2026-07-30
+
+The feature-flow trial finally ran far enough to grade: on 0.3.37 it built the
+Events capability end to end, took it through a review round, applied the
+confirmed fixes and reverted its own out-of-scope ones — then the print-mode
+session hit its 600-second wait ceiling mid-way through review round two.
+
+Measured against the five rule violations the 0.3.34 attempt produced, **0.3.36's
+load-the-knowledge-layer fix repaired two**: enum members now start at 1, and
+validator messages use `Messages<TRequest>.X(x => x.Prop)` instead of the
+superseded extension form. **Three survived** — an enum declared inside its
+entity file, a `Global`-prefixed validation type, and `IsRequired()` on
+non-nullable properties (now joined by `HasMaxLength`). All three are decisions
+taken in the first minute of creating a file, and all three sit in bodies the
+task prompt named.
+
+**Added — PHASE 3's conformance sweep.** Before the testers and reviewers are
+spawned, the session runs eight commands over the files the phase created and
+fixes every hit. Each command is `dotnet-code-review`'s own — cited by check
+number, adding no rule here — chosen because each of these defects has now
+shipped from a task whose prompt named the owning skill: they are invisible to a
+passing test suite and cost a full review round each when a lens finds them
+instead. A deliberate hit is stated in the report rather than left silent.
+
+This is the generation-side counterpart of the lesson the review side has been
+teaching all trial: a rule fires when it is a command, not when it is a
+pointer.
+
+---
+
 ## [0.3.39] — round-5 readout: the last check that asked for unbounded work, 2026-07-30
 
 Round 5 (Sonnet, 0.3.38) scored **14 of 15 again, and missed the same single
