@@ -8,6 +8,27 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.42] — MediatR anchors on the root Startup, not an invented marker, 2026-07-31
+
+**User ruling (reverses part of 0.3.16).** A consumer-repo report showed
+`mediatr-messaging` teaching an invented `internal sealed class
+MessagingAssemblyMarker;` as the `AddMediatR` scan anchor. The user ruled this
+wrong: the architecture already prescribes a root `Infrastructure/Startup.cs`,
+and the registration call lives inside it — so the anchor is
+`cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly)`, the corpus form
+(apsp `Infrastructure/Startup.cs:78`).
+
+**Changed:** `mediatr-messaging/SKILL.md` "Registering handlers" — the marker
+class is deleted; the example is now the Startup-anchored corpus form, marked
+as living in `Infrastructure/Startup.cs`. The two corpus-verified hazards that
+motivated the marker at S17 are kept, inverted into placement rules: `Startup`
+is declared dozens of times across one assembly, so the anchor is only safe
+written inside the root `Startup.cs` itself (self-referential, no `using` can
+rebind it); and a wrong-assembly scan fails silently (zero-handler
+notifications no-op).
+
+---
+
 ## [0.3.41] — a long command is waited for, not abandoned, 2026-07-30
 
 The feature-flow trial's fourth attempt ended mid-run, and this time the cause
