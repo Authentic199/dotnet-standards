@@ -253,6 +253,10 @@ same LINQ into three response maps is how they drift apart. Wrapper construction
 belongs in the map for the same reason — the entity keeps the storage-level value,
 the response carries the type the caller should see, and the conversion exists once.
 
+Where that wrapper is the storage-key type a response exposes as a pre-signed URL,
+`file-storage` owns it — the type, its JSON converter, and what the boolean second
+argument decides.
+
 ### `IncludeMembers`: flattening a nested member
 
 When a destination's members come partly from a nested member of the source, declare

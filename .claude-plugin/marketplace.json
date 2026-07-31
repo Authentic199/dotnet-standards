@@ -9,7 +9,7 @@
     {
       "name": "dotnet-standards",
       "source": "./",
-      "version": "0.3.57",
+      "version": "0.3.58",
       "description": "Personal .NET knowledge layer plus /dotnet-feature and /dotnet-review workflows (requires the Superpowers plugin).",
       "author": {
         "name": "Authentic199"

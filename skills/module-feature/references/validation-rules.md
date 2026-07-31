@@ -395,6 +395,10 @@ look for the rule already written — `Required()`, the character-class helpers
 and their siblings. The helper is the rule's one definition; every hand-rolled
 copy is a second one, and the copies drift the day the rule changes.
 
+`common-extensions` owns that file — the reuse → promote → inline ladder that decides
+whether a rule deserves a helper at all, and the canonical form to recreate
+`ValidatorExtension.cs` from when the project has none to open.
+
 **When the helper itself is wrong, the order is fixed:** warn the user and
 change nothing on your own; fix the helper only once the user approves; migrate
 the hand-rolled call sites onto it only after the fix. Migrating first launders

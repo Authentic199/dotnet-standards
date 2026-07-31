@@ -168,7 +168,7 @@ which is the design. The reverse is the finding.
 
 | # | Finding | Severity |
 |---|---|---|
-| 2.1 | A facade naming a module type. `Find:` `grep -rn "using .*\.Modules\." src/Infrastructure/Facades/`. It fails the question that defines the axis — *would this code still make sense in a project with a completely different business domain?* **Escalate to CRITICAL when the naming is mutual:** a facade and a module that reference each other are a type-level cycle MSBuild cannot see, and neither can be moved, extracted or reused without the other coming along | **HIGH** |
+| 2.1 | A facade naming a module type. `Find:` `grep -rn "using .*\.Modules\." src/Infrastructure/Facades/`. It fails the question that defines the axis — *would this code still make sense in a project with a completely different business domain?* **Escalate to CRITICAL when the naming is mutual:** a facade and a module that reference each other are a type-level cycle MSBuild cannot see, and neither can be moved, extracted or reused without the other coming along · `common-extensions`, *A base `Common/` file never names a module* + `list-query-pipeline`, `references/anti-patterns.md`, *Domain knowledge welded into the reflection walk* | **HIGH** |
 | 2.2 | `Core` carrying a package beyond `Humanizer` and `NewId`, or a `using` reaching into `Infrastructure`. `Core` is the contract layer, not a utility bag. `Find:` open `src/Core/Core.csproj` and read every `PackageReference`; `grep -rn "using " src/Core/` | **HIGH** |
 | 2.3 | A type in `Core` that only one layer names. The rule is **"must two or more layers name this type?"**, not "is it small?". `Find:` for each type added to `Core` in the diff, `grep -rn "<TypeName>" src/` and count the layers. Same MEDIUM from the other direction: a type in `Core` or in a facade whose **name states a business concept** | **MEDIUM** |
 
@@ -179,6 +179,11 @@ point the facade at the principal abstraction under `Facades/Identity/Base`,
 which the module's entity already implements. The facade keeps the concept, the
 module keeps the type, and the cycle unwinds without adding an edge. Name that
 destination in the finding — a 2.1 with no destination is deferred forever.
+
+**A shared `Common/` extension has a different repair, and it is not always a move.**
+A feature member on a base extension moves to `Modules/<Feature>/Expressions/`; a
+module type welded into a generic reflection walk moves nowhere at all — it becomes a
+parameter or an attribute the caller passes in.
 
 **Three things that look like findings here and are not.** Each is house law, and
 reporting one burns the author's trust in the whole report:
@@ -420,6 +425,7 @@ the rule itself lives here.
 | What a migration *contains*, versus which project it sits in | `ef-core-data-access` |
 | Which folder a message envelope belongs in; handler registration; pipeline behaviours | `mediatr-messaging` |
 | Profile placement and mapping mechanics once the file is placed | `automapper-mapping` |
+| What may sit in a base `Facades/Common/` file, versus which of `Extensions/`, `Services/`, `Attributes/` it sits in | `common-extensions` |
 | Unsure which of the above owns a boundary question | `choosing-a-dotnet-skill` |
 
 **Process.** Requesting the review and triaging what comes back belong to

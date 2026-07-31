@@ -35,6 +35,11 @@ The order is the design:
   stable across requests.
 - `ToPagedListAsync` last, so paging applies to the filtered, sorted result.
 
+The call sites above are this skill's; the extensions behind them are not —
+`list-query-pipeline` owns `QueryExpressionExtension` and `PaginationExtension`, and
+is where to go when `ApplyFilter` or `ToPagedListAsync` does not resolve, or when one
+of them has to be ported into a project that lacks it or repaired where it misbehaves.
+
 ## The get shape
 
 ```csharp

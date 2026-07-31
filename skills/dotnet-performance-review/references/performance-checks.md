@@ -190,7 +190,8 @@ it to singleton** is a shipped instruction rather than a tuning opinion.
 
 **2.10 A process-wide client constructed per call** — *graded by `dotnet-code-review` 4.8,
 "An outbound call with no timeout or no client lifetime"* **for an HTTP client**; *HIGH* for
-a capability client the house ships as a singleton · `distributed-lock`,
+a capability client the house ships as a singleton · `http-client-factory`, *The
+sender is the only way out of the process* (the HTTP arm) + `distributed-lock`,
 `references/implementation.md` + `elasticsearch-search`, *Registration*
 `Find:` `grep -rn --include=*.cs "new HttpClient(\|ConnectionMultiplexer.Connect\|new ElasticClient(\|RedLockFactory.Create" src/`
 and read the lifetime of whatever holds each one.
@@ -198,7 +199,9 @@ and read the lifetime of whatever holds each one.
 The HTTP arm is already graded; cite it and add the cost — a per-call client exhausts
 sockets under load and never picks up DNS changes, and the failure arrives as a connection
 error under concurrency rather than as a slow response, which is why it survives every
-low-traffic test. The capability clients are this rubric's, because 4.8 does not cite them:
+low-traffic test. Name the shipped destination, not the generic one: the house answer
+is the facade's single pooled client with a bounded `PooledConnectionLifetime`, never
+a `static readonly` field at the call site. The capability clients are this rubric's, because 4.8 does not cite them:
 the lock factory *"is a singleton, and it is constructed eagerly … One multiplexer per
 process is the point; a per-request one exhausts connections under load"*, and the search
 client is *"Singleton from a factory — one client per process."* Connection exhaustion does

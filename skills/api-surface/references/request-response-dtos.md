@@ -184,6 +184,11 @@ absurd `PageSize`/`Current` is rejected before the query runs. The unbounded
 default is deliberate but sharp: an endpoint that must never return everything
 needs its own guard, because the contract will not supply one.
 
+The contract is this skill's; the code behind it is not — `list-query-pipeline` owns
+`QueryContainer`, the model binder that reads `filter.` off the raw query string and
+the operator set in the table above. Go there when an operator behaves unexpectedly,
+or when the project has no `QueryContainer` for this request to derive from.
+
 **Add a property to the subclass only for a filter the generic contract cannot
 express.** A property that duplicates `Filter` or `SortQuery` gives callers two
 ways to ask the same question and the service two things to reconcile.

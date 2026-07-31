@@ -232,6 +232,8 @@ the code disagrees with the rule; the rule itself lives here.
 | Cache keys, TTL, invalidation | `distributed-caching` |
 | Lock keys, options, double-processing | `distributed-lock` |
 | Index documents, search descriptors, reindexing | `elasticsearch-search` |
+| Outbound HTTP calls — the sender chain, content builders, the integration's settings section, timeouts | `http-client-factory` |
+| Shared helpers, extensions and attributes; regex patterns; what may sit in `Facades/Common/` | `common-extensions` |
 | Unsure which of the above owns it | `choosing-a-dotnet-skill` |
 
 **Process.** Requesting a review, and triaging feedback received, belong to
