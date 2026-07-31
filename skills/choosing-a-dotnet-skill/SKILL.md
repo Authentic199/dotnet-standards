@@ -48,6 +48,7 @@ memory.
 | Calling out over HTTP: the IHttpClientSender chain and HttpResult, content via ToStringContent/ToFormUrlEncodedContent/ToFormDataContent and [FormName], HttpClientSettings partials and httpclient.json, typed AddHttpClient clients, or recreating the sender facade | `http-client-factory` |
 | Storing files in S3: the storage facade and its recreation, uploading IFormFile/Stream/directory, bucket keys, pre-signed vs public vs service URLs, `S3FilePath` on responses, attachment downloads, deleting objects, ingesting an external URL | `file-storage` |
 | Writing, porting or repairing the list-query extensions themselves - QueryExpressionExtension/PaginationExtension/ApplyQuery source, the $eq...$sw operator table, CustomFilterBinder, or ApplyFilter/ToPagedListAsync not resolving in a project without the pipeline | `list-query-pipeline` |
+| Reaching for a helper, utility, extension method or attribute — regex, random string, generated password, client IP, JSON serialize, Expression composition, reusable validation rule — adding to Infrastructure/Facades/Common/, or a project missing a house extension you are about to inline | `common-extensions` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
