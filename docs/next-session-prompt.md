@@ -7,12 +7,32 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.44 (21 skills + 2 commands + 6 agents + 4 hooks)** as of
-2026-07-31 — 0.3.35–0.3.43 were maintenance/ruling releases (see CHANGELOG);
-0.3.44 added the fourth hook, `test-report-nudge` (the parked
-`dotnet-test-report` roadmap row, redesigned: nudges the model to write a
-human-readable `test-report.md` instead of shell-parsing TRX; format
-user-approved 2026-07-31). The board header sat at 0.3.21 for four releases, then at 0.3.25
+Shipped through **v0.3.52 (26 skills + 2 commands + 6 agents + 4 hook
+scripts)** as of 2026-07-31 — expect `details` to print **Skills (28)** and
+**Hooks (3)** (both counting quirks below). 0.3.35–0.3.43 were
+maintenance/ruling releases (see CHANGELOG); 0.3.44 added the fourth hook,
+`test-report-nudge` (the parked `dotnet-test-report` roadmap row, redesigned:
+nudges the model to write a human-readable `test-report.md` instead of
+shell-parsing TRX; format user-approved 2026-07-31). **The 2026-07-31
+mega-session (solo, user-directed) then shipped:** 0.3.45 integration-tier
+hardening (subcutaneous never substitutes for the factory host; renumbered
+after a same-number collision with 0.3.44) · 0.3.46 three user rules (review
+reports → `docs/code-review/` in the reviewed repo; R16's house-pattern
+exception; R25 lookup-first over `Common/Extensions`) · **the
+common-extensions batch 0.3.47–0.3.52**: soft delete into `ef-core-data-access`
+(0.3.47), then five NEW skills — `excel-miniexcel` (0.3.48),
+`http-client-factory` (0.3.49), `file-storage` (0.3.50), `list-query-pipeline`
+(0.3.51), `common-extensions` (0.3.52) — every piece through the three-way
+loop run by delegated headless `claude -p` coordinators (playbook in the
+project memory; skill-creator now installed at USER scope — the old
+local-scope install was bound to the repo's pre-move path and broke every
+arbiter). All six coordinator reports + the field-trial evidence preserved
+under `docs/ext-batch-2026-07-31/`. Sonnet field trial on the consumer repo:
+the hook→router chain self-triggered (api-surface + module-feature +
+list-query-pipeline loaded unprompted), and a from-scratch module landed
+canonical — entity config chain verbatim, list pipeline verbatim, permission
+catalogue wired, real migration generated; the user stopped the remaining two
+trial tasks as unnecessary. The board header sat at 0.3.21 for four releases, then at 0.3.25
 through 0.3.26 — if you ship, update this line, or the next session reads a
 stale roster. **On the skill count — 23 and 21 are both right.** This line used
 to read "23 skills"; `skills/` holds **21**. The 23 comes from `claude plugin
@@ -302,6 +322,28 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   stays silent) asked the same kind of request. Whether that test is worth
   running, or whether hook-primed success is sufficient going forward, is a
   call for a session that owns `choosing-a-dotnet-skill` or `router-nudge`.
+
+- [solo, 2026-07-31] **The batch's R7/R8 banks, none labelled** — 7 soft-delete
+  candidates (strongest: a live no-op `.IgnoreQueryFilters()` call), 8
+  excel-miniexcel, 10 file-storage, the http-client-factory bank, 16
+  common-extensions — all in `docs/ext-batch-2026-07-31/*-report.md`; consumed
+  by a user labelling pass or the rubrics.
+- [solo, 2026-07-31] Banked follow-ups from the batch: the `Any()`-probe drop
+  (exact edit locations in the list-query-pipeline report; dropping it forces
+  a dotnet-performance-review edit); api-surface + automapper-mapping
+  reciprocal `Not for:`s (file-storage report); api-surface reciprocal for
+  http-client-factory; the vetoable `$null` `it.`-prefix ruling (revert
+  instruction in the lqp report); the `*-RESCUED.md` http references drafts
+  (an R7 call inside them is the user's).
+- [solo, 2026-07-31] `module-feature`'s description still names
+  `background-worker` (unshipped — shipped-only-roster violation, pre-existing;
+  observed during the batch's description trims) — needs a
+  module-feature-owning session.
+- [solo, 2026-07-31] Excel/file-storage corpus defects were fixed IN THE SKILL
+  CANON only — the real projects still carry them (apsp template-name save
+  bug; the S3FilePath converter's broken `Read` in five projects; the
+  non-disposing `Service<T>()`) — fixing the projects themselves is outside
+  the plugin's scope and stays the user's call.
 
 ## Standing rules (unchanged, summarized)
 

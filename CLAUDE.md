@@ -256,3 +256,24 @@ API names (S17: `LogExtension.Error`) are also sanitized out.
   extension (needs user to name its file); `background-worker`/
   `http-resilience` briefs @ the S14 lane-file-rewrite commit; lane-log
   consolidation into `03-session-roadmap.md` (solo chore, best after rubrics).
+
+> **FOURTH PASS — 2026-07-31, mega-session close. The tree ships v0.3.52: 26
+> skills + 2 commands + 6 agents + 4 hook scripts** (`details` prints Skills
+> (28) and Hooks (3) — both are counting quirks, see the board header). The
+> board (`docs/next-session-prompt.md`) is authoritative; this banner is a
+> pointer. What landed 2026-07-31: MediatR anchors on the root `Startup`
+> (0.3.42, marker-type REVERSED by user ruling) · `RangeItemRequest<T>` with
+> `Items` (0.3.43) · integration-tier hardening — subcutaneous never
+> substitutes for the factory host (0.3.45) · review reports are FILES under
+> `docs/code-review/`, R16's house-pattern NuGet exception, R25 lookup-first
+> (0.3.46) · soft delete into ef-core-data-access (0.3.47) · five new skills:
+> excel-miniexcel, http-client-factory, file-storage, list-query-pipeline,
+> common-extensions (0.3.48–0.3.52). Process facts that outrank the numbers:
+> the three-way loop can run in delegated headless `claude -p` coordinators
+> (subagents SYNCHRONOUS, resume by session id — playbook in project memory);
+> `skill-creator` must be installed at USER scope (the local-scope install was
+> bound to the pre-move `D:\ALTA\...` path and silently broke every arbiter);
+> two same-number version collisions have now shipped from parallel sessions —
+> ALWAYS read the version off `main` at merge time. Coordinator reports +
+> field-trial evidence: `docs/ext-batch-2026-07-31/`. R7/R8 banks await user
+> labels (PENDING log).

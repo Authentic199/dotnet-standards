@@ -1,0 +1,1494 @@
+diff --git a/src/Infrastructure/Facades/Definitions/MXMPermissions.cs b/src/Infrastructure/Facades/Definitions/MXMPermissions.cs
+index 9386f97..b8bcc45 100644
+--- a/src/Infrastructure/Facades/Definitions/MXMPermissions.cs
++++ b/src/Infrastructure/Facades/Definitions/MXMPermissions.cs
+@@ -20,6 +20,7 @@ public static class MxmPermissions
+         .Concat(DeviceTypes)
+         .Concat(Events)
+         .Concat(Booths)
++        .Concat(Vouchers)
+         .ToList();
+ 
+     private static readonly MxmPermission[] Users = new MxmPermission[]
+@@ -167,6 +168,47 @@ public static class MxmPermissions
+         new(MxmResource.Booths, MxmAction.ViewDetail, typeof(User).FullName!, JoinGuards(AdminGuard, BasicGuard), MxmResource.Booths + MxmAction.View),
+     };
+ 
++    private static readonly MxmPermission[] Vouchers = new MxmPermission[]
++    {
++        new(
++            MxmResource.Vouchers,
++            MxmAction.Create,
++            typeof(User).FullName!,
++            AdminGuard,
++            MxmResource.Vouchers + MxmAction.View,
++            MxmResource.Vouchers + MxmAction.ViewDetail
++        ),
++        new(
++            MxmResource.Vouchers,
++            MxmAction.Update,
++            typeof(User).FullName!,
++            AdminGuard,
++            MxmResource.Vouchers + MxmAction.View,
++            MxmResource.Vouchers + MxmAction.ViewDetail
++        ),
++        new(
++            MxmResource.Vouchers,
++            MxmAction.Delete,
++            typeof(User).FullName!,
++            AdminGuard,
++            MxmResource.Vouchers + MxmAction.View,
++            MxmResource.Vouchers + MxmAction.ViewDetail
++        ),
++        new(
++            MxmResource.Vouchers,
++            MxmAction.View,
++            typeof(User).FullName!,
++            AdminGuard
++        ),
++        new(
++            MxmResource.Vouchers,
++            MxmAction.ViewDetail,
++            typeof(User).FullName!,
++            AdminGuard,
++            MxmResource.Vouchers + MxmAction.View
++        ),
++    };
++
+     public static IReadOnlyList<MxmPermission> All { get; } = GetAllValue();
+ 
+     public static IReadOnlyList<MxmPermission> Admin { get; }
+@@ -240,4 +282,5 @@ public static class MxmResource
+     public const string DeviceTypes = nameof(DeviceTypes);
+     public const string Events = nameof(Events);
+     public const string Booths = nameof(Booths);
++    public const string Vouchers = nameof(Vouchers);
+ }
+diff --git a/src/Infrastructure/Modules/Vouchers/Entities/Voucher.cs b/src/Infrastructure/Modules/Vouchers/Entities/Voucher.cs
+new file mode 100644
+index 0000000..f0dea60
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Entities/Voucher.cs
+@@ -0,0 +1,61 @@
++using Core.Bases;
++using Core.Common.Interfaces;
++using Infrastructure.Facades.Common.Extensions;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.EntityFrameworkCore.Metadata.Builders;
++
++namespace Infrastructure.Modules.Vouchers.Entities;
++
++public class Voucher : BaseEntity, ICode
++{
++    public string? Code { get; set; }
++
++    public string Name { get; set; } = default!;
++
++    public string? Description { get; set; }
++
++    public int Quantity { get; set; }
++
++    public DateTimeOffset ExpiredAt { get; set; }
++
++    public VoucherStatus Status { get; set; } = VoucherStatus.Active;
++}
++
++public enum VoucherStatus : byte
++{
++    /// <summary>
++    /// Voucher đang hoạt động và có thể sử dụng.
++    /// </summary>
++    Active = 1,
++
++    /// <summary>
++    /// Voucher đang tạm ngưng sử dụng.
++    /// </summary>
++    Inactive = 2,
++
++    /// <summary>
++    /// Voucher đã hết hạn.
++    /// </summary>
++    Expired = 3,
++}
++
++public class VoucherConfiguration : IEntityTypeConfiguration<Voucher>
++{
++    public void Configure(EntityTypeBuilder<Voucher> builder)
++    {
++        builder
++            .UnderscoreTable()
++            .HasBaseEntity()
++            .HasCode();
++
++        builder.Property(x => x.Code).HasMaxLength(100);
++        builder.Property(x => x.Name).IsRequired().HasMaxLength(250);
++        builder.Property(x => x.Description).HasMaxLength(2000);
++        builder.Property(x => x.Quantity).IsRequired();
++        builder.Property(x => x.ExpiredAt).IsRequired();
++        builder.Property(x => x.Status).IsRequired().HasDefaultValue(VoucherStatus.Active);
++
++        builder.HasIndex(x => x.Status);
++        builder.HasIndex(x => x.ExpiredAt);
++    }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/CreateVoucherRequest.cs b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/CreateVoucherRequest.cs
+new file mode 100644
+index 0000000..36d9819
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/CreateVoucherRequest.cs
+@@ -0,0 +1,6 @@
++namespace Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++public class CreateVoucherRequest : VoucherRequest
++{
++    public string? Code { get; set; }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/DeleteVoucherRequest.cs b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/DeleteVoucherRequest.cs
+new file mode 100644
+index 0000000..0e7bd64
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/DeleteVoucherRequest.cs
+@@ -0,0 +1,10 @@
++using Infrastructure.Facades.Common.Attributes;
++using Infrastructure.Facades.Common.Requests;
++using Infrastructure.Modules.Vouchers.Entities;
++
++namespace Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++[MessageDisplay(nameof(Voucher))]
++public class DeleteVoucherRequest : RangeItemRequest<Guid>
++{
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/UpdateVoucherRequest.cs b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/UpdateVoucherRequest.cs
+new file mode 100644
+index 0000000..6b4f7df
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/UpdateVoucherRequest.cs
+@@ -0,0 +1,8 @@
++using Infrastructure.Modules.Vouchers.Entities;
++
++namespace Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++public class UpdateVoucherRequest : VoucherRequest
++{
++    public VoucherStatus Status { get; set; }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequest.cs b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequest.cs
+new file mode 100644
+index 0000000..c490f3a
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequest.cs
+@@ -0,0 +1,16 @@
++using Infrastructure.Facades.Common.Attributes;
++using Infrastructure.Modules.Vouchers.Entities;
++
++namespace Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++[MessageDisplay(nameof(Voucher))]
++public class VoucherRequest
++{
++    public string? Name { get; set; }
++
++    public string? Description { get; set; }
++
++    public int Quantity { get; set; }
++
++    public DateTimeOffset ExpiredAt { get; set; }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequestProfile.cs b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequestProfile.cs
+new file mode 100644
+index 0000000..3bc7ac2
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Requests/Vouchers/VoucherRequestProfile.cs
+@@ -0,0 +1,24 @@
++using AutoMapper;
++using Infrastructure.Modules.Vouchers.Entities;
++
++namespace Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++public class VoucherRequestProfile : Profile
++{
++    public VoucherRequestProfile()
++    {
++        CreateMap<CreateVoucherRequest, Voucher>()
++            .ForMember(destination => destination.Code, options => options.MapFrom(source => source.Code!.Trim()))
++            .ForMember(destination => destination.Name, options => options.MapFrom(source => source.Name!.Trim()))
++            .ForMember(destination => destination.Description, options => options.MapFrom(source => NormalizeDescription(source.Description)))
++            .ForMember(destination => destination.Status, options => options.Ignore());
++
++        CreateMap<UpdateVoucherRequest, Voucher>()
++            .ForMember(destination => destination.Code, options => options.Ignore())
++            .ForMember(destination => destination.Name, options => options.MapFrom(source => source.Name!.Trim()))
++            .ForMember(destination => destination.Description, options => options.MapFrom(source => NormalizeDescription(source.Description)));
++    }
++
++    private static string? NormalizeDescription(string? description)
++        => string.IsNullOrWhiteSpace(description) ? null : description.Trim();
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Responses/VoucherResponse.cs b/src/Infrastructure/Modules/Vouchers/Responses/VoucherResponse.cs
+new file mode 100644
+index 0000000..595b06c
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Responses/VoucherResponse.cs
+@@ -0,0 +1,26 @@
++using AutoMapper;
++using Core.Bases;
++using Infrastructure.Modules.Vouchers.Entities;
++
++namespace Infrastructure.Modules.Vouchers.Responses;
++
++public class VoucherResponse : BaseEntity<Guid>
++{
++    public string Code { get; set; } = default!;
++
++    public string Name { get; set; } = default!;
++
++    public string? Description { get; set; }
++
++    public int Quantity { get; set; }
++
++    public DateTimeOffset ExpiredAt { get; set; }
++
++    public VoucherStatus Status { get; set; }
++}
++
++public class VoucherResponseProfile : Profile
++{
++    public VoucherResponseProfile()
++        => CreateMap<Voucher, VoucherResponse>();
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Services/VoucherService.cs b/src/Infrastructure/Modules/Vouchers/Services/VoucherService.cs
+new file mode 100644
+index 0000000..a619160
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Services/VoucherService.cs
+@@ -0,0 +1,104 @@
++using AutoMapper;
++using AutoMapper.QueryableExtensions;
++using Core.Bases;
++using Core.Common.Exceptions;
++using Core.Common.Interfaces;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Common.Responses;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Facades.Persistence.Repositories;
++using Infrastructure.Modules.Vouchers.Entities;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++using Infrastructure.Modules.Vouchers.Responses;
++using Microsoft.EntityFrameworkCore;
++
++namespace Infrastructure.Modules.Vouchers.Services;
++
++public interface IVoucherService : IScopedService
++{
++    Task<VoucherResponse> CreateAsync(CreateVoucherRequest request, CancellationToken cancellationToken = default);
++
++    Task<VoucherResponse> UpdateAsync(Guid voucherId, UpdateVoucherRequest request, CancellationToken cancellationToken = default);
++
++    Task<VoucherResponse> GetAsync(Guid voucherId, CancellationToken cancellationToken = default);
++
++    Task<PaginationResponse<VoucherResponse>> SearchAsync(QueryContainer request, CancellationToken cancellationToken = default);
++
++    Task<MultipleIdentiferResponse> DeleteRangeAsync(DeleteVoucherRequest request, CancellationToken cancellationToken = default);
++}
++
++public class VoucherService : IVoucherService
++{
++    private readonly IRepositoryWrapper repositoryWrapper;
++    private readonly IMapper mapper;
++
++    public VoucherService(IRepositoryWrapper repositoryWrapper, IMapper mapper)
++    {
++        this.repositoryWrapper = repositoryWrapper;
++        this.mapper = mapper;
++    }
++
++    public async Task<VoucherResponse> CreateAsync(CreateVoucherRequest request, CancellationToken cancellationToken = default)
++    {
++        string code = request.Code!.Trim();
++        await ThrowIfCodeExistsAsync(code, cancellationToken: cancellationToken);
++
++        Voucher voucher = mapper.Map<Voucher>(request);
++        voucher.Status = VoucherStatus.Active;
++        await repositoryWrapper.Repository<Voucher>().AddAsync(voucher, cancellationToken);
++        return await GetAsync(voucher.Id, cancellationToken);
++    }
++
++    public async Task<VoucherResponse> UpdateAsync(Guid voucherId, UpdateVoucherRequest request, CancellationToken cancellationToken = default)
++    {
++        Voucher voucher = await repositoryWrapper.Repository<Voucher>().GetByIdAsync(voucherId, cancellationToken)
++            ?? throw new BadRequestException(Messages<Voucher>.NotFound());
++
++        mapper.Map(request, voucher);
++        await repositoryWrapper.Repository<Voucher>().UpdateAsync(voucher, cancellationToken);
++        return await GetAsync(voucher.Id, cancellationToken);
++    }
++
++    public async Task<VoucherResponse> GetAsync(Guid voucherId, CancellationToken cancellationToken = default)
++        => await repositoryWrapper.Repository<Voucher>()
++            .Find(x => x.Id == voucherId, isAsNoTracking: true)
++            .ProjectTo<VoucherResponse>(mapper.ConfigurationProvider)
++            .FirstOrDefaultAsync(cancellationToken)
++        ?? throw new BadRequestException(Messages<Voucher>.NotFound());
++
++    public async Task<PaginationResponse<VoucherResponse>> SearchAsync(QueryContainer request, CancellationToken cancellationToken = default)
++        => await repositoryWrapper.Repository<Voucher>()
++            .Find(isAsNoTracking: true)
++            .ProjectTo<VoucherResponse>(mapper.ConfigurationProvider)
++            .ApplyFilter(request.Filter)
++            .ApplySearch(request.SearchKeyword, new[] { nameof(VoucherResponse.Name), nameof(VoucherResponse.Code) }, request.Filter?.Keys.ToArray())
++            .ApplySort($"{nameof(BaseEntity.CreatedAt)} desc", request.SortQuery)
++            .ToPagedListAsync(request.Current, request.PageSize, cancellationToken: cancellationToken);
++
++    public async Task<MultipleIdentiferResponse> DeleteRangeAsync(DeleteVoucherRequest request, CancellationToken cancellationToken = default)
++    {
++        Voucher[] vouchers = await repositoryWrapper.Repository<Voucher>()
++            .Find(x => request.Items!.Contains(x.Id))
++            .ToArrayAsync(cancellationToken);
++        if (vouchers.Length != request.Items!.Count)
++        {
++            throw new BadRequestException(Messages<Voucher>.NotFound());
++        }
++
++        await repositoryWrapper.Repository<Voucher>().DeleteRangeAsync(vouchers, cancellationToken);
++        return new(request.Items);
++    }
++
++    private async Task ThrowIfCodeExistsAsync(string code, Guid? exceptId = null, CancellationToken cancellationToken = default)
++    {
++        bool codeExists = await repositoryWrapper.Repository<Voucher>()
++            .AnyAsync(
++                x => x.Code == code
++                    && (!exceptId.HasValue || x.Id != exceptId.Value),
++                cancellationToken);
++        if (codeExists)
++        {
++            throw new BadRequestException(Messages<Voucher>.AlreadyExist(x => x.Code));
++        }
++    }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/CreateVoucherRequestValidator.cs b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/CreateVoucherRequestValidator.cs
+new file mode 100644
+index 0000000..b9b894e
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/CreateVoucherRequestValidator.cs
+@@ -0,0 +1,20 @@
++using FluentValidation;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++using System.Text.RegularExpressions;
++
++namespace Infrastructure.Modules.Vouchers.Validations.Vouchers;
++
++public class CreateVoucherRequestValidator : VoucherRequestValidator<CreateVoucherRequest>
++{
++    public CreateVoucherRequestValidator()
++    {
++        RuleFor(x => x.Code)
++            .Cascade(CascadeMode.Stop)
++            .NotEmpty().WithMessage(MessagesType.Required)
++            .Must(code => code!.Trim().Length <= 100).WithMessage(MessagesType.OverLength)
++            .Must(code => Regex.IsMatch(code!.Trim(), "^[A-Za-z0-9_-]+$"))
++            .WithMessage(MessagesType.Invalid);
++    }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/DeleteVoucherRequestValidator.cs b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/DeleteVoucherRequestValidator.cs
+new file mode 100644
+index 0000000..e327bc7
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/DeleteVoucherRequestValidator.cs
+@@ -0,0 +1,16 @@
++using FluentValidation;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++namespace Infrastructure.Modules.Vouchers.Validations.Vouchers;
++
++public class DeleteVoucherRequestValidator : AbstractValidator<DeleteVoucherRequest>
++{
++    public DeleteVoucherRequestValidator()
++    {
++        RuleFor(x => x.Items)
++            .NotEmpty().WithMessage(MessagesType.Required)
++            .NotDuplicate().WithMessage(MessagesType.Repeated);
++    }
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/UpdateVoucherRequestValidator.cs b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/UpdateVoucherRequestValidator.cs
+new file mode 100644
+index 0000000..5844e11
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/UpdateVoucherRequestValidator.cs
+@@ -0,0 +1,12 @@
++using FluentValidation;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++namespace Infrastructure.Modules.Vouchers.Validations.Vouchers;
++
++public class UpdateVoucherRequestValidator : VoucherRequestValidator<UpdateVoucherRequest>
++{
++    public UpdateVoucherRequestValidator()
++        => RuleFor(x => x.Status).IsInEnum().WithMessage(MessagesType.Invalid);
++}
+diff --git a/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/VoucherRequestValidator.cs b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/VoucherRequestValidator.cs
+new file mode 100644
+index 0000000..66ce04a
+--- /dev/null
++++ b/src/Infrastructure/Modules/Vouchers/Validations/Vouchers/VoucherRequestValidator.cs
+@@ -0,0 +1,27 @@
++using FluentValidation;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++
++namespace Infrastructure.Modules.Vouchers.Validations.Vouchers;
++
++public abstract class VoucherRequestValidator<T> : AbstractValidator<T>
++    where T : VoucherRequest
++{
++    protected VoucherRequestValidator()
++    {
++        RuleFor(x => x.Name)
++            .NotEmpty().WithMessage(MessagesType.Required)
++            .MaximumLength(250).WithMessage(MessagesType.OverLength);
++
++        RuleFor(x => x.Description)
++            .Must(description => string.IsNullOrWhiteSpace(description) || description.Trim().Length <= 2000)
++            .WithMessage(MessagesType.OverLength);
++
++        RuleFor(x => x.Quantity)
++            .GreaterThanOrEqualTo(0).WithMessage(MessagesType.Invalid);
++
++        RuleFor(x => x.ExpiredAt)
++            .NotEqual(default(DateTimeOffset)).WithMessage(MessagesType.Required);
++    }
++}
+diff --git a/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.Designer.cs b/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.Designer.cs
+new file mode 100644
+index 0000000..725b53f
+--- /dev/null
++++ b/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.Designer.cs
+@@ -0,0 +1,764 @@
++﻿// <auto-generated />
++using System;
++using System.Text.Json;
++using Infrastructure.Facades.Persistence.Contexts;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.EntityFrameworkCore.Infrastructure;
++using Microsoft.EntityFrameworkCore.Migrations;
++using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
++using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
++
++#nullable disable
++
++namespace Migrators.PostgreSql.Migrations
++{
++    [DbContext(typeof(ApplicationDbContext))]
++    [Migration("20260731020441_AddVoucher")]
++    partial class AddVoucher
++    {
++        /// <inheritdoc />
++        protected override void BuildTargetModel(ModelBuilder modelBuilder)
++        {
++#pragma warning disable 612, 618
++            modelBuilder
++                .HasAnnotation("ProductVersion", "8.0.11")
++                .HasAnnotation("Relational:MaxIdentifierLength", 63);
++
++            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "citext");
++            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.ModelPermission", b =>
++                {
++                    b.Property<Guid>("ModelId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ModelType")
++                        .HasColumnType("text");
++
++                    b.Property<string>("PermissionCode")
++                        .HasColumnType("text");
++
++                    b.HasKey("ModelId", "ModelType", "PermissionCode");
++
++                    b.HasIndex("PermissionCode");
++
++                    b.ToTable("model_permission", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.ModelRole", b =>
++                {
++                    b.Property<Guid>("ModelId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ModelType")
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("RoleId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("ModelId", "ModelType", "RoleId");
++
++                    b.HasIndex("RoleId");
++
++                    b.ToTable("model_role", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.Permission", b =>
++                {
++                    b.Property<string>("Code")
++                        .HasColumnType("text");
++
++                    b.Property<string>("Guards")
++                        .HasColumnType("text");
++
++                    b.Property<string>("ModelType")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Resource")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Code");
++
++                    b.ToTable("permission", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.Role", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Description")
++                        .HasColumnType("text");
++
++                    b.Property<string>("Guards")
++                        .HasColumnType("text");
++
++                    b.Property<string>("ModelType")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.ToTable("role", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.RolePermission", b =>
++                {
++                    b.Property<Guid>("RoleId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("PermissionCode")
++                        .HasColumnType("text");
++
++                    b.HasKey("RoleId", "PermissionCode");
++
++                    b.HasIndex("PermissionCode");
++
++                    b.ToTable("role_permission", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Auth.Entities.UserRefreshToken", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<DateTime>("ExpireTime")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<Guid>("SessionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Token")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Token")
++                        .IsUnique();
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("user_refresh_token", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Booths.Entities.Booth", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<Guid>("CreatedBy")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Description")
++                        .HasMaxLength(2000)
++                        .HasColumnType("character varying(2000)");
++
++                    b.Property<Guid>("EventId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasMaxLength(250)
++                        .HasColumnType("citext");
++
++                    b.Property<byte>("Status")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("smallint")
++                        .HasDefaultValue((byte)1);
++
++                    b.Property<DateTimeOffset>("UpdatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<Guid>("UpdatedBy")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("EventId");
++
++                    b.HasIndex("EventId", "Name")
++                        .IsUnique();
++
++                    b.HasIndex("EventId", "Status");
++
++                    b.ToTable("booth", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.DeviceTypes.Entities.DeviceType", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasMaxLength(100)
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Description")
++                        .HasMaxLength(2000)
++                        .HasColumnType("character varying(2000)");
++
++                    b.Property<byte>("FunctionType")
++                        .HasColumnType("smallint");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasMaxLength(250)
++                        .HasColumnType("character varying(250)");
++
++                    b.Property<JsonDocument>("Settings")
++                        .IsRequired()
++                        .HasColumnType("jsonb");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.ToTable("device_type", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Events.Entities.Event", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasMaxLength(100)
++                        .HasColumnType("varchar(100)");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<Guid>("CreatedBy")
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTimeOffset?>("DeletedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<DateTimeOffset>("EndAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasMaxLength(250)
++                        .HasColumnType("character varying(250)");
++
++                    b.Property<DateTimeOffset>("StartAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<byte>("State")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("smallint")
++                        .HasDefaultValue((byte)1);
++
++                    b.Property<DateTimeOffset>("UpdatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<Guid>("UpdatedBy")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.HasIndex("State", "StartAt", "EndAt");
++
++                    b.ToTable("event", null, t =>
++                        {
++                            t.HasCheckConstraint("CK_Event_TimeRange", "\"StartAt\" < \"EndAt\"");
++                        });
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.Commune", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("AdministrativeUnitId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("DistrictCode")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("DistrictId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("FullName")
++                        .HasColumnType("text");
++
++                    b.Property<string>("FullNameEn")
++                        .HasColumnType("text");
++
++                    b.Property<DateTimeOffset?>("ModifiedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .HasColumnType("text");
++
++                    b.Property<string>("NameEn")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.HasIndex("DistrictId");
++
++                    b.ToTable("commune", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.District", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("AdministrativeUnitId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("FullName")
++                        .HasColumnType("text");
++
++                    b.Property<string>("FullNameEn")
++                        .HasColumnType("text");
++
++                    b.Property<DateTimeOffset?>("ModifiedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .HasColumnType("text");
++
++                    b.Property<string>("NameEn")
++                        .HasColumnType("text");
++
++                    b.Property<string>("ProvinceCode")
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("ProvinceId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.HasIndex("ProvinceId");
++
++                    b.ToTable("district", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.Province", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("AdministrativeUnitId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("FullName")
++                        .HasColumnType("text");
++
++                    b.Property<string>("FullNameEn")
++                        .HasColumnType("text");
++
++                    b.Property<DateTimeOffset?>("ModifiedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .HasColumnType("text");
++
++                    b.Property<string>("NameEn")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.ToTable("province", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Notifications.Entities.Notification", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ContentRaw")
++                        .HasColumnType("text");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<int?>("EventType")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("ExtraDatasRaw")
++                        .HasColumnType("text");
++
++                    b.Property<string>("From")
++                        .HasColumnType("text");
++
++                    b.Property<int>("Group")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("MessageStatus")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid?>("RefId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("SubjectRaw")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("notification", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Notifications.Entities.NotificationTemplateArg", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Key")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("NotificationId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("RefId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Value")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("NotificationId");
++
++                    b.ToTable("notification_template_arg", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Users.Entities.User", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Avatar")
++                        .HasColumnType("text");
++
++                    b.Property<DateTimeOffset?>("CodeExpiredTime")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<DateTimeOffset?>("DayOfBirth")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Email")
++                        .HasColumnType("citext");
++
++                    b.Property<string>("Name")
++                        .HasColumnType("text");
++
++                    b.Property<string>("Password")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("PhoneNumber")
++                        .HasColumnType("text");
++
++                    b.Property<string>("RecoveryCode")
++                        .HasColumnType("text");
++
++                    b.Property<Guid?>("RoleId")
++                        .HasColumnType("uuid");
++
++                    b.Property<byte>("Status")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("smallint")
++                        .HasDefaultValue((byte)1);
++
++                    b.Property<string>("Username")
++                        .IsRequired()
++                        .HasColumnType("citext");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Email")
++                        .IsUnique();
++
++                    b.HasIndex("RoleId");
++
++                    b.HasIndex("Username")
++                        .IsUnique();
++
++                    b.ToTable("user", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Vouchers.Entities.Voucher", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasMaxLength(100)
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Description")
++                        .HasMaxLength(2000)
++                        .HasColumnType("character varying(2000)");
++
++                    b.Property<DateTimeOffset>("ExpiredAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasMaxLength(250)
++                        .HasColumnType("character varying(250)");
++
++                    b.Property<int>("Quantity")
++                        .HasColumnType("integer");
++
++                    b.Property<byte>("Status")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("smallint")
++                        .HasDefaultValue((byte)1);
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.HasIndex("ExpiredAt");
++
++                    b.HasIndex("Status");
++
++                    b.ToTable("voucher", (string)null);
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.ModelPermission", b =>
++                {
++                    b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Permission", "Permission")
++                        .WithMany("ModelPermissions")
++                        .HasForeignKey("PermissionCode")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Permission");
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.ModelRole", b =>
++                {
++                    b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Role", "Role")
++                        .WithMany("ModelRoles")
++                        .HasForeignKey("RoleId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Role");
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.RolePermission", b =>
++                {
++                    b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Permission", "Permission")
++                        .WithMany("RolePermissions")
++                        .HasForeignKey("PermissionCode")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Role", "Role")
++                        .WithMany("RolePermissions")
++                        .HasForeignKey("RoleId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Permission");
++
++                    b.Navigation("Role");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Auth.Entities.UserRefreshToken", b =>
++                {
++                    b.HasOne("Infrastructure.Modules.Users.Entities.User", "User")
++                        .WithMany("UserRefreshTokens")
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("User");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Booths.Entities.Booth", b =>
++                {
++                    b.HasOne("Infrastructure.Modules.Events.Entities.Event", "Event")
++                        .WithMany()
++                        .HasForeignKey("EventId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.Navigation("Event");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.Commune", b =>
++                {
++                    b.HasOne("Infrastructure.Modules.Geographies.Entities.District", "District")
++                        .WithMany("Communes")
++                        .HasForeignKey("DistrictId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("District");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.District", b =>
++                {
++                    b.HasOne("Infrastructure.Modules.Geographies.Entities.Province", "Province")
++                        .WithMany("Districts")
++                        .HasForeignKey("ProvinceId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Province");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Notifications.Entities.NotificationTemplateArg", b =>
++                {
++                    b.HasOne("Infrastructure.Modules.Notifications.Entities.Notification", "Notification")
++                        .WithMany("NotificationTemplateArgs")
++                        .HasForeignKey("NotificationId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Notification");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Users.Entities.User", b =>
++                {
++                    b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Role", "Role")
++                        .WithMany()
++                        .HasForeignKey("RoleId");
++
++                    b.Navigation("Role");
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.Permission", b =>
++                {
++                    b.Navigation("ModelPermissions");
++
++                    b.Navigation("RolePermissions");
++                });
++
++            modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.Role", b =>
++                {
++                    b.Navigation("ModelRoles");
++
++                    b.Navigation("RolePermissions");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.District", b =>
++                {
++                    b.Navigation("Communes");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Geographies.Entities.Province", b =>
++                {
++                    b.Navigation("Districts");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Notifications.Entities.Notification", b =>
++                {
++                    b.Navigation("NotificationTemplateArgs");
++                });
++
++            modelBuilder.Entity("Infrastructure.Modules.Users.Entities.User", b =>
++                {
++                    b.Navigation("UserRefreshTokens");
++                });
++#pragma warning restore 612, 618
++        }
++    }
++}
+diff --git a/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.cs b/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.cs
+new file mode 100644
+index 0000000..3269972
+--- /dev/null
++++ b/src/Migrators/Migrators.PostgreSql/Migrations/20260731020441_AddVoucher.cs
+@@ -0,0 +1,56 @@
++﻿using System;
++using Microsoft.EntityFrameworkCore.Migrations;
++
++#nullable disable
++
++namespace Migrators.PostgreSql.Migrations
++{
++    /// <inheritdoc />
++    public partial class AddVoucher : Migration
++    {
++        /// <inheritdoc />
++        protected override void Up(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.CreateTable(
++                name: "voucher",
++                columns: table => new
++                {
++                    Id = table.Column<Guid>(type: "uuid", nullable: false),
++                    Code = table.Column<string>(type: "citext", maxLength: 100, nullable: false),
++                    Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
++                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
++                    Quantity = table.Column<int>(type: "integer", nullable: false),
++                    ExpiredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
++                    Status = table.Column<byte>(type: "smallint", nullable: false, defaultValue: (byte)1),
++                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
++                },
++                constraints: table =>
++                {
++                    table.PrimaryKey("PK_voucher", x => x.Id);
++                });
++
++            migrationBuilder.CreateIndex(
++                name: "IX_voucher_Code",
++                table: "voucher",
++                column: "Code",
++                unique: true);
++
++            migrationBuilder.CreateIndex(
++                name: "IX_voucher_ExpiredAt",
++                table: "voucher",
++                column: "ExpiredAt");
++
++            migrationBuilder.CreateIndex(
++                name: "IX_voucher_Status",
++                table: "voucher",
++                column: "Status");
++        }
++
++        /// <inheritdoc />
++        protected override void Down(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.DropTable(
++                name: "voucher");
++        }
++    }
++}
+diff --git a/src/Migrators/Migrators.PostgreSql/Migrations/ApplicationDbContextModelSnapshot.cs b/src/Migrators/Migrators.PostgreSql/Migrations/ApplicationDbContextModelSnapshot.cs
+index 59f355d..f113eb4 100644
+--- a/src/Migrators/Migrators.PostgreSql/Migrations/ApplicationDbContextModelSnapshot.cs
++++ b/src/Migrators/Migrators.PostgreSql/Migrations/ApplicationDbContextModelSnapshot.cs
+@@ -214,7 +214,7 @@ namespace Migrators.PostgreSql.Migrations
+                     b.ToTable("booth", (string)null);
+                 });
+ 
+-            modelBuilder.Entity("Infrastructure.Modules.Devices.Entities.DeviceType", b =>
++            modelBuilder.Entity("Infrastructure.Modules.DeviceTypes.Entities.DeviceType", b =>
+                 {
+                     b.Property<Guid>("Id")
+                         .ValueGeneratedOnAdd()
+@@ -571,6 +571,52 @@ namespace Migrators.PostgreSql.Migrations
+                     b.ToTable("user", (string)null);
+                 });
+ 
++            modelBuilder.Entity("Infrastructure.Modules.Vouchers.Entities.Voucher", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasMaxLength(100)
++                        .HasColumnType("citext");
++
++                    b.Property<DateTimeOffset>("CreatedAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Description")
++                        .HasMaxLength(2000)
++                        .HasColumnType("character varying(2000)");
++
++                    b.Property<DateTimeOffset>("ExpiredAt")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasMaxLength(250)
++                        .HasColumnType("character varying(250)");
++
++                    b.Property<int>("Quantity")
++                        .HasColumnType("integer");
++
++                    b.Property<byte>("Status")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("smallint")
++                        .HasDefaultValue((byte)1);
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Code")
++                        .IsUnique();
++
++                    b.HasIndex("ExpiredAt");
++
++                    b.HasIndex("Status");
++
++                    b.ToTable("voucher", (string)null);
++                });
++
+             modelBuilder.Entity("Infrastructure.Facades.Identity.GrantPermission.Entities.ModelPermission", b =>
+                 {
+                     b.HasOne("Infrastructure.Facades.Identity.GrantPermission.Entities.Permission", "Permission")
+diff --git a/src/Web/Controllers/Vouchers/VouchersController.cs b/src/Web/Controllers/Vouchers/VouchersController.cs
+new file mode 100644
+index 0000000..b4a52fe
+--- /dev/null
++++ b/src/Web/Controllers/Vouchers/VouchersController.cs
+@@ -0,0 +1,69 @@
++using Core.Common.Exceptions;
++using Infrastructure.Facades.Auth.Jwt;
++using Infrastructure.Facades.Auth.Permissions;
++using Infrastructure.Facades.Common.Extensions;
++using Infrastructure.Facades.Common.Responses;
++using Infrastructure.Facades.Definitions;
++using Infrastructure.Modules.Vouchers.Entities;
++using Infrastructure.Modules.Vouchers.Requests.Vouchers;
++using Infrastructure.Modules.Vouchers.Responses;
++using Infrastructure.Modules.Vouchers.Services;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Mvc;
++
++namespace Web.Controllers.Vouchers;
++
++[Authorize]
++public class VouchersController : BaseController
++{
++    private readonly IVoucherService voucherService;
++
++    public VouchersController(IVoucherService voucherService)
++    {
++        this.voucherService = voucherService;
++    }
++
++    [HttpGet]
++    [HasPermission(schemes: new[] { JwtScheme.Default }, permissions: MxmResource.Vouchers + MxmAction.View)]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ErrorResultWrapper), StatusCodes.Status400BadRequest)]
++    public async Task<ActionResult<SuccessResultWrapper<PaginationResponse<VoucherResponse>>>> SearchAsync([FromQuery] QueryContainer request, CancellationToken cancellation)
++        => OkWrapper(await voucherService.SearchAsync(request, cancellation), Messages<Voucher>.Search());
++
++    [HttpGet("{id:guid}")]
++    [HasPermission(schemes: new[] { JwtScheme.Default }, permissions: MxmResource.Vouchers + MxmAction.ViewDetail)]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ErrorResultWrapper), StatusCodes.Status400BadRequest)]
++    public async Task<ActionResult<SuccessResultWrapper<VoucherResponse>>> GetAsync(
++        [FromRoute] Guid id,
++        CancellationToken cancellation)
++        => OkWrapper(await voucherService.GetAsync(id, cancellation), Messages<Voucher>.Detail());
++
++    [HttpPost]
++    [HasPermission(schemes: new[] { JwtScheme.Default }, permissions: MxmResource.Vouchers + MxmAction.Create)]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ErrorResultWrapper), StatusCodes.Status400BadRequest)]
++    public async Task<ActionResult<SuccessResultWrapper<VoucherResponse>>> CreateAsync(
++        [FromBody] CreateVoucherRequest request,
++        CancellationToken cancellation)
++        => OkWrapper(await voucherService.CreateAsync(request, cancellation), Messages<Voucher>.Create());
++
++    [HttpPut("{id:guid}")]
++    [HasPermission(schemes: new[] { JwtScheme.Default }, permissions: MxmResource.Vouchers + MxmAction.Update)]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ErrorResultWrapper), StatusCodes.Status400BadRequest)]
++    public async Task<ActionResult<SuccessResultWrapper<VoucherResponse>>> UpdateAsync(
++        [FromRoute] Guid id,
++        [FromBody] UpdateVoucherRequest request,
++        CancellationToken cancellation)
++        => OkWrapper(await voucherService.UpdateAsync(id, request, cancellation), Messages<Voucher>.Update());
++
++    [HttpPost("DeleteMany")]
++    [HasPermission(schemes: new[] { JwtScheme.Default }, permissions: MxmResource.Vouchers + MxmAction.Delete)]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ErrorResultWrapper), StatusCodes.Status400BadRequest)]
++    public async Task<ActionResult<SuccessResultWrapper<MultipleIdentiferResponse>>> DeleteRangeAsync(
++        [FromBody] DeleteVoucherRequest request,
++        CancellationToken cancellation)
++        => OkWrapper(await voucherService.DeleteRangeAsync(request, cancellation), Messages<Voucher>.Delete());
++}
+diff --git a/test-report.md b/test-report.md
+new file mode 100644
+index 0000000..3c1428e
+--- /dev/null
++++ b/test-report.md
+@@ -0,0 +1,47 @@
++# Test Report — 2026-07-31
++
++**Lệnh chạy:** `dotnet test tests/Infrastructure.UnitTests/Infrastructure.UnitTests.csproj`
++**Kết quả:** Passed: 43, Failed: 0, Skipped: 0, Total: 43
++
++## DeviceTypeTests
++
++- Validator cập nhật chấp nhận các loại chức năng thiết bị hợp lệ — PASS
++- Validator cập nhật từ chối loại chức năng thiết bị không nằm trong danh sách hợp lệ — PASS
++- Khi tạo mới, các trường text (mã, tên, mô tả) được cắt khoảng trắng thừa — PASS
++- Khi tạo mới, mô tả chỉ chứa khoảng trắng sẽ được lưu thành null — PASS
++- Khi cập nhật, mã thiết bị không bị ghi đè (giữ nguyên mã cũ) — PASS
++- Quyền của DeviceTypes chỉ được cấp cho vai trò Admin, không cấp cho Basic — PASS
++- Validator xóa từ chối danh sách rỗng hoặc có id trùng lặp — PASS
++- Cấu hình đồng bộ QR chỉ yêu cầu điểm thưởng khi bật tính năng cộng điểm — PASS
++- Cấu hình đồng bộ QR từ chối thời gian chờ hoặc số lượng RFID không dương — PASS
++- Cấu hình đổi quà chỉ yêu cầu giới hạn số lần khi không chọn "không giới hạn" — PASS
++- Cấu hình đổi quà từ chối tỷ lệ cảnh báo tồn kho ngoài khoảng 0-100 — PASS
++- Khi map sang response, phần cấu hình (Settings) được giữ nguyên đầy đủ — PASS
++
++## BoothTests
++
++- Cấu hình entity Booth bắt buộc EventId, chặn xóa Event liên quan, và có đủ index — PASS
++- Entity Booth không lộ các trường ngoài phạm vi (Code, DisplayOrder, Devices...) — PASS
++- Request tạo Booth không cho phép set EventId hoặc Status — PASS
++- Request cập nhật Booth không cho phép set EventId — PASS
++- Validator cập nhật cho phép chuyển trạng thái Active/Paused — PASS
++- Validator cập nhật từ chối trạng thái DeviceError — PASS
++- Validator xóa từ chối danh sách rỗng hoặc có id trùng lặp — PASS
++- Khi tạo mới, tên/mô tả được cắt khoảng trắng, EventId không bị gán trong mapping request — PASS
++- Khi map sang response, thông tin Event và Booth được ánh xạ đúng — PASS
++- Chuyển trạng thái Active/Paused qua lại được cho phép — PASS
++- Chuyển trạng thái liên quan đến DeviceError bị từ chối — PASS
++
++## EventTests
++
++- Tính trạng thái vòng đời sự kiện đúng tại các mốc thời gian biên (trước/đúng lúc/sau bắt đầu và kết thúc) — PASS
++- Trạng thái "Đã hủy" luôn được ưu tiên bất kể thời gian — PASS
++- Khi map sang response, trạng thái được tính toán đúng theo thời điểm hiện tại — PASS
++- Có thể lọc danh sách sự kiện theo trạng thái được tính toán (derived status) — PASS
++- Validator tạo mới yêu cầu thời gian kết thúc phải sau thời gian bắt đầu — PASS
++- Request cập nhật sự kiện không cho phép sửa mã (Code) — PASS
++- Entity Event dùng đúng cơ chế soft delete qua trường DeletedAt — PASS
++- Entity Event không lộ danh sách gán người dùng (UserEvents) — PASS
++- Validator xóa từ chối danh sách rỗng hoặc có id trùng lặp — PASS
++
++> Ghi chú: module Vouchers mới thêm chưa có unit test riêng (việc viết test là tùy chọn theo CLAUDE.md, không bắt buộc).
