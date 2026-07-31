@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.59 (26 skills + 2 commands + 6 agents + 4 hook
+Shipped through **v0.3.60 (26 skills + 2 commands + 6 agents + 4 hook
 scripts)** as of 2026-07-31. **After the batch closed at 0.3.52 the same session
 kept shipping** — read these before assuming anything about the tree: 0.3.53
 narrowed the soft-delete section's `HasQueryFilter` claim (a corpus census
@@ -40,9 +40,24 @@ existing files; (2) all six `mediatr-messaging` envelope examples shipped
 them the wrong way) — **a disclaimer naming no rule loses to an example showing
 the opposite**, and a fourth leak was found in `elasticsearch-search`; (3) the
 router's *"load it one row and stop"* sat 100 lines above the section governing
-spec-writing, so the planning section **moved above the tables**. The fourth
-cause is a real gap and is **open in the PENDING log**: no skill owns a module
-whose public surface *is* its MediatR commands.
+spec-writing, so the planning section **moved above the tables**. A fourth cause
+was logged as "no skill owns a module whose public surface *is* its MediatR
+commands" and is **withdrawn — that was a misreading**; `module-feature:249-272`
+owns it with a diagram. What survives in the PENDING log is narrower and real:
+**inverted reach** — a plug-in interface the module owns and *other* modules
+implement, which no rule covers in either direction. · 0.3.60 **a shipped
+contradiction between two skills**, found the same day by the same consumer
+session, which had to adjudicate it itself in a *Xung đột giữa hai skill*
+section — having to do that is the defect. `ef-core-data-access:222` claimed the
+entity file holds *"any enums it owns"* (its example declared one inline) while
+`facade-module-architecture:215` says every enum lives in `Enums/`, *"never
+declared inside an entity, response or service file"*. **Resolved toward
+`facade-module-architecture`** — it owns placement. **Second instance of the
+0.3.59 family**: prose deferred correctly or said nothing while the *example*
+demonstrated another skill's rule being broken, and the example is what gets
+copied. **A sweep for further example-versus-rule conflicts across skill pairs
+is worth a session** — two found in one day, neither by review, both by field
+use.
 
 Original 0.3.52 close follows — expect `details` to print **Skills (28)** and
 **Hooks (3)** (both counting quirks below). 0.3.35–0.3.43 were
@@ -157,24 +172,29 @@ rubrics, Lane D.
 
 Format: `- [lane, date] what was parked — where the detail lives — what unblocks it`
 
-- [solo, 2026-07-31] **MediatR as a module's public surface — no skill owns it,
-  and a user ruling is needed before one can.** Both `module-feature` and its
-  `references/mediatr-envelopes.md` assume MediatR is intra-module plumbing
-  behind a service, and rule envelopes `internal sealed` *precisely* so a
-  controller cannot `Send` — that is the enforcement mechanism for "controllers
-  call services", not a style choice. The consumer case that exposed the gap is
-  a **reusable core module** (access control) whose `Contracts/` folder is
-  deliberately the boundary other modules in the same assembly call through, and
-  whose chosen verify path was a thin controller forwarding to `IMediator`. That
-  path collides head-on with the `internal sealed` rule. `mediatr-messaging`'s
-  0.3.32 rule (foreign reach by `Send` only) points toward the case but does not
-  cover a module *designed* as a shared core. **Two arms, user's call:** (a)
-  admit the exception and write it into `module-feature` + `mediatr-messaging`
-  as a second arm with its own boundary conditions, or (b) hold the rule and
-  require such a core to expose a public service, controllers calling it
-  directly. Do not resolve this by inference — the `internal` rule is
-  load-bearing, and weakening it silently opens the controller door the whole
-  convention exists to keep shut. Evidence: CHANGELOG 0.3.59.
+- [solo, 2026-07-31] **Inverted reach: a plug-in interface a module owns and
+  *other* modules implement.** The house rule for crossing a module boundary is
+  one-directional — `module-feature:252` *"a service that needs a foreign one
+  names a message, never the foreign service interface"*. The consumer case runs
+  the other way: an access-control core declares `IScenarioEvaluator`, injects
+  `IEnumerable<IScenarioEvaluator>`, and calls implementations that live in
+  **other** modules. Nothing is `Send`, nothing is foreign-named — the interface
+  is the core's own — so no shipped rule is broken and none applies either. Open
+  questions a ruling would settle: where such a contract and its context/result
+  records live (the module-folder vocabulary in `facade-module-architecture:203`
+  has no slot, and `Services/` is closed to non-services); whether the registry
+  that dispatches by key is a class at all or belongs inside the owning service
+  as a partial; and whether fail-fast-on-duplicate at startup is reachable when
+  the implementations are scoped. Needs a corpus exemplar before it can be
+  written — do not invent one. Evidence: CHANGELOG 0.3.59.
+  **Correction:** an earlier draft of this entry claimed no skill owned "MediatR
+  as a module's public surface". That was wrong and is withdrawn —
+  `module-feature:249-272` and `references/mediatr-envelopes.md:20-48` own it
+  fully, diagram included: envelopes live in the **owning** module's `Commands/`,
+  the foreign module's service `Send`s them, and `internal` does not hide an
+  envelope from another module (same assembly) — only from the HTTP project. A
+  core module exposing capability as commands is the house pattern working as
+  designed, not an exception to it.
 
 - [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
   `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze
