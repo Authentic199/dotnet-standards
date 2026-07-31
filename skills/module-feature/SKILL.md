@@ -1,18 +1,18 @@
 ---
 name: module-feature
 description: >-
-  This skill should be used when writing or reviewing a feature inside a .NET
+  This skill should be used when writing a feature inside a .NET
   module: a service pairing interface and implementation behind IScopedService,
-  suffix partials under Services/, its request and response types,
+  suffix partials under Services/, its request/response types,
   FluentValidation rules, IsExist predicates and ThrowIf guards in
-  <X>Validation.cs, a thin MediatR command, query or event envelope, or a
+  <X>Validation.cs, a thin MediatR command/query/event envelope, or a
   service call versus a message. Not for: placement, wiring —
   facade-module-architecture; DbContext, entities, migrations —
   ef-core-data-access; routes, endpoints, DTO chains — api-surface; mapping
   mechanics — automapper-mapping; messaging pipeline — mediatr-messaging;
   Redis — distributed-caching; Elasticsearch — elasticsearch-search; Hangfire
   jobs — background-worker; exception middleware — error-handling; Messages<T>
-  text — message-keys.
+  text — message-keys; Excel parsing, import flows — excel-miniexcel.
 ---
 
 ## Overview

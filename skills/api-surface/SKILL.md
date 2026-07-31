@@ -2,16 +2,15 @@
 name: api-surface
 description: >-
   This skill should be used when shaping the HTTP surface of a .NET API:
-  adding a route or endpoint, writing a controller action — expression-bodied
+  adding a route, writing a controller action — expression-bodied
   bodies, segment casing, id constraints, [HasPermission],
-  [ProducesResponseType], XML summaries, partial-file splits — request and
-  response DTO base-class chains, colocated validator and mapping profile,
+  [ProducesResponseType], XML summaries, partial-file splits — request/response DTO base-class chains, colocated validator and mapping profile,
   pagination and search contracts, API versioning, or Swashbuckle/OpenAPI
   setup. Not for: where a controller file goes — facade-module-architecture;
   handler and service internals, validation rules — module-feature;
   entities, DbContext, queries — ef-core-data-access; JWT, policies,
   permission internals — auth-and-security; exception flow, error responses —
-  error-handling; success and error message text — message-keys.
+  error-handling; success and error message text — message-keys; Excel export/import streams — excel-miniexcel.
 ---
 
 ## Overview
