@@ -8,6 +8,25 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.53] — the soft-delete section stops overstating `HasQueryFilter`, 2026-07-31
+
+**Caught while pulling evidence for the R8 labelling pass, one release after
+0.3.47 shipped it.** The new `## Soft delete` section claimed *"No
+`HasQueryFilter` is registered anywhere in this standard"*. A full corpus
+census falsifies it: two entities register one (staged-import exclusion), just
+never for a soft-delete stamp. Both authors and the arbiter missed it because
+the survey grepped the SoftDeletes folders and the repository, not the whole
+corpus — a shared blind spot the loop's own shared-claim rule exists to catch.
+
+**Changed:** the claim is narrowed to what is true (no *stamp* is registered
+that way; `HasQueryFilter` exists for a different job), and the
+documentation-derived block now tells the reader to check whether the entity
+registers one at all — where none is registered `IgnoreQueryFilters()` is dead
+weight, where one is it clears *that*, which is a different intention than
+reading past a soft delete. The R8 candidate that exposed this (a live no-op
+`IgnoreQueryFilters()` call in a project with zero `HasQueryFilter`
+registrations) is unaffected and still banked.
+
 ## [0.3.52] — `common-extensions`: the lookup-first doctrine and the utility canon, 2026-07-31
 
 **Batch deliverable 6/6 — the batch is complete.** (Three-way loop, delegated

@@ -395,13 +395,20 @@ filtering is invisible from the outside. `ExpressionExtension.Join` is what ANDs
 the stamp check onto the caller's predicate; `common-extensions` owns it.
 
 **The injected condition is an ordinary `Where`, not an EF query filter.** No
-`HasQueryFilter` is registered anywhere in this standard, so "global query
-filter" names this composed predicate and nothing else.
+soft-delete stamp is ever registered through `HasQueryFilter`, so within this
+pattern "global query filter" names this composed predicate and nothing else.
+`HasQueryFilter` does appear in the standard, but for a different job —
+excluding staged import rows from every read of an entity being imported into
+— and never for `DeleteAt` or `HiddenAt`.
 
 > **Documentation-derived** — not corpus-verified. EF Core's own
 > `IgnoreQueryFilters()` clears filters registered through `HasQueryFilter`.
-> With none registered it has nothing to clear, so it is not the escape hatch
-> for this pattern and a call to it here changes nothing.
+> It therefore does **not** reach the stamp check, which is an ordinary
+> `Where` — `IgnoreGlobalQueryFilter` below is the escape hatch for this
+> pattern. Check first whether the entity registers a `HasQueryFilter` at all:
+> where none is registered, `IgnoreQueryFilters()` clears nothing and the call
+> is dead weight; where one is (a staging filter, say), it clears *that*, which
+> is a different intention than reading past a soft delete.
 
 **By-key and raw-SQL members sit outside the filter by construction.**
 `GetById`/`GetByIdAsync` go through `DbSet.Find`, and `FromSqlRaw` /
