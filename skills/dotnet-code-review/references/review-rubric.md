@@ -640,6 +640,42 @@ DTO in the family — and it is not excused by other types in the tree already
 doing it. **A pre-existing count is context for the fix's size, never a reason
 to withhold the finding**; say how many sites the grep returned.
 
+**5.21 A request property that cannot express "not sent"** — *MEDIUM* ·
+`api-surface`, *The request chain* + `module-feature`, *Every required property
+is asserted, never assumed*
+`Find:` `grep -rnE --include=*Request*.cs "public (int|long|short|decimal|double|float|bool|Guid|DateTime|DateTimeOffset|TimeSpan)\b[^?]* [A-Z]" src/`, then read
+the enum-typed properties in the same files — the grep cannot see those. **Keep
+the `\b`**: without it `public interface I…` matches on the `int` inside
+`interface`, and that noise trains the reviewer to skim the hits.
+Every property on a request is nullable, and required-ness is stated by
+`NotEmpty()` in the validator. A non-nullable value type breaks that in both
+directions at once. It is filled with its own default before any rule runs, so
+`Guid.Empty`, `0` or `false` arrives indistinguishable from a value the caller
+chose: an omitted foreign key looks sent, and a caller who genuinely means
+`false` or `0` has no way to say so that the type can carry. **The property's
+type is not where optionality belongs** — the validator states it, and only a
+nullable property leaves the validator anything to decide. `string` looks
+compliant for free in a nullable-enabled project; that is an accident of the
+reference type, not a different rule.
+Raise it to **HIGH** when the property is a foreign key, a money or quantity
+amount, or a state flag — there the invented default reaches the database.
+
+**5.22 A timestamp converted by hand** — *MEDIUM* · `ef-core-data-access`
+`Find:` `grep -rn --include=*.cs "ToUniversalTime()\|ToLocalTime()" src/`, then
+drop the hits inside a converter — a JSON converter and the `DbContext`'s own
+`DateTimeOffset` value converter are where the conversion is *supposed* to live,
+and reporting them is a false positive that costs the whole check its credibility.
+Every hit that survives that filter is one of two findings. Either the value is a
+`DateTimeOffset` and the conversion the model already performs on the way to the
+database and back has been written a second time by hand — delete it, and note
+that its presence tells every later reader the convention does not exist — or the
+value is a `DateTime`, which **no** convention converts: that property sits
+outside the model's UTC guarantee, and changing its type is the fix, not adding
+more conversions around it. Say which of the two each surviving hit is; a hit
+reported without that verdict has not been reviewed.
+A purely redundant call on a `DateTimeOffset`, with no `DateTime` behind it, is
+INFO.
+
 ## 6. Tests
 
 Which tier a scenario belongs to is `dotnet-testing`'s Decision Guide. This pass

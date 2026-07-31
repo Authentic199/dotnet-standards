@@ -8,6 +8,37 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.56] — rubric checks 5.21 and 5.22 close the two orphans, 2026-07-31
+
+The two rules shipped at 0.3.55 had no reviewer. Both now do, in
+`dotnet-code-review/references/review-rubric.md`, area 5.
+
+**5.21 A request property that cannot express "not sent"** — *MEDIUM*, raised
+to HIGH for a foreign key, a money or quantity amount, or a state flag. A
+non-nullable value type on a request breaks the convention in both directions
+at once: it is filled with its own default before any rule runs, so
+`Guid.Empty`, `0` or `false` arrives indistinguishable from a value the caller
+chose — and a caller who genuinely means `false` has no way to say so. Cites
+`api-surface` *The request chain* and `module-feature` *Every required property
+is asserted, never assumed*.
+
+**5.22 A timestamp converted by hand** — *MEDIUM*, INFO when merely redundant.
+Each surviving hit is one of two findings: a `DateTimeOffset` whose conversion
+the model already performs, written a second time; or a `DateTime`, which no
+convention converts and whose type is the fix.
+
+**Both `Find:` greps were smoke-tested against a real project before shipping,
+and both were wrong on the first pass.** 5.21's matched `public interface I…`
+on the `int` inside `interface` — the check now carries the `` and says why
+to keep it. 5.22's flagged a JSON converter and the `DbContext`'s own value
+converter, i.e. the two places the conversion is supposed to live; the check now
+filters converters first and says that reporting them costs the check its
+credibility. The original text asserted every hit "is one of two findings and
+never a pass" — that absolutism was falsified by the first project it met.
+
+**Also fixed:** the `### Check coverage` example in `dotnet-code-review/SKILL.md`
+still read `5: 5.1-5.19` after 5.20 shipped; it now reads `5.1-5.22`.
+
 ## [0.3.55] — two user rules: nullable requests with `NotEmpty()`, and UTC without help, 2026-07-31
 
 **Rule 1 — every request property is nullable, every required one carries
