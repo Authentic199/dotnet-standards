@@ -8,6 +8,37 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.49] — `http-client-factory`: the mandatory outbound-HTTP facade, 2026-07-31
+
+**Batch deliverable 3/6** (three-way loop, delegated headless coordinator;
+arbiter-first ordering — its process lesson from the wasted first-run author
+rounds). New skill `http-client-factory`: SKILL.md 491 lines + 3 references/
+files (sender-and-result, content-extensions, registration-and-settings) —
+full sanitized implementations for verbatim recreation.
+
+- Canonical sender lineage: the three-project byte-identical modern variant
+  with the `IFormFile` `ToFormDataContent` fix; the sync-over-async eager-read
+  lineage shipped nowhere (divergent corpus code presented unlabelled — R8
+  bank held).
+- Doctrine grounded in numbers: zero `new HttpClient(` outside the facade
+  corpus-wide; the partial-class `HttpClientSettings` mechanism (5 of 6
+  projects); settings examples placeholder-only (live-looking secrets existed
+  in every corpus `httpclient.json`).
+- Resilience deliberately narrowed: retry exists only in one project's
+  modules, never the facade — the skill teaches the boundary and refuses
+  doc-recall resilience advice (the parked `http-resilience` roadmap name is
+  superseded by this narrower corpus-grounded scope).
+- **Router:** one base-map row + two disambiguation rows (`HTTP`
+  inbound/outbound; `a file over the wire` vs `file-storage`). The proposed
+  third row (retry/timeout) was declined — it would route a topic the skill
+  itself declares module-owned. The arbiter-flagged reciprocal
+  `Not for:` on `file-storage` ("the outbound HTTP call itself") is queued for
+  that skill's own merge; the optional api-surface reciprocal is banked.
+- Nothing was compiled; every code block verified by transcription diff
+  against the corpus (noted honestly in the report).
+
+---
+
 ## [0.3.48] — `excel-miniexcel`: MiniExcel both directions, 2026-07-31
 
 **Batch deliverable 2/6** (three-way loop, delegated headless coordinator; 7
