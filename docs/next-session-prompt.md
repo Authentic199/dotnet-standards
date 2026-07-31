@@ -345,6 +345,14 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   non-disposing `Service<T>()`) — fixing the projects themselves is outside
   the plugin's scope and stays the user's call.
 
+- [solo, 2026-07-31] **Two shipped rules are VERIFIED ORPHANS — no rubric checks
+  them.** (a) every request property nullable + `NotEmpty()` on the required ones
+  (0.3.55, taught in `api-surface` and `module-feature`); (b) `claude-md-builder`
+  R26, no hand-written `ToUniversalTime()`. Same shape as the `Guid.NewGuid()`
+  orphan already logged below — belongs in `dotnet-code-review`'s rubric, needs a
+  session that owns it and will write the check in the rubric's own numbered
+  format.
+
 ## Standing rules (unchanged, summarized)
 
 - One session, one deliverable **+ the mandatory router merge-time edits in

@@ -2,6 +2,7 @@
 
 - [One file, two callers](#one-file-two-callers)
 - [Naming law](#naming-law)
+- [Every required property is asserted, never assumed](#every-required-property-is-asserted-never-assumed)
 - [Shape A: predicates a validator asks](#shape-a-predicates-a-validator-asks)
   - [Uniqueness and the `exceptId` parameter](#uniqueness-and-the-exceptid-parameter)
   - [Existence: one row, or a whole collection](#existence-one-row-or-a-whole-collection)
@@ -123,6 +124,27 @@ question, and the facade's own helpers (`IsExistByIds`, `IsExistByUnique`) speak
 `IsExistCategory(Guid id)`, not `IsExistCategoryId(Guid id)`. Reserve the property segment
 for when it distinguishes something — `IsExistOrderCode`. Rename when you touch the file; a
 static method rename is safe.
+
+## Every required property is asserted, never assumed
+
+**A request property is nullable and a required one carries
+`NotEmpty().WithMessage(...)`. Both halves, always.** The validator is the only
+place that can tell a caller who sent nothing from a caller who sent a default,
+and it can only do so if the property was nullable in the first place: a
+non-nullable `Guid`, `int`, `bool`, `DateTimeOffset` or enum arrives already
+filled with a value the binder invented, and every rule downstream treats it as
+the caller's own.
+
+```csharp
+RuleFor(x => x.ProductId)
+    .NotEmpty().WithMessage(Messages<Order>.Required(x => x.ProductId));
+```
+
+So a rule that follows `NotEmpty()` may dereference with `!` — the chain has
+already stopped on null. And an optional property is the one with **no**
+`NotEmpty()`; optionality is stated here, never by making the property
+non-nullable. The DTO half of this law, with the binder trap spelled out, is
+`api-surface`, *The request chain*.
 
 ## Shape A: predicates a validator asks
 
@@ -406,6 +428,8 @@ registered and never injected, so only the type name and its call sites change.
 ## Review checklist
 
 - The module has one `Validations/<X>Validation.cs`, a `public static class`, no prefix.
+- Every request property is nullable, and every required one carries `NotEmpty()`. A
+  non-nullable value type on a request is the defect, not a shortcut.
 - Every existence predicate is `IsExist<Thing>` or `IsExist<Thing><Property>`, returns `bool`,
   and throws nothing. No `IsExisted…`, no `Id` suffix on an id parameter.
 - Every guard is `ThrowIf<Condition>`, returns `void`, throws `BadRequestException` with a

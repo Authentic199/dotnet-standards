@@ -42,6 +42,13 @@ found no ambiguity.
 *Prevents:* a bare `dotnet ef` writing the migration into the wrong project, or
 failing to find a `DbContext` at all.
 
+**R26** — `Timestamps reach the database as UTC without your help: the DbContext converts every DateTimeOffset on the way in and back on the way out. Never call ToUniversalTime() or ToLocalTime() on a value going to or coming from the repository. Use DateTimeOffset, not DateTime — a DateTime property is outside that conversion and is the thing to change.`
+**Applies when** the scan found a `ConfigureConventions` override converting
+`DateTimeOffset` (or an equivalent global value converter).
+*Prevents:* the double conversion — a value shifted by hand and again by the
+convention — and the silent local-time drift when a `DateTime` slips into a
+model everything else treats as UTC.
+
 ---
 
 ## Async and cancellation
