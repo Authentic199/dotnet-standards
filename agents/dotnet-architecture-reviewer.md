@@ -27,8 +27,10 @@ Then load the doctrine the rubric grades against, the same way:
 `dotnet-standards:api-surface` and `dotnet-standards:mediatr-messaging` — the
 bodies its audits cite. A finding graded from a summary of a rule reads exactly
 like one graded from the rule, and only the body settles which. Any other skill
-an audit cites is loaded before a finding citing it is written; house doctrine
-is never graded from memory.
+an audit cites is loaded before a finding citing it is written, **and equally
+before a citation is relied on to suppress one.** House doctrine is never graded
+from memory in either direction: a suppression taken from memory is the same
+defect as a finding taken from memory, in the direction nobody audits.
 
 If a skill does not load, stop and say exactly that. Auditing layering from
 memory of general .NET architecture is the specific failure that rubric exists to

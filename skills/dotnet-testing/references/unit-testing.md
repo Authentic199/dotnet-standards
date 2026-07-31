@@ -249,6 +249,12 @@ constructor is the change worth making; it is a recommendation, not a requiremen
 `HttpMessageHandler` stub that returns the response the test needs** — no
 additional package, and no container for something that is not yours to run.
 
+Where the path reaches that API through the house's sender facade rather than holding
+a client of its own, the seam is the facade: substitute `IHttpClientSender` and return
+the `HttpResult` the path expects. `http-client-factory` describes that result —
+including that the sender catches transport failures and returns a `500` instead of
+throwing, which is the behaviour a faithful double reproduces.
+
 ## Packages
 
 Add packages by name and let `dotnet add package` resolve the current stable

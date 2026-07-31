@@ -80,13 +80,16 @@ Two or more in one operation without `BeginTransactionAsync` means the operation
 is not atomic: a failure between them leaves half the change committed.
 
 **1.5 A transaction that cannot unwind** — *HIGH; CRITICAL when the half-state is
-observable* · `ef-core-data-access` + `error-handling`
+observable* · `ef-core-data-access` + `error-handling` + `file-storage`, *A storage
+write is not part of the database transaction*
 `Find:` `grep -rn -A6 --include=*.cs "BeginTransactionAsync" src/`, then read each
 hit to the end of its method.
 Any of — no `catch`; a `catch` that does not call `RollbackTransactionAsync`; a
 `catch` that rolls back and *returns*, reporting success for work that was undone;
 a `Begin`/`Commit`/`Rollback` call missing the cancellation token; a `return`
-inside the `try` that skips the commit. Rank CRITICAL when the uncommitted half is
+inside the `try` that skips the commit; a non-transactional side effect inside the
+`try` that the rollback cannot undo — an object uploaded, a file written — with no
+compensating delete on the failure path. Rank CRITICAL when the uncommitted half is
 observable — a row written without its lines, a status advanced without its
 ledger entry. The compensating `catch` is one of the two catches that earn their
 place, and the failure must keep travelling.
@@ -241,7 +244,8 @@ An exception thrown from an `async void` method cannot be caught by the caller a
 takes the process down. Return `Task`.
 
 **3.4 A captive dependency** — *HIGH; CRITICAL when the captive is the context or
-the wrapper* · universal
+the wrapper* · universal, reinforced by `http-client-factory`, *The builder is
+instance state that outlives the call*
 `Find:` `grep -rn --include=*.cs "AddSingleton\|AddHostedService\|: BackgroundService" src/`,
 then open each registered type and read every constructor parameter's registered
 lifetime.
@@ -250,7 +254,10 @@ per-request service — captured by a singleton is resolved once and held foreve
 For the context that means one non-thread-safe change tracker shared by every
 concurrent request: stale reads, cross-request state, a tracker that grows without
 bound, and exceptions that reproduce only under load. Fix shape: inject
-`IServiceScopeFactory` and open a scope per unit of work. Where the registration
+`IServiceScopeFactory` and open a scope per unit of work. A **transient** that
+carries state is the same finding: the outbound sender holds one request builder
+that no send resets, so a singleton consumer's concurrent calls overwrite each
+other's method, URI, headers and content. Where the registration
 belongs is `facade-module-architecture`'s.
 
 **3.5 Mutable state on a singleton** — *HIGH* · universal
@@ -314,10 +321,48 @@ documented, and made benign by storing lazy values — **so the finding is not
 here."** Name the interleaving and ask for the invariant; do not prescribe the fix
 at review time.
 
+**3.11 A task started and never awaited** — *HIGH; MEDIUM only where the called
+member logs its own failures and no later statement depends on it having
+finished* · universal, reinforced by `common-extensions`,
+`references/anti-patterns.md`, *12. `WaitAsync()` called without `await`* +
+`file-storage`, `references/anti-patterns.md`, *9. Discarding the `Task` returned
+by a delete* + `excel-miniexcel`, `references/anti-patterns.md`, *Passing an
+`async` lambda to `List<T>.ForEach`*
+`Find:` three independent passes — **none of them subsumes another**, because the
+first two produce no compiler diagnostic at all and the shipped shapes are written
+exactly that way in a green build.
+1. `grep -rn --include=*.cs "^\s*_ = [A-Za-z_][A-Za-z0-9_.]*(" src/`, discarding
+   the hits that read `_ = await` — those discard a *result*, not a task.
+2. `grep -rn --include=*.cs "\.ForEach(async" src/`
+3. Build, and read every CS4014.
+The method returns before the work it started has finished, and nothing joins the
+two. Which consequence you can show decides the rung. **Nothing joins the outcome
+to the request** — an exception inside the abandoned task reaches no caller, so
+the surrounding `try`/`catch` cannot catch it however carefully it is written, and
+the caller is told the request succeeded. **Nothing orders it** — a `finally`
+completes with its deletes and disposals still outstanding, so whatever is
+sequenced after that block is ordered against nothing; and in a `finally` this is
+worst, because the block exists to tidy up after a failure and it is that
+cleanup's own errors which vanish. **Where the task takes a gate, nothing waits**
+— the guarded work runs concurrently with another caller and the matching release
+unbalances a permit this caller never took, which corrupts only under concurrency
+and passes every single-threaded test.
+**Say which of the three shapes you found, because the fix differs.** A lambda
+containing `await` needs a target that returns a `Task`, so the `ForEach` becomes
+a `foreach` the method awaits; a discard needs the `await` and nothing else; a
+fire-and-forget that is genuinely wanted needs stating as one, with what happens
+to its failure. **A discard is not evidence of a decision** — it is the same three
+characters whether the author weighed the trade or reached for the quickest way
+past a warning, so ask rather than assume.
+Pass 2's *rule* is 3.3's, the lambda being `async void` by conversion — but 3.3's
+grep cannot see it, because the token `async void` is written nowhere. Report it
+once: under 3.3 where that check also fired, here where it did not.
+
 ## 4. Integration
 
 **4.1 A swallowed failure** — *HIGH; CRITICAL when the caller is told it
-succeeded* · `error-handling`
+succeeded* · `error-handling` + `list-query-pipeline`,
+`references/anti-patterns.md`, *The catch arm that leaves no record*
 `Find:` `grep -rn -A5 --include=*.cs "catch" src/` and read every block that does
 not end in `throw`.
 A `catch` that logs and continues, returns `null`, or returns an empty result makes
@@ -325,14 +370,20 @@ the request report success while nothing happened — and the 500 that would hav
 been logged with a trace id never was. The default is not to catch: an exception
 reaching the middleware uncaught becomes a 500 carrying a trace id, the exception
 text, its source type, method and line, and an error log entry. A `catch` that
-adds nothing *removes* all of that.
+adds nothing *removes* all of that. **One shipped exception:** in the list-query
+filter stages the dropped term **is** the contract, so the finding there is that the
+arm leaves no record — converting it to a throw is itself the defect.
 
 **4.2 `Console.WriteLine` as logging** — *MEDIUM; HIGH when it is the only record
-of a swallowed failure* · universal
+of a swallowed failure* · universal, reinforced by `list-query-pipeline`,
+`references/anti-patterns.md`, *Console diagnostics inside the filter loop*
 `Find:` `grep -rn --include=*.cs "Console.Write\|Debug.WriteLine" src/`
 It has no level, no scope, no trace id and no sink, so it is invisible in exactly
 the environment where it would have mattered. When it pairs with 4.1 that is one
-defect, not two — report it once, at the higher severity.
+defect, not two — report it once, at the higher severity. A `Debug.WriteLine` inside the recreated
+list-query extensions is that listing's settled form and is not this finding; a
+`Console.WriteLine` in the same loop is — it runs once per surviving filter term on
+every list request.
 
 **4.3 A catch filter that downgrades an exception already carrying its status** —
 *HIGH* · `distributed-lock` + `error-handling`
@@ -395,13 +446,17 @@ invalidation strategy. It reproduces for some callers and not others, and never
 for the developer who just wrote the row.
 
 **4.8 An outbound call with no timeout or no client lifetime** — *HIGH* ·
-universal + `error-handling`
+universal + `error-handling` + `http-client-factory`, *Retry, timeout and the
+facade boundary*
 `Find:` `grep -rn --include=*.cs "new HttpClient(" src/` and grep the typed-client
 registrations for `Timeout`.
 A client constructed per call exhausts sockets under load and never picks up DNS
 changes; a call with no timeout hangs the request thread on a dependency that has
 stopped answering, and the default timeout is long enough to exhaust the request
-pool before it fires. A dependency's own exception type also means nothing to your
+pool before it fires. Where the house ships an outbound facade it answers the
+client-lifetime half and **not** the timeout half — the facade carries no retry or
+timeout policy, so those live in the calling integration's own settings section, and
+a clean grep of the sender is not a pass. A dependency's own exception type also means nothing to your
 caller — wrap it in a leaf with a written message and the original as the inner
 exception, which is the other catch that earns its place.
 
@@ -545,7 +600,9 @@ tidiness issue — which is why it is a correctness finding and not slop, even
 though it surfaces during the cleanup sweep. A suppression added instead of a fix
 is the same finding: `grep -rn --include=*.cs "#pragma warning disable" src/`.
 
-**5.14 A suspicious range in a regex character class** — *HIGH* · universal
+**5.14 A suspicious range in a regex character class** — *HIGH* · universal,
+reinforced by `common-extensions`, `references/anti-patterns.md`, *9. The `A-z`
+character class*
 `Find:` `grep -rn --include=*.cs "A-z\|a-Z" src/`
 `A-z` is not `A-Za-z`: ASCII puts six characters between `Z` and `a` — `` [ \ ] ^ _ ` ``
 — so the class admits exactly the punctuation its author meant to exclude. The
@@ -561,7 +618,8 @@ Worse than dead code: it tells every reader that the property is validated
 while nothing at all is enforced. Delete it, or write the rule it promised.
 
 **5.16 A hand-rolled rule the facade already ships** — *MEDIUM* ·
-`module-feature`, *The facade's rule helpers come first*
+`module-feature`, *The facade's rule helpers come first* + `common-extensions`,
+*Regex: one home, one law*
 `Find:` **one grep decides the finding** — `grep -rn "\.Matches(" src/` — plus
 the same sweep for `.Must(` chains that test a string's shape rather than
 querying the database.
@@ -572,7 +630,9 @@ second definition by construction. Raise it from the grep alone — do **not**
 make the finding conditional on first reading the facade's extension file,
 because that lookup is the step reviewers skip, and skipping it has silently
 turned this check into a pass. Name the fix by what you find afterwards: an
-existing helper if there is one, a new facade helper if there is not.
+existing helper if there is one, a new facade helper if there is not. `common-extensions` publishes the canonical
+rule-method and regex-field set, so which of the two it is, is a lookup rather than
+a judgement.
 A regex or predicate re-deriving a helper is a second definition of one rule,
 and the copies drift the day the rule changes. When the helper itself is wrong
 the order is fixed — warn, fix on approval, then migrate call sites — never
@@ -813,7 +873,8 @@ added is `cleanup-checklist.md` category 3 *(Dead code)*, behind the same
 safe-delete checks. A folder created in advance of its trigger is
 `dotnet-architecture-review` 4.2, at INFO. Cite them; do not re-grade them.
 
-**7.2 A helper written where one already exists** — *MEDIUM* · universal
+**7.2 A helper written where one already exists** — *MEDIUM* · universal,
+reinforced by `common-extensions`, *Search `Common/` before writing a helper*
 `Find:` search for what the new code *does*, never for what it is called — a
 duplicate that shared a name would have collided at compile time. For each
 helper, extension method, converter, mapper or private method the diff adds, grep

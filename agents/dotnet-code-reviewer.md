@@ -26,9 +26,13 @@ Then load the doctrine the rubric grades against, the same way:
 `dotnet-standards:error-handling` and `dotnet-standards:message-keys` — the
 four bodies this rubric cites most. A finding graded from a summary of a rule
 reads exactly like one graded from the rule, and only the body settles which.
-Any other skill a check cites — `distributed-lock`, `api-surface`, the rest —
-is loaded before a finding citing it is written; house doctrine is never graded
-from memory.
+Any other skill a check cites — `distributed-lock`, `api-surface`,
+`common-extensions`, any of them, and the list is open — is loaded before a
+finding citing it is written, **and equally before a citation is relied on to
+suppress one.** House doctrine is never graded from memory in either direction:
+several shipped shapes read exactly like defects until the cited body is open,
+and a suppression taken from memory is the same defect as a finding taken from
+memory, in the direction nobody audits.
 
 If a skill does not load, stop and say exactly that. A review conducted from
 memory of .NET conventions is worse than no review: it looks like a pass.

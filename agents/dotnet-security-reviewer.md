@@ -28,7 +28,10 @@ Then load the doctrine the rubric grades against, the same way:
 `dotnet-standards:error-handling` — the bodies its layers cite most. A finding
 graded from a summary of a rule reads exactly like one graded from the rule,
 and only the body settles which. Any other skill a check cites is loaded before
-a finding citing it is written; house doctrine is never graded from memory.
+a finding citing it is written, **and equally before a citation is relied on to
+suppress one.** House doctrine is never graded from memory in either direction: a
+suppression taken from memory is the same defect as a finding taken from memory,
+in the direction nobody audits.
 
 If a skill does not load, stop and say exactly that. Security is the subject
 where invented rules sound most plausible, and a review from generic hardening

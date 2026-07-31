@@ -8,6 +8,54 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.58] — the five new skills become reachable from inside, and visible to review, 2026-07-31
+
+**A measured gap, raised by the user: does anything but a description trigger
+these skills?** Measurement, after the batch shipped: router base-map rows
+present for all five; reciprocal `Not for:` entries present — but those live in
+descriptions; **body pointers from the 21 pre-existing skills: 1 of 5**; **rubric
+citations: 0 of 5**; **agent mentions: 0 of 5**. A description fires at
+skill-selection time only, so a session already inside `module-feature` or
+`api-surface` was never told these skills existed — and the review layer, which
+loads the knowledge skills its rubric cites (0.3.32), could not see any of them,
+including the 32 anti-examples shipped at 0.3.54.
+
+Two coordinators, two three-way loops, disjoint scopes.
+
+**Package A — body pointers: 1 of 5 → 4 of 5.** Five pointers, **eleven
+candidate sites rejected**, under the repo's standing discipline that *a pointer
+earns its place only when it restates a boundary a shipped `Not for:` itself
+draws*. `api-surface` → `list-query-pipeline` (the contract is ours, the binder
+and operator set are theirs); `ef-core-data-access` `query-conventions.md` →
+`list-query-pipeline` (call sites ours, extensions theirs); `module-feature`
+`validation-rules.md` → `common-extensions` (the reuse→promote→inline ladder and
+the canonical `ValidatorExtension` to recreate); `automapper-mapping` →
+`file-storage` (the storage-key wrapper in `MapFrom`, closing a reciprocal banked
+at 0.3.50); and one site nobody proposed — `dotnet-testing`
+`references/unit-testing.md` → `http-client-factory`, for substituting the sender
+in a double, carrying the corpus-verified fact that the sender returns a `500`
+rather than throwing, which is what a faithful double must reproduce.
+**`excel-miniexcel` stays at zero pointers by ruling:** no pre-existing body sits
+on its path, and adding one would be coverage for its own sake.
+
+**Package B — the review layer.** Existing checks now cite the new owners, and
+three checks were added where a shipped anti-example had no reviewer at all:
+code-review **3.11** (a task started and never awaited), **5.14** (a suspicious
+range in a regex character class), **7.2** (a helper written where one already
+exists). The four reviewer agents' load instructions now say that **any** skill a
+check cites is loaded before a finding citing it is written — **and equally
+before a citation is relied on to suppress one**, closing the direction nobody
+audits: doctrine graded from memory to justify silence is the same defect as
+doctrine graded from memory to justify a finding.
+
+**Every new `Find:` grep was smoke-tested against a real project first** (the
+0.3.56 lesson, now standing practice). 3.11's returned two hits, both true
+positives — one of them the exact shape of `file-storage`'s anti-pattern 9,
+live. **A fourth candidate check was dropped rather than shipped**: an
+undisposed `CreateScope()` grep returned seven hits of which four needed
+case-by-case reading, and a check whose hits are judgement calls trains
+reviewers to skim.
+
 ## [0.3.57] — update mode reconciles against the rule catalogue, 2026-07-31
 
 **Field report, and the defect is the skill's, not the session's.** A
