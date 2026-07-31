@@ -2,20 +2,19 @@
 name: ef-core-data-access
 description: >-
   This skill should be used when working the data layer of a .NET API:
-  querying or saving through IRepositoryWrapper/RepositoryBase,
+  query or save through IRepositoryWrapper/RepositoryBase,
   Find(isAsNoTracking:), ProjectTo, includes, pagination, SaveChangesAsync per
   operation, Begin/Commit/RollbackTransactionAsync, ApplicationDbContext,
-  adding an entity or IEntityTypeConfiguration — BaseEntity,
+  an entity or IEntityTypeConfiguration — BaseEntity,
   HasBaseEntity, UnderscoreTable, HasCitextUnique, citext, OnDelete, soft
   delete via ISoftDelete/IHidden, DeleteAt/HiddenAt, IgnoreGlobalQueryFilter —
-  DatabaseSettings, connection strings, a migration under
-  Migrators.PostgreSql or Migrators.MySql, or DbInitializer seeding. Not for:
+  DatabaseSettings, connection strings, a Migrators.PostgreSql/Migrators.MySql migration, or DbInitializer seeding. Not for:
   services, validators, computed-value expressions — module-feature; file
   placement — facade-module-architecture; endpoints, DTOs — api-surface;
   exceptions, status codes — error-handling; message text — message-keys;
   mapping profiles — automapper-mapping; Redis — distributed-caching;
   locks, ConcurrencyHandlers — distributed-lock; Elasticsearch indexing —
-  elasticsearch-search.
+  elasticsearch-search; query-extension internals — list-query-pipeline.
 ---
 
 ## Repository and wrapper

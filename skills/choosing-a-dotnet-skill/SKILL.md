@@ -47,6 +47,7 @@ memory.
 | Excel with MiniExcel: exporting rows to .xlsx (plain or via a designed template), importing an uploaded workbook or a zip of workbook plus images, serving or replacing the import template, staging imported rows for confirm | `excel-miniexcel` |
 | Calling out over HTTP: the IHttpClientSender chain and HttpResult, content via ToStringContent/ToFormUrlEncodedContent/ToFormDataContent and [FormName], HttpClientSettings partials and httpclient.json, typed AddHttpClient clients, or recreating the sender facade | `http-client-factory` |
 | Storing files in S3: the storage facade and its recreation, uploading IFormFile/Stream/directory, bucket keys, pre-signed vs public vs service URLs, `S3FilePath` on responses, attachment downloads, deleting objects, ingesting an external URL | `file-storage` |
+| Writing, porting or repairing the list-query extensions themselves - QueryExpressionExtension/PaginationExtension/ApplyQuery source, the $eq...$sw operator table, CustomFilterBinder, or ApplyFilter/ToPagedListAsync not resolving in a project without the pipeline | `list-query-pipeline` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
@@ -74,7 +75,7 @@ alone picks wrong. Match the question, not the word.
 | an exception | which to throw and how it becomes a response — `error-handling`; the text it carries — `message-keys`; one raised because a resource was already being processed — `distributed-lock`; where the class itself lives — `facade-module-architecture` |
 | mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — `automapper-mapping` |
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature`; dispatching that envelope and the handler that receives it — `mediatr-messaging` |
-| pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
+| pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access`; the extension source itself — `list-query-pipeline` |
 | a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
 | soft delete / hidden rows | the stamps, the repository filter and the escape hatch — `ef-core-data-access`; why `BaseEntity` carries no flag — `facade-module-architecture` |
 | HTTP | an inbound route, controller or DTO — `api-surface`; the outbound call through the sender facade — `http-client-factory` |
