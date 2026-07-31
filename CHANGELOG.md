@@ -8,6 +8,46 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.52] — `common-extensions`: the lookup-first doctrine and the utility canon, 2026-07-31
+
+**Batch deliverable 6/6 — the batch is complete.** (Three-way loop, delegated
+headless coordinator; every arbiter spawn loaded `skill-creator` live. Five
+shared-false author claims caught across the rounds — non-canonical wrappers,
+a wrong ValidatorService census, R7 member-averaging, a false leak census
+(round 3a NEITHER — the corrected four-shape census shipped), and the
+password-shuffle security rationale, refuted against the code.)
+
+New skill `common-extensions`: SKILL.md 480 lines + 9 references/ files
+(1,868 lines of recreate-ready canon: regex, expression, serializer, random,
+password, action-context, validation, validator-extension, validator-service).
+
+- **The doctrine half:** lookup-first over `Infrastructure/Facades/Common/`
+  (Extensions first) — reuse → promote-to-extension → inline only the
+  genuinely one-off; recreate a missing house extension from canon; attributes
+  centralized. The regex law ruled absolute within shipped canon — the
+  validator references hoist inline literals into `RegexExtension` fields as a
+  second visibly-marked corrected-canon fix (banked for user review).
+- **Corrected canon shipped under the pre-authorization:** the
+  ValidatorService scope-disposal synthesis (the non-disposing `Service<T>()`
+  resolution replaced by the disposing shape; the catalogue names the leaking
+  variant as anti-pattern 4). The arbiter overruled the coordinator once —
+  the misspelled exception message stays verbatim under one coherent rule
+  (file/type name corrected, nothing inside the type) — accepted as
+  better-reasoned.
+- **Reconciliations executed per the ownership map:** `PropertyInfoExtension`
+  catalogue row now points at `list-query-pipeline`'s full listing (the
+  dual-listing question from 0.3.51, closed); zip/import-template →
+  excel-miniexcel; `RepositoryBaseExtentions` → ef-core-data-access pointer;
+  Crypto/ parked; `JsonNamingPolicyExtension` silent.
+- **Router:** one base-map row (helper/utility/attribute triggers + the
+  Common/ address + the missing-extension reflex). **Sibling `Not for:`**:
+  module-feature gains `reusable rule methods, existence-check extensions —
+  common-extensions` (description re-trimmed to 98 words).
+- Banked, unlabelled (R8): 16 verified anti-example candidates — the batch's
+  largest bank; detail in the coordinator report.
+
+---
+
 ## [0.3.51] — `list-query-pipeline`: the list-API extensions as recreatable source, 2026-07-31
 
 **Batch deliverable 5/6** (three-way loop, delegated headless coordinator;
