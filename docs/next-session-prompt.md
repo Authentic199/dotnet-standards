@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.58 (26 skills + 2 commands + 6 agents + 4 hook
+Shipped through **v0.3.59 (26 skills + 2 commands + 6 agents + 4 hook
 scripts)** as of 2026-07-31. **After the batch closed at 0.3.52 the same session
 kept shipping** — read these before assuming anything about the tree: 0.3.53
 narrowed the soft-delete section's `HasQueryFilter` claim (a corpus census
@@ -29,7 +29,20 @@ catalogue, so every `CLAUDE.md` was frozen against the rules of its creation
 day) · 0.3.58 **the activation surface** — body pointers from the pre-existing
 skills went 1/5 → 4/5 and the review layer, which had 0/5 rubric citations and
 0/5 agent mentions, can now see the five new skills and their 32 anti-examples;
-three checks added, a fourth dropped as judgement-call.
+three checks added, a fourth dropped as judgement-call. · 0.3.59 **three
+activation defects, all found by one field failure** — a consumer session
+designed a MediatR surface from memory and produced a spec with five convention
+violations. Its three stated causes were all ours: (1) the generated *Where this
+repository differs* section read as a licence to skip a skill — **R27** now
+opens it, placed in the rule catalogue so 0.3.57's reconciliation carries it into
+existing files; (2) all six `mediatr-messaging` envelope examples shipped
+`public` against `module-feature`'s `internal sealed` rule (0.3.31 normalized
+them the wrong way) — **a disclaimer naming no rule loses to an example showing
+the opposite**, and a fourth leak was found in `elasticsearch-search`; (3) the
+router's *"load it one row and stop"* sat 100 lines above the section governing
+spec-writing, so the planning section **moved above the tables**. The fourth
+cause is a real gap and is **open in the PENDING log**: no skill owns a module
+whose public surface *is* its MediatR commands.
 
 Original 0.3.52 close follows — expect `details` to print **Skills (28)** and
 **Hooks (3)** (both counting quirks below). 0.3.35–0.3.43 were
@@ -143,6 +156,25 @@ rubrics, Lane D.
 ## PENDING log (append-only; any lane may park work here)
 
 Format: `- [lane, date] what was parked — where the detail lives — what unblocks it`
+
+- [solo, 2026-07-31] **MediatR as a module's public surface — no skill owns it,
+  and a user ruling is needed before one can.** Both `module-feature` and its
+  `references/mediatr-envelopes.md` assume MediatR is intra-module plumbing
+  behind a service, and rule envelopes `internal sealed` *precisely* so a
+  controller cannot `Send` — that is the enforcement mechanism for "controllers
+  call services", not a style choice. The consumer case that exposed the gap is
+  a **reusable core module** (access control) whose `Contracts/` folder is
+  deliberately the boundary other modules in the same assembly call through, and
+  whose chosen verify path was a thin controller forwarding to `IMediator`. That
+  path collides head-on with the `internal sealed` rule. `mediatr-messaging`'s
+  0.3.32 rule (foreign reach by `Send` only) points toward the case but does not
+  cover a module *designed* as a shared core. **Two arms, user's call:** (a)
+  admit the exception and write it into `module-feature` + `mediatr-messaging`
+  as a second arm with its own boundary conditions, or (b) hold the rule and
+  require such a core to expose a public service, controllers calling it
+  directly. Do not resolve this by inference — the `internal` rule is
+  load-bearing, and weakening it silently opens the controller door the whole
+  convention exists to keep shut. Evidence: CHANGELOG 0.3.59.
 
 - [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
   `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze

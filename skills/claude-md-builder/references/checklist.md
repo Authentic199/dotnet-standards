@@ -70,6 +70,12 @@ either rule alone — Claude picks one arbitrarily.
 - A rule the user answered a question to produce.
 - The `When unsure` section.
 - Anything the PHASE 6 probes depend on.
+- **The R27 preamble under section 6b, and the *load it first* clause on any
+  capability-absent bullet.** Both read like rationale, so items 6 and 10 will
+  reach for them first; neither may be cut. Without them the section states that
+  a capability is missing and nothing more, which is read as the owning skill
+  being switched off — the exact misreading R27 exists to prevent, and it does
+  its damage at the moment the capability is being introduced.
 
 ## Final gate
 
@@ -84,5 +90,7 @@ Answer yes to all of these, or keep working:
 - [ ] Each of the three PHASE 6 probes is answerable from the file alone.
 - [ ] No section heading stands empty.
 - [ ] Every line describing something not yet built carries its source mark.
+- [ ] Section 6b opens with R27, and every bullet recording an absent capability
+      says to load that skill when the capability is introduced.
 - [ ] Every contradiction found was reported and classified — none was cut
       silently, and none classified as a defect reached the file.

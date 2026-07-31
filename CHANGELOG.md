@@ -8,6 +8,80 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.59] — three activation defects found by a field failure, 2026-07-31
+
+Field evidence, not prediction. A session in a consumer .NET repository designed
+a MediatR surface for a reusable access-control core and produced a spec with
+five convention violations, having loaded neither owning skill. The session's own
+account of *why* is the useful part, and all three of its causes turned out to be
+plugin defects rather than model error. The fourth cause it identified — no skill
+owns a module whose public surface **is** its MediatR commands — is a genuine
+gap and is **not** fixed here; it is in the PENDING log awaiting a user ruling.
+
+### `claude-md-builder` — R27: an absence is not an exemption
+
+The generated *Where this repository differs from what a skill assumes* section
+listed `mediatr-messaging — neither MediatR nor a ConcurrencyHandler exists in
+this solution; services are called directly`. The session read that as *this
+skill does not apply here* and designed from memory. The bullet was accurate;
+what it lacked was any statement that the skill still governs — and it is read
+most often by exactly the session that is **introducing** the capability, which
+is when the skill binds hardest.
+
+- **R27 added to `references/static-rules.md`**, in *Architecture and placement*
+  beside R9. It is not a `Rules` bullet: it is the standing **preamble of
+  section 6b**. Placing it in the catalogue is what makes 0.3.57's update-mode
+  reconciliation carry it into `CLAUDE.md` files that already exist — a
+  template-only change would have reached new files only.
+- **`references/template.md` §6b** now requires the preamble verbatim, and
+  requires every capability-absent bullet to carry its own *load it first*
+  clause. Prefer *not yet* over *does not exist*: the second reads as permanent.
+- **`references/checklist.md`** — both are `Never cut` (they read as rationale,
+  so cut-items 6 and 10 reach for them first), plus a final-gate checkbox.
+- **`SKILL.md` PHASE 1c** — the finding is recorded as absence *plus*
+  instruction, not absence alone.
+
+### `mediatr-messaging` — the examples contradicted the owning skill
+
+All six envelope declarations in the skill shipped as `public record`, while
+`module-feature/references/mediatr-envelopes.md` rules every envelope `internal
+sealed` — and explains that `internal` is the *enforcement mechanism* for
+"controllers call services", because the HTTP project is a separate assembly.
+The skill did disclaim ownership of envelope shape in prose, but **a disclaimer
+naming no rule loses to an example demonstrating the opposite**. 0.3.31
+normalized these examples to `public` on the grounds of that disclaimer; that
+was the wrong direction and is reversed here.
+
+- Six envelopes → `internal sealed record`.
+- `ProcessEntityBatchHandler<TData>` → `internal sealed` with its envelope. Not
+  cosmetic: a `public` class cannot implement `IRequestHandler<T>` where `T` is
+  internal (CS0061), so the two only move together.
+- The bare `.Send(...)` snippet — which read as controller code — now names its
+  holder (*service, facade or worker; never a controller*) and states why the
+  controller cannot reach it, matching the `Publish` snippet above it.
+- Core Principle 4's deferral now carries the rule it defers to, so a reader who
+  never opens `module-feature` still knows the answer.
+
+### `choosing-a-dotnet-skill` — the router told the reader to stop too early
+
+*"If exactly one base-map row fits, load it and stop"* sat 100 lines above *When
+the work is being planned, not yet written* — the section that governs
+spec-writing. The failing session did not skip that section; it obeyed the stop
+instruction. A rule placed after the instruction to stop reading is not shipped.
+
+- The planning section **moved above the tables**, with a pointer to it in the
+  opening lines and an explicit carve-out in the one-row rule.
+- Two additions: a plan touching four areas loads four skills (the one-row rule
+  governs a question in front of you, never a document that decides many), and
+  **a capability the repository does not have yet is the strongest reason to
+  load its skill** — the router-side statement of R27, so the two reinforce
+  rather than depend on each other.
+
+Solo session, no three-way loop: every change is a correction traceable to
+shipped text plus field evidence, not new doctrine. R7/R8 carve-outs untouched.
+
+---
+
 ## [0.3.58] — the five new skills become reachable from inside, and visible to review, 2026-07-31
 
 **A measured gap, raised by the user: does anything but a description trigger
