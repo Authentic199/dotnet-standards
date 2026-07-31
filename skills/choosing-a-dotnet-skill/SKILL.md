@@ -45,6 +45,7 @@ memory.
 | A route, controller action, request or response DTO chain, pagination or search contract, or OpenAPI setup | `api-surface` |
 | Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
 | Excel with MiniExcel: exporting rows to .xlsx (plain or via a designed template), importing an uploaded workbook or a zip of workbook plus images, serving or replacing the import template, staging imported rows for confirm | `excel-miniexcel` |
+| Calling out over HTTP: the IHttpClientSender chain and HttpResult, content via ToStringContent/ToFormUrlEncodedContent/ToFormDataContent and [FormName], HttpClientSettings partials and httpclient.json, typed AddHttpClient clients, or recreating the sender facade | `http-client-factory` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
@@ -75,6 +76,8 @@ alone picks wrong. Match the question, not the word.
 | pagination | the request and response contract — `api-surface`; executing the paged read — `ef-core-data-access` |
 | a cache that went stale | a Redis value not invalidated — `distributed-caching`; a permission check still passing after a grant changed — `auth-and-security` |
 | soft delete / hidden rows | the stamps, the repository filter and the escape hatch — `ef-core-data-access`; why `BaseEntity` carries no flag — `facade-module-architecture` |
+| HTTP | an inbound route, controller or DTO — `api-surface`; the outbound call through the sender facade — `http-client-factory` |
+| a file over the wire | uploading it to a third-party API or pulling bytes through the sender — `http-client-factory`; object storage and the download-then-store workflow — `file-storage` |
 | placement / project references / the composition root | deciding where a file, project or registration goes — `facade-module-architecture`; checking whether what is already there conforms — `dotnet-architecture-review` |
 | a query | against the database — `ef-core-data-access`; full-text or index search — `elasticsearch-search`; the in-process query envelope — `module-feature`; dispatching it and its handler — `mediatr-messaging` |
 | Redis | storing or invalidating a cached value — `distributed-caching`; making two callers take turns — `distributed-lock` |
