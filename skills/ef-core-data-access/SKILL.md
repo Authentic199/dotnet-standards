@@ -373,8 +373,8 @@ wiring that applies them. A `bool IsDeleted` on the entity, or an
 `x.DeleteAt == null` typed by hand at a call site, is the drift this pattern
 exists to remove: the first is unfilterable without touching every query, the
 second is correct exactly until the query someone forgets. Read
-`references/soft-deletes.md` and recreate the files from it when the project
-lacks them; do not write a local variant.
+`references/soft-deletes.md` — recreate the files from it when the project
+lacks them; the near-misses it names all compile; do not write a local variant.
 
 ### The filter belongs to the repository
 

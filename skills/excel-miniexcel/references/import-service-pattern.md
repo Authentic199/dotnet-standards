@@ -244,7 +244,6 @@ public class ImportEntityService(
         try
         {
             await repositoryWrapper.Repository<Entity>().AddRangeAsync(entities, cancellationToken);
-            ScheduleAutoClean();                                                        // staging only
             await repositoryWrapper.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
@@ -253,6 +252,8 @@ public class ImportEntityService(
             /* log — error-handling */
             throw new InternalServerException(/* message-keys */);
         }
+
+        ScheduleAutoClean();                                                            // staging only
     }
 }
 ```
@@ -329,7 +330,6 @@ public async Task ImportPackageAsync(ImportEntityRequest request, CancellationTo
                 tempDirectoryPath, Entity.StorageFolderKey, cancellationToken);
 
             await repositoryWrapper.Repository<Entity>().AddRangeAsync(entities, cancellationToken);
-            ScheduleAutoClean();                                                        // staging only
             await repositoryWrapper.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
@@ -339,6 +339,8 @@ public async Task ImportPackageAsync(ImportEntityRequest request, CancellationTo
             // (uploaded objects) -> file-storage. Logging -> error-handling.
             throw new InternalServerException(/* message-keys */);
         }
+
+        ScheduleAutoClean();                                                            // staging only
     }
     finally
     {
@@ -500,6 +502,10 @@ public async Task AutoCleanAsync(Guid importSessionId)
     await repositoryWrapper.Repository<Entity>().DeleteRangeAsync(abandoned);
 }
 ```
+
+`ScheduleAutoClean()` is called after the transaction block returns, not inside
+it: the sweep deletes rows, so whether it should exist at all is decided by the
+commit. `references/anti-patterns.md` carries the reasoning.
 
 Background job wiring is `background-worker`.
 

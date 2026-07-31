@@ -222,9 +222,10 @@ throwing — parsing an untrusted or third-party payload is a control-flow decis
 not an exception case, and without it every call site grows a `try`/`catch`.
 
 *Corpus divergence, stated neutrally:* the same job also exists as an injected
-service. Those variants declare their options **inline in each method**, and in one
-of them the deserialize path passes no options at all — so that service writes
-camelCase and reads with the defaults. **`references/serializer-extension.md`**
+service. Those variants declare their options **inline in each method**, and in four
+of the six the deserialize path passes no options at all — three of those omit the
+parameter from the interface, so no call site can supply them. Those services write
+camelCase and read with the defaults. **`references/serializer-extension.md`**
 
 ### Random values and generated passwords
 
@@ -448,6 +449,13 @@ IValidator<T> validator = scope.ServiceProvider.GetRequiredService<IValidator<T>
 it presents as gradual memory growth with no failing request to trace it back to.
 The one-liner is convenient; use it only where the caller owns and disposes the
 scope itself.
+
+### 5–13. Nine measured shapes — `references/anti-patterns.md`
+
+Base file grown a feature department (5) · canonical name held by a stub (6) · its
+`Guid.Parse` route read (7) · one more IP answer in middleware (8) · `A-z` (9) · a laxer
+twin rule (10) · a serializer that writes with options and reads without (11) ·
+`WaitAsync()` unawaited (12) · **the security one** — a credential from `Random` (13).
 
 ## Decision Guide
 
