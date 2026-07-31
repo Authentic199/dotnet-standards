@@ -8,6 +8,45 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.48] — `excel-miniexcel`: MiniExcel both directions, 2026-07-31
+
+**Batch deliverable 2/6** (three-way loop, delegated headless coordinator; 7
+verdicts — 1×A, 6×MERGE — plus a budget pass, all coordinator-verified). New
+skill `excel-miniexcel`: SKILL.md 472 lines + 4 references/ files carrying full
+sanitized implementations for verbatim recreation.
+
+- **Export:** the six-project byte-identical `ExcelExtension`, reproduced
+  untouched.
+- **Zip helper canonical:** the modern corpus variant made public; `Archive`
+  check adopted into `IsImages` (defect fix); `SaveImage` decoupled from the
+  S3 statics (temp root parameterized, corpus `FormatFileName` shape kept
+  privately); cross-type `nameof` corrected; the second corpus variant
+  presented neutrally (R8 label question banked, not taken).
+- **Templates SHIP CORRECTED:** the three-way-verified template-name defect
+  (extension passed as the name argument saves the replacement as ".xlsx",
+  unfindable by the `StartsWith` lookup) fixed under the pre-authorization,
+  marked visibly in body and reference; the working-directory anchor
+  divergence surfaced with a marked documentation-derived note, not silently
+  fixed.
+- **Import:** no corpus extension exists — `references/import-service-pattern.md`
+  distills the canon: direct + zip flows, optional staged/confirm lifecycle
+  with session-scoped `FindStaged` (a security catch — one draft lost the
+  session scoping), set-based uniqueness grounded in the staging query filter,
+  per-row structural media guard, bounded upload gate canonical with the
+  unbounded corpus shape recorded neutrally; row-validation rule content
+  routes to `module-feature`.
+- **Provenance refusals:** un-rewound-stream consequence claims, a Hangfire
+  transaction-coupling claim, a MIME literal.
+- **Router:** one base-map row (export/import/template/staging triggers).
+  **Sibling `Not for:` additions:** api-surface (`Excel export/import
+  streams`), module-feature (`Excel parsing, import flows`) — both
+  descriptions re-trimmed to 99/98 words by cutting nouns, no entry dropped.
+- **Banked (user's call, non-blocking):** eight unlabelled R8 candidates, the
+  `ExcelExtension` rename question (R7), the `EntryExcelCastTo` no-seek
+  question, the 472-vs-450 budget call — detail in the coordinator report.
+
+---
+
 ## [0.3.47] — soft delete joins `ef-core-data-access`, 2026-07-31
 
 **First deliverable of the common-extensions batch** (three-way loop, run by a

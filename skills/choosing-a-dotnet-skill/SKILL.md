@@ -44,6 +44,7 @@ memory.
 | Repositories and queries, entities and their configurations, migrations, transactions, seeding | `ef-core-data-access` |
 | A route, controller action, request or response DTO chain, pagination or search contract, or OpenAPI setup | `api-surface` |
 | Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
+| Excel with MiniExcel: exporting rows to .xlsx (plain or via a designed template), importing an uploaded workbook or a zip of workbook plus images, serving or replacing the import template, staging imported rows for confirm | `excel-miniexcel` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
