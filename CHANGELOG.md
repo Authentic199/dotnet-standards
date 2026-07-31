@@ -8,6 +8,38 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.50] — `file-storage`: the S3 facade, `S3FilePath`, keys, media downloads, 2026-07-31
+
+**Batch deliverable 4/6** (three-way loop, delegated headless coordinator;
+seven verdicts, all MERGE, drafts relayed verbatim). New skill `file-storage`:
+SKILL.md 460 lines + 4 references/ files (implementation 860, key-generation
+191, media-downloads 539, usage-patterns 315) — full sanitized implementations
+with a "Normalizations at a glance" table auditing every divergence from
+corpus.
+
+- The facade file set with pre-scaffold guard, csproj-verified package
+  prerequisites, and a 12-step checklist; `S3FilePath` + its `JsonConverter`
+  as the mandatory response pattern (13 corpus mapping sites grounded it);
+  `S3AwsExtensions` key law with the argument-order trap defended in code;
+  the five-file media-download pipeline with the caller-dispose contract and
+  a corrected `AddHttpClient` registration.
+- **Corpus defect corrected under the pre-authorization:** the converter's
+  `Read` is broken verbatim in all five projects that carry it — shipped
+  fixed, marked. The arbiter also fixed two defects in its own settled
+  fragments, and one finding legitimately reached back into locked text
+  (`BeginTransactionAsync` — mandated by all six corpus upload+transact
+  sites) and was authorized explicitly rather than silently diverged from.
+- Config examples placeholder-only (every corpus `filestorage.json` holds
+  real credentials). `KeysGenerationExtension` stays excluded (RSA, not S3).
+- **Router:** one base-map row. The queued reciprocal obligation from 0.3.49
+  is satisfied — the description's `Not for:` names `http-client-factory`.
+  **Banked for owning sessions** (S17 precedent): reciprocal `Not for:`
+  additions on api-surface (`file fields, pre-signed URLs, S3FilePath`) and
+  automapper-mapping (`S3FilePath in MapFrom, IsSystem`).
+- Ten R8 anti-example candidates banked, none labelled.
+
+---
+
 ## [0.3.49] — `http-client-factory`: the mandatory outbound-HTTP facade, 2026-07-31
 
 **Batch deliverable 3/6** (three-way loop, delegated headless coordinator;

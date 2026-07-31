@@ -46,6 +46,7 @@ memory.
 | Mapping one type onto another with AutoMapper: profiles, their conventions, registration | `automapper-mapping` |
 | Excel with MiniExcel: exporting rows to .xlsx (plain or via a designed template), importing an uploaded workbook or a zip of workbook plus images, serving or replacing the import template, staging imported rows for confirm | `excel-miniexcel` |
 | Calling out over HTTP: the IHttpClientSender chain and HttpResult, content via ToStringContent/ToFormUrlEncodedContent/ToFormDataContent and [FormName], HttpClientSettings partials and httpclient.json, typed AddHttpClient clients, or recreating the sender facade | `http-client-factory` |
+| Storing files in S3: the storage facade and its recreation, uploading IFormFile/Stream/directory, bucket keys, pre-signed vs public vs service URLs, `S3FilePath` on responses, attachment downloads, deleting objects, ingesting an external URL | `file-storage` |
 | Which exception to throw, status codes, how the middleware turns a throw into a response | `error-handling` |
 | The text a validator, success path or exception shows the user; message keys | `message-keys` |
 | Authentication and authorization: schemes and tokens, permission grants and checks, the current principal, API keys, auth secrets | `auth-and-security` |
