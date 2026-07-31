@@ -278,9 +278,9 @@ business change, the projection is a consequence of it, and several documents ma
 copies of the same row. One event, one handler each, each independently correct.
 
 ```csharp
-public record OrderStatusChangedEvent(Guid OrderId, OrderStatus Status) : INotification;
+internal sealed record OrderStatusChangedEvent(Guid OrderId, OrderStatus Status) : INotification;
 
-public class ReindexOrderHandler : INotificationHandler<OrderStatusChangedEvent>
+internal sealed class ReindexOrderHandler : INotificationHandler<OrderStatusChangedEvent>
 {
     private readonly IElasticSearchWrapper elasticSearchWrapper;
     private readonly IRepositoryWrapper repositoryWrapper;

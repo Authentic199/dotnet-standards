@@ -129,7 +129,11 @@ Three rules hold across the whole scan:
      - **Contradicts** → **never cut this silently.** See below.
      - **The skill assumes something this repository does not have** → a real
        finding, and the most valuable kind. It goes in the *Where this repository
-       differs* section (`references/template.md` §6b).
+       differs* section (`references/template.md` §6b) — recorded as an absence
+       **plus** the instruction to load that skill when the capability is
+       introduced. An absence written on its own is read as the skill being void,
+       and is read that way most often by the session adding the very thing
+       (R27).
 
   Answering only question 1 is how the scan re-introduces doctrine through the
   back door, and it is also how a genuine contradiction gets deleted for looking

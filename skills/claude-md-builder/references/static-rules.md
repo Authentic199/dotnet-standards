@@ -90,6 +90,24 @@ and every sibling repository then disagree with.
 where things go; it does not say *stop and ask before inventing a new place*,
 and that is the part a scan cannot supply either.
 
+**R27** — `Every bullet below records what is in the tree today, not that the skill is void. "X does not exist here" is never a licence to skip X's skill — and it is at its most misleading when the task is to introduce X, which is exactly when that skill governs. Load the owning skill before designing, while the spec or plan is still being written, not when you start typing code.`
+**Applies when** section 6b ships — that is, whenever the scan found any
+divergence at all. It is not a bullet in the `Rules` section: it is the
+**standing preamble of section 6b**, written directly under that heading and
+above the first bullet.
+*Prevents:* the failure this rule was written from. A session designing a
+feature read `mediatr-messaging — neither MediatR nor a ConcurrencyHandler
+exists in this solution` as *this skill does not apply here*, and designed the
+MediatR surface from memory — inventing a folder outside the house vocabulary,
+a handler layout the owning skill forbids, and a registration anchor that fails
+silently. The task was *introducing* the capability, which is the moment the
+skill is most binding, and the section as written read as a licence to skip it.
+*Note:* R20 bars reconstructing a convention from memory; this bars the
+reasoning that makes a reader think no convention applies. A section-6b bullet
+describes a **tree**, never a **rule** — see `template.md` §6b, which requires
+every capability-absent bullet to carry its own *load it first* clause on top of
+this preamble.
+
 ---
 
 ## Secrets and configuration

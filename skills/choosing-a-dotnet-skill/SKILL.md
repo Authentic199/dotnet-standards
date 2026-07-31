@@ -11,10 +11,19 @@ description: >-
   a question already matched to one skill — load that skill directly.
 ---
 
+## First: is the work being planned, or written?
+
+**If a spec, plan, design document or subagent prompt is being written, read
+*When the work is being planned* below before using the tables.** That case
+routes differently — a plan touches several areas at once, so "one row, then
+stop" is the wrong shape and following it is how a convention gets decided with
+no skill looking.
+
 ## How to use these tables
 
 Find the row that matches the situation, load that one skill, and work from it.
-If exactly one base-map row fits, load it and stop. If none fits, see *When
+If exactly one base-map row fits, load it and stop — *unless* the work is being
+planned rather than written, which is the case above. If none fits, see *When
 nothing here fits*.
 
 Each row names a **single entry point, never a sequence**. A task spanning
@@ -29,6 +38,33 @@ act on. Having chosen, load the skill.
 
 Rows marked *not yet covered* mean no skill here owns that area yet — see
 *Not yet covered*.
+
+## When the work is being planned, not yet written
+
+A generic prompt — *implement feature X* — carries none of the nouns these
+skills trigger on, so nothing fires while the spec, the plan, or the subagent
+prompt is being written. That is precisely when the conventions get decided,
+with no skill looking.
+
+So work step by step. For each spec step, plan step, or subagent prompt — e.g.
+while running Superpowers brainstorming, plan writing, or subagent-driven
+development — identify the area the step touches and look it up in the tables
+below. **Where a shipped skill owns that area, the step must name it, and the
+skill must be loaded before the step is written — not when the code is typed.**
+A step reading *add the endpoint* leaves whoever executes it matching on
+descriptions alone, which is the failure this router exists to prevent; a step
+reading *add the endpoint (`api-surface`)* does not. Steps in uncovered areas
+have nothing to name — say so in the step if it helps the plan.
+
+A plan touching four areas loads four skills. That is the expected cost of
+planning, not a sign of over-reach — the one-row rule governs a question already
+in front of you, never a document that decides many.
+
+**A capability the repository does not have yet is the strongest reason to load
+its skill, not a reason to skip it.** When the plan introduces MediatR, caching,
+a lock or a test library that is absent today, the owning skill governs that
+plan from its first line. A `CLAUDE.md` note that the capability is missing
+records the tree as it stands; it never retires the skill that owns it.
 
 ## Base map — one area, one skill
 
@@ -112,22 +148,6 @@ about that skill's area, not about this one.
 | HTTP calls to another service: retry, timeout, circuit breaker, client setup | — |
 | Observability: logging, tracing, health checks | `observability` |
 | Repository bootstrapping: starting a new solution from nothing — once the projects exist, placement belongs to `facade-module-architecture` | `project-scaffolding` |
-
-## When the work is being planned, not yet written
-
-A generic prompt — *implement feature X* — carries none of the nouns these
-skills trigger on, so nothing fires while the spec, the plan, or the subagent
-prompt is being written. That is precisely when the conventions get decided,
-with no skill looking.
-
-So work step by step. For each spec step, plan step, or subagent prompt — e.g.
-while running Superpowers brainstorming, plan writing, or subagent-driven
-development — identify the area the step touches and look it up above. **Where
-a shipped skill owns that area, the step must name it.** A step reading *add the
-endpoint* leaves whoever executes it matching on descriptions alone, which is
-the failure this router exists to prevent; a step reading *add the endpoint
-(`api-surface`)* does not. Steps in uncovered areas have nothing to name — say
-so in the step if it helps the plan.
 
 ## When nothing here fits
 

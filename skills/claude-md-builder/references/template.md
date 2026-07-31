@@ -74,15 +74,25 @@ Static rules R9, R10 and R20 live here.
 it here is what pushes a file past 200 lines — and a summary of a skill is the
 one form of bloat that also makes the reader stop consulting the original.
 
-**6b — Where this repository differs from what a skill assumes.** One line per
-difference, each naming the skill and then the fact that replaces its assumption.
-Three things belong here:
+**6b — Where this repository differs from what a skill assumes.** **Open with
+R27 verbatim as the section's preamble**, above the first bullet — without it
+this section is read as a list of skills that have been switched off, which is
+the one way it does harm. Then one line per difference, each naming the skill and
+then the fact that replaces its assumption. Three things belong here:
 
 - **A skill assumes a capability this repository does not have** — no MediatR, no
   distributed lock, caching that is in-memory rather than cache-aside, a test
   stack without the libraries the testing skill expects. This is the highest-value
   content the scan produces: without it, Claude loads the skill and hunts for a
   type that was never written.
+
+  **Write each of these as a present-tense fact plus a standing instruction**,
+  never as the fact alone. *"…is not in the solution yet; services are called
+  directly"* states the tree and stops. *"…is not in the solution **yet**;
+  services are called directly. **Introducing it puts its skill in force: load it
+  first.**"* states the tree and survives the day someone introduces it — which
+  is the day this bullet is most likely to be read and most likely to mislead.
+  Prefer *not yet* over *does not exist*: the second reads as permanent.
 - **A deliberate local choice that contradicts a skill**, once PHASE 1c has
   confirmed it is deliberate — with its reason.
 - **A capability specified but not built yet**, marked per the rule below.

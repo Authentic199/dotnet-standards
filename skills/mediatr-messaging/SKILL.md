@@ -74,7 +74,12 @@ Colocation is the point: for a notification the handler is often the only
 documentation of what publishing causes. The file is named for the envelope.
 
 The **shape of the envelope record itself** — declaration form, accessibility,
-what may sit on it — belongs to `module-feature`.
+what may sit on it — belongs to `module-feature`, which rules it **`internal
+sealed`**. Every envelope in this skill is written that way; do not read an
+example here as licence to make one `public`. The reason is not style: modules
+share an assembly, so `internal` hides an envelope from the **HTTP project**,
+which is a separate one. One `public` envelope opens that door for every
+controller after it.
 
 ### 5. A handler's name derives from its message, unless the message fans out
 
@@ -133,7 +138,7 @@ container that unifies generic arguments (*Patterns*).
 ```csharp
 // Modules/<Module>/DomainEvents/EntityActivatedEvent.cs
 
-public record EntityActivatedEvent(Guid EntityId, DateTimeOffset OccurredAt) : INotification;
+internal sealed record EntityActivatedEvent(Guid EntityId, DateTimeOffset OccurredAt) : INotification;
 
 internal sealed class EntityActivatedHandler : INotificationHandler<EntityActivatedEvent>
 {
@@ -170,7 +175,7 @@ The derived name can only belong to one of them — the trigger is the handler
 count, not taste.
 
 ```csharp
-public record EntityStatusChangedEvent(Guid EntityId) : INotification;
+internal sealed record EntityStatusChangedEvent(Guid EntityId) : INotification;
 
 internal sealed class IndexEntityStatusHandler : INotificationHandler<EntityStatusChangedEvent> { }
 
@@ -182,7 +187,7 @@ internal sealed class ExpireEntityCacheHandler : INotificationHandler<EntityStat
 ```csharp
 // Modules/<Module>/Commands/CreateEntityCommand.cs
 
-public record CreateEntityCommand(CreateEntityRequest Request) : IRequest<EntityBaseResponse>;
+internal sealed record CreateEntityCommand(CreateEntityRequest Request) : IRequest<EntityBaseResponse>;
 
 internal sealed class CreateEntityHandler : IRequestHandler<CreateEntityCommand, EntityBaseResponse>
 {
@@ -191,11 +196,19 @@ internal sealed class CreateEntityHandler : IRequestHandler<CreateEntityCommand,
 }
 ```
 
+Dispatch from a service, facade or worker — **never from a controller**:
+
 ```csharp
 EntityBaseResponse response = await mediator
     .Send(new CreateEntityCommand(request), cancellationToken)
     .ConfigureAwait(false);
 ```
+
+The envelope is `internal` and the HTTP project is a separate assembly, so a
+controller cannot name this type even if it holds `IMediator`. That is
+deliberate: it is what makes "controllers call services" enforceable rather than
+stylistic. The rule and its reasoning belong to `module-feature` — see its
+`references/mediatr-envelopes.md` before making any envelope `public`.
 
 Nothing coming back: `record X : IRequest` pairs with `IRequestHandler<X>` and a
 plain `Task Handle`.
@@ -254,10 +267,10 @@ the message type**:
 ```csharp
 // Modules/<Module>/.../Handlers/ProcessEntityBatchMessage.cs
 
-public record ProcessEntityBatchMessage<TData>(params TData[] Sources) : IRequest
+internal sealed record ProcessEntityBatchMessage<TData>(params TData[] Sources) : IRequest
     where TData : class;
 
-public class ProcessEntityBatchHandler<TData>(IEntityService entityService)
+internal sealed class ProcessEntityBatchHandler<TData>(IEntityService entityService)
     : IRequestHandler<ProcessEntityBatchMessage<TData>>
     where TData : class
 {
@@ -329,7 +342,7 @@ must be awaited exactly once — skipping it silently cancels the handler.
 
 ```csharp
 // DomainEvents/CreateEntityCommand.cs
-public record CreateEntityCommand(string Name) : IRequest;
+internal sealed record CreateEntityCommand(string Name) : IRequest;
 ```
 
 `DomainEvents/` is what a reader scans to learn what a module broadcasts, and the
@@ -358,7 +371,7 @@ defect this skill will flag.
 ### A descriptive handler name on a single-handler message
 
 ```csharp
-public record EntityStatusUpdatedEvent(Guid EntityId) : INotification;
+internal sealed record EntityStatusUpdatedEvent(Guid EntityId) : INotification;
 
 internal sealed class UpdateEntityHistoryHandler       // only handler for this event
     : INotificationHandler<EntityStatusUpdatedEvent>
