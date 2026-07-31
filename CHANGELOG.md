@@ -8,6 +8,40 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.57] — update mode reconciles against the rule catalogue, 2026-07-31
+
+**Field report, and the defect is the skill's, not the session's.** A
+`claude-md-builder` update run on a consumer repository added exactly one
+factual line and no rules — while three static rules had shipped in the same
+day's releases (R16's house-pattern exception, R25 lookup-first over
+`Common/Extensions`, R26 timestamps-are-UTC) and all three applied to that
+project. Inspection of the file confirmed it: the old R16 wording present, R25
+and R26 absent.
+
+**Cause: update mode had six steps and none of them re-opened the catalogue.**
+It diffed the file against the *project* — stale facts, analyzer duplicates,
+provisional content — and never against the *rules*. So a `CLAUDE.md` was frozen
+against whatever the catalogue held on the day it was written, and every rule
+shipped afterwards was invisible to it, permanently.
+
+**Added: update-mode step 3, "Reconcile against the current rule catalogue"**
+(the old steps 3–6 renumber to 4–7). It re-runs PHASE 3 selection against
+`references/static-rules.md` as it stands now and diffs **both** directions: a
+rule whose `Applies when` the scan satisfies but which the file lacks — offered,
+never asserted, because **absence is not rejection** and a rule the user rejected
+before must not return wearing a new hat; and a rule the file carries whose
+canonical text has since changed — both wordings shown, the user chooses,
+because a silently stale rule reads as current and is enforced as written. The
+file's line budget still binds. PHASE 3 gained the reciprocal sentence: the
+catalogue moves, which is why update mode cannot trust an existing file.
+
+**Known seam:** generated files carry no provenance marker naming the catalogue
+version they were built against, so reconciliation is a full re-selection and a
+text diff rather than a version comparison. Adding such a marker would put a
+line in the output that is neither project-specific nor an approved static rule,
+which the skill's own hard constraints forbid — so the cheap fix is deliberately
+not taken.
+
 ## [0.3.56] — rubric checks 5.21 and 5.22 close the two orphans, 2026-07-31
 
 The two rules shipped at 0.3.55 had no reviewer. Both now do, in

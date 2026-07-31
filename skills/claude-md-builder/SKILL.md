@@ -209,6 +209,11 @@ the EF migration rules, and forcing them in is how a generic file gets built.
 Rules with a `<slot>` take the value the scan found. A slot the scan could not
 fill means the rule does not ship — never leave a placeholder in the output.
 
+**This catalogue moves.** Rules are added and their wording is sharpened between
+releases, and an existing `CLAUDE.md` has no way to notice — which is why update
+mode re-runs this phase against the current file rather than trusting it (*Update
+mode*, step 3).
+
 ### PHASE 4 — Draft
 
 Follow `references/template.md`: the section order, which sections are required
@@ -269,20 +274,38 @@ about intent and unreliable about facts.
    wrong, lines that duplicate an analyzer, lines that restate a convention a
    `dotnet-standards` skill owns, lines Claude can derive from the code, and
    genuine gaps. Show it before editing.
-3. **Ask the update question:** *"What mistake did Claude repeat recently?"* Every
+3. **Reconcile against the current rule catalogue — the step that is easy to skip
+   and the reason an existing file silently rots.** An existing `CLAUDE.md` was
+   written against the catalogue as it stood *then*. Re-run PHASE 3 selection
+   against `references/static-rules.md` as it stands **now**, and diff both
+   directions:
+   - **A rule whose `Applies when` the scan satisfies, absent from the file.**
+     Either it shipped after this file was written, or the project has since
+     grown the thing it applies to. Offer it. **Absence is not a rejection** —
+     but a rule the user rejected before must not be re-offered as though it
+     were new, so ask rather than assert, and take "we decided against it" as a
+     final answer for this file.
+   - **A rule present in the file whose canonical text has since changed.** Show
+     both wordings side by side and let the user choose. A silently stale rule is
+     worse than a missing one: it reads as current and is enforced as written.
+
+   Nothing here is added without the user seeing it, and the file's budget still
+   binds — if the reconciliation would push it over, say so and let the user cut.
+
+4. **Ask the update question:** *"What mistake did Claude repeat recently?"* Every
    answer is a candidate rule — this is the highest-yield source of real rules
    there is, because it is evidence rather than prediction. Add each as one
    falsifiable imperative line.
-4. **Preserve deliberate oddities.** A rule that looks wrong may be a decision.
+5. **Preserve deliberate oddities.** A rule that looks wrong may be a decision.
    Ask before removing anything that reads like a hard constraint; never delete a
    rule merely because its reason is not written down.
-5. **Settle the provisional content first.** Any `Planned, not yet built` section
+6. **Settle the provisional content first.** Any `Planned, not yet built` section
    and any line carrying an `unverified` source comment is now due: check it
    against the code that exists. Each one is either deleted (it happened, and the
    code says so better), promoted to a rule (it was decided), or re-marked (still
    not built). Nothing stays provisional across two updates without being said
    out loud.
-6. **Trim and verify** (PHASES 5–6) exactly as in create mode, then hand over.
+7. **Trim and verify** (PHASES 5–6) exactly as in create mode, then hand over.
 
 ## Hard constraints
 
