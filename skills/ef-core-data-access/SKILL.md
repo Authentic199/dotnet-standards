@@ -219,10 +219,16 @@ nothing outside persistence should drive initialization.
 
 ## Entities and configurations
 
-One entity lives in one file, together with its `IEntityTypeConfiguration<T>`
-and any enums it owns. The configuration sits beside the class it configures,
-so a reviewer reads the shape and its mapping without opening a second file,
-and `ApplyConfigurationsFromAssembly` finds it with no registration step.
+One entity lives in one file, together with its `IEntityTypeConfiguration<T>`.
+The configuration sits beside the class it configures, so a reviewer reads the
+shape and its mapping without opening a second file, and
+`ApplyConfigurationsFromAssembly` finds it with no registration step.
+
+**An enum the entity uses is not in that file.** Every enum a capability owns
+lives in `Enums/`, one per file — placement is `facade-module-architecture`'s
+rule, and it is stated there as *never declared inside an entity, response or
+service file*. The example below shows `FulfilmentStatus` only so the mapping
+line reads; it belongs in `Enums/FulfilmentStatus.cs`.
 Every public property carries an XML `<summary>` — the documentation law lives
 in `api-surface` and covers entities alongside the DTOs they feed.
 
@@ -246,6 +252,7 @@ public class Order : BaseEntity
     }
 }
 
+// Enums/FulfilmentStatus.cs — a separate file, shown here only for readability
 public enum FulfilmentStatus
 {
     /// <summary>

@@ -8,6 +8,35 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.60] — a shipped contradiction between two skills, 2026-07-31
+
+Found the same day and the same way as 0.3.59: a consumer session rewriting its
+spec against the skills hit two shipped rules that cannot both be satisfied, and
+had to adjudicate the conflict itself in a *Xung đột giữa hai skill* section.
+Having to do that is the defect.
+
+- `ef-core-data-access:222` — *"One entity lives in one file, together with its
+  `IEntityTypeConfiguration<T>` **and any enums it owns**"*, and its example
+  declared `public enum FulfilmentStatus` inside the `Order` file.
+- `facade-module-architecture:215` — *"**Every enum the capability owns lives in
+  `Enums/`** — never declared inside an entity, response or service file."*
+
+**Resolved toward `facade-module-architecture`**, which owns placement — the
+same reading the consumer session reached unaided, and the one the router's base
+map assigns. `ef-core-data-access` no longer claims the enum, states the rule and
+its owner explicitly, and its example carries an `// Enums/FulfilmentStatus.cs`
+comment marking the enum as a separate file shown inline only so the
+`HasDefaultValue` line reads.
+
+**Second instance of the 0.3.59 family, and the reason to look for more.** In
+both cases the skill's *prose* deferred correctly or said nothing, while its
+*example* demonstrated the opposite of another skill's rule — and the example is
+what gets copied. 0.3.59 fixed it for MediatR envelope accessibility across
+three skills; this fixes it for enum placement. A sweep for further
+example-versus-rule conflicts across skill pairs is worth a session.
+
+---
+
 ## [0.3.59] — three activation defects found by a field failure, 2026-07-31
 
 Field evidence, not prediction. A session in a consumer .NET repository designed
