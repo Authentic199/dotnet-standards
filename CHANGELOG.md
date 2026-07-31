@@ -8,6 +8,41 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.51] — `list-query-pipeline`: the list-API extensions as recreatable source, 2026-07-31
+
+**Batch deliverable 5/6** (three-way loop, delegated headless coordinator;
+piece 1 MERGE, body MERGE, references MERGE per file, every verdict
+spot-verified). New skill `list-query-pipeline`: SKILL.md 462 lines (90-word
+description) + 3 references/ files — QueryExpressionExtension (454),
+PaginationExtension (250), PropertyInfoExtension (195), each with a
+Deviations-from-corpus table. Fires on **authorship** (writing/porting/
+repairing the extensions), never on usage — usage stays with
+`ef-core-data-access`/`api-surface`.
+
+- **The `Any()` probes were KEPT** — the shipped five-trips cost model in
+  `dotnet-performance-review` stays true; **no perf follow-up needed**. The
+  probe-drop optimization is banked as a named follow-up with exact edit
+  locations.
+- Both authors' independently-added `CancellationToken` on the `ApplyQuery`
+  bundle was overruled (citation verified overstated; the settled "bundle is
+  the short form" identity corroborated); the shared unverified
+  `new ParsingConfig()` construction replaced with corpus tokens, flag
+  placement fixed.
+- **Router:** one base-map row (authorship + does-not-resolve triggers); the
+  `pagination` disambiguation row gains an authorship arm. **Sibling
+  `Not for:`** — ef-core-data-access (`query-extension internals`) and
+  api-surface (`pipeline implementation`), both descriptions re-trimmed to 99
+  words by cutting nouns.
+- **Incident recovered mid-run:** a concurrent lane overwrote un-namespaced
+  reference drafts; the arbiter refused wrong-skill content, both drafts were
+  re-emitted verbatim from transcript, and the other lane's orphans were
+  safety-copied (`*-RESCUED.md` in the scratchpad).
+- Vetoable ruling recorded: the `$null` `it.`-prefix drop (revert instruction
+  in the report). Open at the last batch merge: the
+  `common-extensions`/PropertyInfoExtension dual listing must reconcile.
+
+---
+
 ## [0.3.50] — `file-storage`: the S3 facade, `S3FilePath`, keys, media downloads, 2026-07-31
 
 **Batch deliverable 4/6** (three-way loop, delegated headless coordinator;
