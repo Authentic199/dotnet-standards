@@ -8,6 +8,55 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.54] — the R8 labelling pass: 32 anti-examples across six skills, 2026-07-31
+
+**A user-run labelling pass, then a delegated one.** The batch's six coordinator
+reports had banked **63 verified anti-example candidates** — real defects found
+in the corpus while extracting canon — none labelled, because R8 reserves
+labelling to the user. The user ruled on groups 1–2 candidate by candidate, then
+delegated the rest ("từ nay cứ theo bạn đề xuất đi"), waiving the carve-out for
+this pass only. Every decision is recorded with its reason in
+`docs/ext-batch-2026-07-31/r8-decisions.md`, one row per candidate, so any label
+can be vetoed independently.
+
+**Verdict: 32 LABEL, 31 BỎ.** Three exclusion rules, generalized from the user's
+own group-1 calls, account for most of the drops: a misspelling is never an
+anti-example; a variant that merely lost a canonical pick is never one; and
+dead-but-harmless code is not one either. Two more were dropped on merit — the
+`Any()` probes (shipped canon and `dotnet-performance-review`'s cost model both
+rest on them; labelling would force a two-skill change) and `Service<T>()`
+(already taught as anti-pattern 4). One was dropped for lack of evidence: a
+reported `Current`-under-`PageSize` violation could not be reproduced.
+
+**Implementation:** six three-way loops, one per owning skill, run by delegated
+headless coordinators. **All 32 labels re-verified against the corpus and
+shipped; none dropped at implementation.** One was re-framed weaker than the
+decision table implied and that is the pass's most valuable outcome: the
+`TrimEnd(character-set)` defect was traced through all ten operator templates —
+every composed predicate ends in `)`, which is in neither trim set, so nothing
+is corrupted today. It ships as a **latent** defect with the mechanism, never as
+a live failure.
+
+**Where they live:** `ef-core-data-access` (3, woven into `## Soft delete` +
+`references/soft-deletes.md`); the other five skills were at or near the 500-line
+bar, so their sets ship in a new `references/anti-patterns.md` each —
+`list-query-pipeline` (6), `common-extensions` (9), `excel-miniexcel` (5),
+`file-storage` (5), `http-client-factory` (4) — with a short pointer in the
+SKILL.md's existing Anti-patterns section. No description changed, so the router
+needed no edit. No existing anti-pattern was renumbered.
+
+**Coordinator catches worth keeping:** both `http-client-factory` authors
+converged on a *broken* remedy for the builder-state label — passing an empty
+header dictionary — which the shipped `WithHeaders` ignores (it assigns pairs,
+never clears), so the fix fixed nothing; cut in all three places, replaced with
+"only a fresh instance is clean." `list-query-pipeline` proved its dead paged
+`Data` member is `internal set` and never assigned in any lineage, and that the
+`GetType().IsGenericType` guard is wrong in all six lineages while the very next
+branch spells the same test correctly.
+
+**Preserved:** the decision table, the implementation brief, and all six R8
+reports under `docs/ext-batch-2026-07-31/`.
+
 ## [0.3.53] — the soft-delete section stops overstating `HasQueryFilter`, 2026-07-31
 
 **Caught while pulling evidence for the R8 labelling pass, one release after

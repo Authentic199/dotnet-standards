@@ -446,6 +446,13 @@ The readers swallow their exceptions by design (Principle 3). The corrected shap
 A literal host also defeats `ValidateOnStart()`: the misconfiguration that should have stopped
 the process at boot instead surfaces as a failed call in production.
 
+### 5–8. Four more, in `references/anti-patterns.md`
+
+A blocking body read in a result constructor (5); a multipart collection loop that tests the
+collection instead of the item (6); a long-lived consumer holding one sender with a `With…` link
+inside an `if` (7); a reader's return value used with no branch for what it returns on failure
+(8). Read them when auditing an existing call or a hand-maintained copy of the facade.
+
 ## Retry, timeout and the facade boundary
 
 The facade has **no** retry, timeout or circuit-breaker policy, and none gets added to it. Where

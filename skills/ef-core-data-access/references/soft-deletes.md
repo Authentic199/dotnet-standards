@@ -140,6 +140,29 @@ it operates on everything composed up to that call and nothing after it. Because
 the stamp check is an ordinary node rather than a model-level filter, removing it
 is an ordinary visit — that is the payoff of injecting in the repository.
 
+**`IgnoreQueryFilters()` is the near-miss to know about.** It reads like the
+hatch above, compiles beside it, and on a stamped entity the intent behind it
+is legible:
+
+```csharp
+List<OrderResponse> rows = await repositoryWrapper.Repository<Order>()
+    .Find(x => !customerId.HasValue || x.CustomerId == customerId)
+    .IgnoreQueryFilters()
+    .ProjectTo<OrderResponse>(mapper.ConfigurationProvider)
+    .ToListAsync(cancellationToken);
+```
+
+Two things about that call site are invisible in it. This pattern registers no
+stamp through `HasQueryFilter` — the check is composed as an ordinary `Where`
+inside `Find`, before the `DbSet` is touched — and the entity itself registers
+no query filter at all, for this or any other job. What `IgnoreQueryFilters()`
+does under each of those conditions is settled by the documentation-derived
+note under `### The filter belongs to the repository` in `SKILL.md`; read it
+before writing the call. The hatch that reaches the stamp is the one above,
+`IgnoreGlobalQueryFilter(typeof(IHidden))`, composed directly after `Find` —
+and what the other one leaves behind is a call site announcing a bypass that no
+later reader can evaluate without going to check what the entity registers.
+
 ## RemoveGlobalQueryFilterNodeVisitor.cs
 
 ```csharp
@@ -238,6 +261,27 @@ first, `.HiddenObject()` on the result — so both conditions AND together with
 whatever the caller passed. Because neither helper returns null, `Find` always
 composes a `Where`, and there is no null branch to write after the chain.
 
+**The null check that looks defensive is the one to leave out.** A `Find` that
+tests the composed predicate before using it —
+
+```csharp
+expression = ApplySoftDelete(expression).HiddenObject();
+if (expression == null)
+{
+    return isAsNoTracking ? dbContext.Set<T>().AsNoTracking() : dbContext.Set<T>();
+}
+```
+
+— is not a live bug: the branch cannot be reached, for the reason just given,
+and both helpers are declared to return a non-nullable expression. It is a trap
+all the same: that branch is the only exit in the method handing back the
+`DbSet` with no `Where` at all — every deleted and every hidden row — and it
+becomes reachable the moment someone widens a helper to return null, or moves
+the check above the composition line. Until then it does its damage as
+documentation, telling each reader that the helpers might return null and that
+an unfiltered `Set<T>()` is one of the ordinary outcomes of `Find`. Compose,
+then return; there is no null to handle.
+
 The write members are deliberately left alone: `DeleteAsync` and
 `DeleteRangeAsync` still issue a real `Remove`, because entities that are
 genuinely removable still exist, and stamping is the caller's decision rather
@@ -291,6 +335,28 @@ The stamps are ordinary mapped properties — nothing configures them, and nothi
 should. Every unique index on the entity takes the filter; an unfiltered one is
 the defect that surfaces weeks later as "this code is taken" against a row nobody
 can see.
+
+**Reach for the optional parameter, not a second method.** `HasCitextUnique`
+takes the filter as a trailing `string? filter = null` and applies `.HasFilter`
+only when it is non-null. The drift is to leave that helper alone and add one
+beside it whose body is the same plus the `.HasFilter(...)` call:
+
+```csharp
+// two names for one job — and the plain one is the unfiltered index
+builder.HasCitextUnique(x => x.Code);
+builder.HasCitextUniqueHasFilter(x => x.Code, ISoftDelete.SqlFilter);
+```
+
+A shared configuration extension is where an existing helper is *extended*,
+not where a parallel entry point is added beside it: a trailing optional
+parameter breaks no existing call site, while a second method splits one job
+across two names and leaves the default-named one as the unsafe half.
+`HasCitextUnique(x => x.Code)` on a stamped entity then compiles, reads
+correctly, and produces the unfiltered unique index `ISoftDelete.SqlFilter`
+exists to prevent — the safe variant reachable only by already knowing it is
+there. Nothing breaks the day the second method is written; the call sites
+that needed the filter passed it. What breaks is the next one, written by
+whoever reached for the obvious name.
 
 ## Checklist
 

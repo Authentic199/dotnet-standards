@@ -453,6 +453,17 @@ finds nothing and the user gets a not-found for a file that is sitting right
 there. Keep exactly one name builder and one folder constant, both inside the
 extension.
 
+### Five more, in `references/anti-patterns.md`
+
+Kept out of this file for budget — open it when writing an upload endpoint or an
+import service; each entry carries BAD/GOOD and the reasoning.
+
+- **No size ceiling** on an import endpoint — both limits lifted, no cap chosen.
+- **Cleanup sweep armed before the commit** — scheduled inside the transaction.
+- **`async` lambda in `List<T>.ForEach`** — `async void` disposal in a `finally`.
+- **`Console.WriteLine` + `Stopwatch`** probe left in the import path.
+- **A clock read as the only unique part** of a saved media file name.
+
 ## Decision Guide
 
 | Scenario | Do this |

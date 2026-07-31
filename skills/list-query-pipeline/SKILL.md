@@ -406,6 +406,14 @@ project is the same file, and correcting it is a rename, not a redesign.
   `ef-core-data-access`; the response envelope to `api-surface`;
   relevance-ranked full-text search to `elasticsearch-search`. Point at them.
 
+- **Six shapes the existing copies carry.** Console diagnostics inside the filter
+  loop, a catch arm that leaves no record, a character set standing in for a
+  suffix strip, a guard evaluated on the `PropertyInfo` object instead of the
+  property it describes, a concrete type welded into the search-field walk, and a
+  dead member on the paged envelope. `references/anti-patterns.md` gives each one
+  its shape, its observable cost and the form to write instead — read it before
+  porting a pipeline out of an existing project rather than out of the listings.
+
 ### Rationalizations, and what is actually true
 
 | Rationalization | Reality |
@@ -460,3 +468,7 @@ Read the reference file that matches what you are holding:
   (`GetPropertyRecursive`, `GetPropertyRecursiveWithMaxDeep`, `GetDataHolders`,
   `DataHolder`) and `NotSearchableAttribute`. Both files above depend on it;
   `common-extensions` owns the general-utility view of the same type.
+- `references/anti-patterns.md` — the six defects existing copies carry, what each
+  costs at request time, and what the listings above write instead. Read it when
+  you inherit a pipeline rather than recreate one, and before deciding that
+  something in an inherited copy is a typo worth fixing.

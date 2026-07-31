@@ -330,6 +330,19 @@ keeps writing the old shape and nothing fails — the bucket just quietly contai
 conventions. A hand-rolled key also skips the filename sanitization, which is how spaces
 and diacritics reach the bucket.
 
+The commoner shape is worse — it drops the uniqueness component entirely:
+
+```csharp
+// BAD — no tick component: the filename *is* the key
+string key = $"{EntityFolder}/{request.Image.FileName.ReplaceSpecialCharacters(string.Empty)}";
+```
+
+Two uploads of the same filename produce the same key, so the second overwrites the first
+and every other row pointing at that key starts serving the wrong object. Worse, in an
+update flow that otherwise does the right thing — upload, commit, delete old — a
+replacement carrying the name it already had makes the new key *equal* the old one, so the
+delete-old step removes the object just uploaded and the committed row points at nothing.
+
 ### 2. Binding `S3FilePath` on a request model
 
 ```csharp
@@ -420,6 +433,17 @@ entity.Image = key;
 The service never throws — Principle 4 working as intended — so a discarded `bool` is the
 one place a failed upload becomes a row pointing at nothing, with nothing reporting it.
 
+### 6–9. Four more, in `references/anti-patterns.md`
+
+Read them before writing an update flow, an external-URL ingest, or a bulk delete.
+
+| # | Anti-pattern | What it costs |
+|---|---|---|
+| 6 | Deleting the old object before the new upload succeeds | an existing object, on a path whose only reported failure is the upload's |
+| 7 | Taking a checksum over a text decoding of the bytes | a genuine update, skipped as "unchanged" |
+| 8 | Leaving the streams around an ingest undisposed | a file handle held open past the block that opened it |
+| 9 | Discarding the `Task` returned by a delete | any tie between the cleanup's outcome and the request that caused it |
+
 ## Decision Guide
 
 | Scenario | Do this |
@@ -458,3 +482,4 @@ Read these before writing code, not after.
 | `references/key-generation.md` | Producing a bucket key, adding an upload overload, or deciding whether a name is well-formed — both `UploadAsync` overloads, `FormatFileName`, and the bucket-key vs local-temp tick-format distinction |
 | `references/media-downloads.md` | Ingesting a file from an external URL, or wiring `IMediaManager` — the five `MediaDownloads` files, the typed-client registration, and the download → temp → re-upload pipeline |
 | `references/usage-patterns.md` | Wiring the converter or composition root, mapping a key onto a response, writing an upload-then-persist or compensating-delete flow, or serving an attachment download |
+| `references/anti-patterns.md` | Writing an update flow, an external-URL ingest or a bulk delete — anti-patterns 6–9 in full: delete-before-upload ordering, a checksum taken over decoded text, undisposed ingest streams, and a discarded delete `Task` |
