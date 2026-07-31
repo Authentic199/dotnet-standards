@@ -257,7 +257,22 @@ API names (S17: `LogExtension.Error`) are also sanitized out.
   `http-resilience` briefs @ the S14 lane-file-rewrite commit; lane-log
   consolidation into `03-session-roadmap.md` (solo chore, best after rubrics).
 
-> **FOURTH PASS — 2026-07-31, mega-session close. The tree ships v0.3.52: 26
+> **FIFTH PASS — 2026-07-31, same session, later. The tree ships v0.3.58.**
+> After the batch closed at 0.3.52 this session kept going: 0.3.53 a corpus
+> census falsified a claim shipped six hours earlier · 0.3.54 the R8 labelling
+> pass (32 of 63 candidates labelled; decisions table in
+> `docs/ext-batch-2026-07-31/`) · 0.3.55–0.3.56 two user rules plus the rubric
+> checks that give them a reviewer · 0.3.57 `claude-md-builder` update mode now
+> reconciles against the rule catalogue — it never had, so every generated
+> `CLAUDE.md` was frozen against the rules of its creation day · 0.3.58 the
+> activation surface: body pointers 1/5 → 4/5, and the review layer went from
+> blind to the five new skills to citing them. **Two practices earned this
+> session and worth keeping: smoke-test every rubric `Find:` grep against a real
+> project before shipping it (two shipped wrong on the first pass), and treat
+> "the loop agrees" as a hypothesis — three shipped claims were falsified by
+> going back to the corpus after the verdict.**
+>
+> **FOURTH PASS — 2026-07-31, mega-session close. The tree shipped v0.3.52: 26
 > skills + 2 commands + 6 agents + 4 hook scripts** (`details` prints Skills
 > (28) and Hooks (3) — both are counting quirks, see the board header). The
 > board (`docs/next-session-prompt.md`) is authoritative; this banner is a

@@ -7,8 +7,31 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.52 (26 skills + 2 commands + 6 agents + 4 hook
-scripts)** as of 2026-07-31 — expect `details` to print **Skills (28)** and
+Shipped through **v0.3.58 (26 skills + 2 commands + 6 agents + 4 hook
+scripts)** as of 2026-07-31. **After the batch closed at 0.3.52 the same session
+kept shipping** — read these before assuming anything about the tree: 0.3.53
+narrowed the soft-delete section's `HasQueryFilter` claim (a corpus census
+falsified "none registered anywhere"; two entities register one, for staged
+imports) · 0.3.54 **the R8 labelling pass** — 63 banked candidates ruled, 32
+labelled, 31 dropped; five skills gained a `references/anti-patterns.md`;
+decisions table at `docs/ext-batch-2026-07-31/r8-decisions.md`, one row per
+candidate so any label can be vetoed alone · 0.3.55 two user rules (every request
+property nullable + `NotEmpty()` on the required ones, taught in `api-surface`
+and `module-feature`; `claude-md-builder` R26 timestamps-are-UTC, written
+narrower than dictated because the corpus convention covers `DateTimeOffset`
+only) · 0.3.56 rubric checks 5.21/5.22 closing those two orphans — **both
+`Find:` greps were wrong on the first pass and were fixed by smoke-testing them
+against a real project, which is now standing practice** · 0.3.57
+`claude-md-builder` update mode reconciles against the rule catalogue (field
+report: an update run added one factual line and none of the three static rules
+that had shipped that day and applied — update mode had never re-opened the
+catalogue, so every `CLAUDE.md` was frozen against the rules of its creation
+day) · 0.3.58 **the activation surface** — body pointers from the pre-existing
+skills went 1/5 → 4/5 and the review layer, which had 0/5 rubric citations and
+0/5 agent mentions, can now see the five new skills and their 32 anti-examples;
+three checks added, a fourth dropped as judgement-call.
+
+Original 0.3.52 close follows — expect `details` to print **Skills (28)** and
 **Hooks (3)** (both counting quirks below). 0.3.35–0.3.43 were
 maintenance/ruling releases (see CHANGELOG); 0.3.44 added the fourth hook,
 `test-report-nudge` (the parked `dotnet-test-report` roadmap row, redesigned:
