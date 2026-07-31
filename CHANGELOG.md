@@ -8,6 +8,40 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.55] — two user rules: nullable requests with `NotEmpty()`, and UTC without help, 2026-07-31
+
+**Rule 1 — every request property is nullable, every required one carries
+`NotEmpty()`.** Stated by the user as law. The reason is the model binder: a
+non-nullable `Guid`, `int`, `bool`, `DateTimeOffset` or enum on a request
+arrives already filled with a default the binder invented, indistinguishable
+from a value the caller sent, and nothing downstream can tell the difference.
+Nullability is what makes *absent* distinguishable from *sent*; optionality is
+the validator's statement, not the property's. Corpus-confirmed on strings
+(`public string? Code` + `NotEmpty().WithMessage(...)`), and the corpus also
+carries the violations the rule exists to kill — required foreign keys and
+counts declared as non-nullable value types.
+
+**Added, both halves:** `api-surface/references/request-response-dtos.md` (*The
+request chain*) carries the DTO side with the binder trap spelled out;
+`module-feature/references/validation-rules.md` gains a section, a TOC entry and
+a checklist line for the validator side — including the consequence that a rule
+following `NotEmpty()` may dereference with `!`, and that an optional property
+is the one with **no** `NotEmpty()`.
+
+**Rule 2 — `claude-md-builder` R26: timestamps are UTC without your help.** The
+`DbContext` converts every `DateTimeOffset` in and out, so `ToUniversalTime()`
+or `ToLocalTime()` on a value going to or coming from the repository is a
+double conversion. **Written narrower than dictated, deliberately:** the user
+said "every DateTime/DateTimeOffset", but the corpus convention is
+`Properties<DateTimeOffset>().HaveConversion<...>()` — `DateTime` is *not*
+covered by it. Telling a session that `DateTime` is handled automatically would
+be false, so the rule says to use `DateTimeOffset` and names a `DateTime`
+property as the thing to change.
+
+**Known seam:** no review rubric checks either rule. Following the precedent set
+for the `Guid.NewGuid()` sequential-key rule, this is logged as a verified
+orphan rather than fixed by an ad-hoc check in the wrong format.
+
 ## [0.3.54] — the R8 labelling pass: 32 anti-examples across six skills, 2026-07-31
 
 **A user-run labelling pass, then a delegated one.** The batch's six coordinator

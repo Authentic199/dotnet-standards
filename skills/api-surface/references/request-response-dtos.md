@@ -25,6 +25,19 @@ public class OrderRequestValidator : AbstractValidator<OrderRequest>
 }
 ```
 
+**Every property on a request is nullable, and every required one is asserted
+with `NotEmpty()`.** This is a law, not a style: `Guid? ProductId` above is
+nullable so that a caller who omits it produces `null` and fails the rule. Write
+`Guid ProductId` and the omission arrives as `Guid.Empty` — a value the model
+binder invented, indistinguishable from one the caller sent, and `NotEmpty()`
+is the only thing standing between it and the database. The trap is sharpest on
+value types (`int`, `Guid`, `bool`, `DateTimeOffset`, an enum), where the
+default is silent and legal; on a `string` the missing value at least arrives as
+`null` already. Nullability here is not about whether the field is optional —
+it is about being able to tell *absent* from *sent*. Optionality is the
+validator's statement: a required property carries `NotEmpty()`, an optional one
+does not.
+
 - The base is `abstract` — it is never bound to an endpoint, only derived from.
 - **`[MessageDisplay(nameof(Order))]` sits here and only here.** It sets the
   `Messages<T>` key prefix for the whole chain; repeating it on a derived request
