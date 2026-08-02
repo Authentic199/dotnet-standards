@@ -7,8 +7,20 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.62 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-02. **0.3.62 is the first release that changed no
+Shipped through **v0.3.63 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-02. **0.3.63 — every hook marker is now keyed per
+CONTEXT, not per session**, and the bug it fixes had shipped since 0.3.44: under
+`subagent-driven-development` the first `dotnet test` of a run fires inside a
+throwaway implementer subagent, which consumed the session's only emit and
+vanished, so the coordinating session's own final test run was never told
+anything. `agent_id` (present only inside a subagent — CLI 2.1.220 schema) now
+keys the marker in all three nudge hooks; `process-handback` had the identical
+defect on the day it shipped, since `dotnet-feature-flow:210` orders every
+implementer subagent to load skills with the Skill tool. **Standing lesson: a
+"once per session" marker is wrong wherever subagents do the work — ask which
+context receives the emit, not whether the hook fires.**
+
+**0.3.62 was the first release that changed no
 doctrine at all** — a consumer session skipped this plugin at both ends of one
 feature (a specification written with no knowledge skill loaded, then 20+ review
 rounds with no rubric and no specialist agent), and the cause was **entry and

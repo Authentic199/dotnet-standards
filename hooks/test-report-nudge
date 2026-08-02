@@ -17,11 +17,37 @@
 #
 # COST
 #
-# It emits ONCE per session — a marker keyed by session_id — and only after a
-# Bash call whose command contains `dotnet test`. Every other Bash call costs
-# one string match and exits 0 with no output. The emitted instruction is
-# standing ("whenever a test run settles"), so repeating it per run would buy
-# nothing: the injected context persists in the conversation.
+# It emits ONCE per CONTEXT — a marker keyed by session_id plus agent_id — and
+# only after a Bash call whose command contains `dotnet test`. Every other Bash
+# call costs one string match and exits 0 with no output. The emitted
+# instruction is standing ("whenever a test run settles"), so repeating it per
+# run would buy nothing: the injected context persists in the conversation.
+#
+# "ONCE PER CONTEXT", NOT "ONCE PER SESSION" — FIXED 2026-08-02
+#
+# The original marker was keyed by session_id alone, and that was wrong in a way
+# only visible under Superpowers' subagent-driven-development. Each implementer
+# there is a `general-purpose` subagent that runs its own red-green loop, so the
+# FIRST `dotnet test` of the whole session usually fires inside a throwaway
+# subagent context. That context consumed the session's only emit and then
+# vanished — and every later run, including the coordinating session's own final
+# full-suite run, got nothing. The standing instruction was handed to the one
+# context with no "rest of the session" to apply it to.
+#
+# The payload distinguishes them: `agent_id` is present only when the hook fires
+# from within a subagent and is absent on the main thread (CLI 2.1.220 schema —
+# "Use this field, not agent_type, to distinguish subagent calls from main-thread
+# calls"). The marker now carries it, so a subagent and the main thread each get
+# their own single emit and neither starves the other.
+#
+# AND THE TWO CONTEXTS ARE TOLD DIFFERENT THINGS — the second half of the fix
+#
+# Letting a subagent write `test-report.md` is worse than letting it write
+# nothing: the file is overwritten per task, so the last implementer to finish
+# leaves a report that names the whole session and covers one task. A subagent is
+# therefore told to put its plain-language lines in the report it hands back, and
+# to leave the file alone; only the main thread, which survives to the end, owns
+# the file.
 #
 # SILENT ABSENCE IS BENIGN — the binding rule in hooks/README.md
 #
@@ -109,6 +135,12 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 0
 fi
 
+# Present ONLY inside a subagent; absent on the main thread. A CLI that does not
+# send it at all degrades to the pre-2026-08-02 behaviour — one emit per session,
+# to whichever context got there first — which is the direction that was already
+# shipping, so an unknown CLI loses nothing it had.
+AGENT_ID=$(json_string_field agent_id)
+
 STATE_DIR="${TMPDIR:-/tmp}/dotnet-standards"
 if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
     exit 0
@@ -116,6 +148,11 @@ fi
 
 SAFE_ID=$(printf '%s' "$SESSION_ID" | tr -c 'A-Za-z0-9._-' '_')
 MARKER="$STATE_DIR/test-report-nudge-$SAFE_ID"
+
+if [[ -n "$AGENT_ID" ]]; then
+    SAFE_AGENT=$(printf '%s' "$AGENT_ID" | tr -c 'A-Za-z0-9._-' '_')
+    MARKER="$STATE_DIR/test-report-nudge-$SAFE_ID-agent-$SAFE_AGENT"
+fi
 
 if [[ -e "$MARKER" ]]; then
     exit 0
@@ -130,14 +167,29 @@ fi
 find "$STATE_DIR" -maxdepth 1 -type f -name 'test-report-nudge-*' -mtime +7 -delete 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# Emit — the report rule below is user-approved wording (2026-07-31)
+# Emit — the main-thread report rule is user-approved wording (2026-07-31) and
+# is reproduced below UNCHANGED, to the character. The subagent branch added
+# 2026-08-02 does not restate the format: it deliberately hands the file to the
+# one context that owns it and asks the subagent for sentences instead.
 # ---------------------------------------------------------------------------
+
+if [[ -n "$AGENT_ID" ]]; then
+cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "A `dotnet test` run has just completed inside a subagent. Do NOT write or overwrite `test-report.md` — that file belongs to the session that dispatched you, and a subagent writing it leaves a report naming the whole run while covering only this task. Instead, when your tests settle, include in the report you hand back: the exact command and the pass/fail/skip totals, then one line per test case stating in plain language what the test verifies — derived from the test's name and body, e.g. 'User name must not exceed 200 characters — PASS' — marked PASS or FAIL, each FAIL carrying one short reason, written in the language the user is conversing in. Emitted once per subagent."
+  }
+}
+JSON
+    exit 0
+fi
 
 cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "A `dotnet test` run has just completed. Standing instruction for the rest of this session: whenever a test run settles (after the final run of a red-green loop — not between iterations), write `test-report.md` at the repository root, overwriting any previous version. User-approved format: a title line with the date and time, then the exact command and the pass/fail/skip totals; then one section per test class; under each, one line per test case stating in plain language what the test verifies — derived from the test's name and body, e.g. 'User name must not exceed 200 characters — PASS' — marked PASS or FAIL, each FAIL carrying one short reason. Write the report in the language the user is conversing in. Short and human-readable: no jargon, no filler, no explanations beyond the one-line FAIL reasons. Emitted once per session."
+    "additionalContext": "A `dotnet test` run has just completed. Standing instruction for the rest of this session: whenever a test run settles (after the final run of a red-green loop — not between iterations), write `test-report.md` at the repository root, overwriting any previous version. User-approved format: a title line with the date and time, then the exact command and the pass/fail/skip totals; then one section per test class; under each, one line per test case stating in plain language what the test verifies — derived from the test's name and body, e.g. 'User name must not exceed 200 characters — PASS' — marked PASS or FAIL, each FAIL carrying one short reason. Write the report in the language the user is conversing in. Short and human-readable: no jargon, no filler, no explanations beyond the one-line FAIL reasons. Where subagents ran tests, fold the lines they reported back into this file rather than re-deriving them. Emitted once per session."
   }
 }
 JSON

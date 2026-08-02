@@ -82,6 +82,10 @@ json_string_field() {
 
 SESSION_ID=$(json_string_field session_id)
 CWD=$(json_string_field cwd)
+# Present only inside a subagent, absent on the main thread (CLI 2.1.220). The
+# marker carries it so a throwaway subagent context cannot consume the emit the
+# main thread needs — see the note above Gate 1.
+AGENT_ID=$(json_string_field agent_id)
 
 if [[ -z "$CWD" ]]; then
     CWD="$PWD"
@@ -91,8 +95,13 @@ CWD="${CWD//\\//}"
 CWD="${CWD%/}"
 
 # ---------------------------------------------------------------------------
-# Gate 1 — has this session already been told? (cheapest check, so it is first)
+# Gate 1 — has this CONTEXT already been told? (cheapest check, so it is first)
 # ---------------------------------------------------------------------------
+#
+# Per context, not per session. A subagent that spawns its own subagent would
+# otherwise consume the emit the coordinating session needs — the same defect
+# found in `test-report-nudge` on 2026-08-02, where the first `dotnet test` of a
+# run reliably fires inside a throwaway implementer context.
 
 if [[ -z "$SESSION_ID" ]]; then
     exit 0
@@ -104,6 +113,9 @@ if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
 fi
 
 SAFE_ID=$(printf '%s' "$SESSION_ID" | tr -c 'A-Za-z0-9._-' '_')
+if [[ -n "$AGENT_ID" ]]; then
+    SAFE_ID="$SAFE_ID-agent-$(printf '%s' "$AGENT_ID" | tr -c 'A-Za-z0-9._-' '_')"
+fi
 MARKER="$STATE_DIR/fleet-nudge-$SAFE_ID"
 SKIP_MARKER="$STATE_DIR/fleet-nudge-na-$SAFE_ID"
 

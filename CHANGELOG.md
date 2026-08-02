@@ -8,6 +8,59 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.63] — a hook's "once per session" was starving the session it was written for, 2026-08-02
+
+**Found by a user question, not by review: "does the test-report hook still run
+when the phases are Superpowers'?"** It does — and answering it properly exposed
+that it had been running in the wrong place since 0.3.44.
+
+**The defect.** `test-report-nudge` emitted once per session, keyed by
+`session_id`. Under Superpowers' `subagent-driven-development` every implementer
+is a `general-purpose` subagent that runs its own red-green loop, so **the first
+`dotnet test` of a whole run reliably fires inside a throwaway subagent
+context.** That context consumed the session's only emit and then vanished. Every
+later run — including the coordinating session's own final full-suite run — got
+nothing. The standing instruction *"for the rest of this session"* had been
+handed to the one context with no rest of a session to apply it to, and the
+symptom is silent: `test-report.md` simply never gets written, or gets written
+once for one task and never updated.
+
+**Verified against the CLI, not inferred.** The `PreToolUse`/`PostToolUse`
+payload carries `agent_id`, documented in the 2.1.220 schema as *"present only
+when the hook fires from within a subagent … absent for the main thread"*, with
+the explicit instruction to use that field and not `agent_type` to tell the two
+apart. Hooks do fire inside subagents; the tool matcher does not care who called.
+
+**The fix, in two halves.** The marker is now keyed by `session_id` **plus**
+`agent_id`, so a subagent and the main thread each get their own single emit and
+neither starves the other. And the two contexts are told **different things**:
+letting a subagent write `test-report.md` is worse than letting it write nothing,
+because the file is overwritten per task and the last implementer to finish
+leaves a report that names the whole run while covering one task. A subagent is
+now told to put its plain-language lines in the report it hands back and leave
+the file alone; the main thread owns the file and folds those lines in.
+
+**The main-thread report rule is unchanged to the character**, as its own
+approval rule requires. It gains one clause — *"Where subagents ran tests, fold
+the lines they reported back into this file rather than re-deriving them"* — and
+the subagent branch is new wording, both flagged to the user at ship time so
+either can be reversed in one edit.
+
+**The same defect was found in a hook shipped hours earlier.**
+`process-handback` was keyed by session alone, and `dotnet-feature-flow:210`
+orders **every** implementer subagent to load its skills with the Skill tool — so
+an implementer told to follow TDD would load `superpowers:test-driven-development`,
+match the gate, and consume the emit the coordinating session needed.
+`fleet-nudge` gets the same keying for the nested-spawn case. All three hooks now
+say "once per context" and mean it.
+
+**Smoke tests: 13 new for `test-report-nudge`, 6 added to the pair from
+0.3.62 (29 total), all green** — including the exact failure sequence: subagent
+runs tests first, a second subagent runs tests, then the main thread, and all
+three are served.
+
+---
+
 ## [0.3.62] — the plugin was skipped twice in one consumer session, at both ends of the same feature, 2026-08-02
 
 **The failure.** A session building an access-control module on

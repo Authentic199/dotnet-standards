@@ -176,9 +176,9 @@ human-readable test report current.
 
 Extracts `.tool_input.command` from the `PostToolUse` stdin JSON (`jq` if
 available, a sed extraction if not); exits 0 unless it contains a
-`dotnet test` invocation. On the first match of the session — a marker under
-`${TMPDIR:-/tmp}/dotnet-standards/` keyed by `session_id`, swept after seven
-days, exactly router-nudge's mechanism — it emits one `additionalContext`
+`dotnet test` invocation. On the first match **of each context** — a marker under
+`${TMPDIR:-/tmp}/dotnet-standards/` keyed by `session_id` **plus `agent_id`**,
+swept after seven days — it emits one `additionalContext`
 block: a **standing instruction** to write `test-report.md` at the repository
 root whenever a test run settles, overwriting the previous version, in the
 **user-approved format** (date/time + command + pass/fail/skip totals, one
@@ -186,6 +186,29 @@ section per test class, one plain-language line per test case with PASS/FAIL
 and a one-line reason on FAIL, written in the language the user is conversing
 in). The instruction persists in the conversation, so later runs in the same
 session need no re-emit.
+
+**Once per *context*, not once per session — fixed 2026-08-02, and the bug it
+fixes had shipped since 0.3.44.** Under Superpowers'
+`subagent-driven-development` every implementer is a `general-purpose` subagent
+running its own red-green loop, so the first `dotnet test` of a whole run
+reliably fires inside a **throwaway subagent context**. Keyed by `session_id`
+alone, that context consumed the session's only emit and then vanished — and
+every later run, including the coordinating session's own final full-suite run,
+got nothing. The standing instruction had been handed to the one context with no
+"rest of the session" to apply it to. The payload distinguishes them: `agent_id`
+is present only inside a subagent and absent on the main thread (CLI 2.1.220
+schema, which says to use that field and not `agent_type` for exactly this).
+**`fleet-nudge` and `process-handback` carry the same keying** — the second of
+those had the identical defect on the day it shipped, because
+`dotnet-feature-flow:210` orders every implementer subagent to load its skills
+with the Skill tool.
+
+**And the two contexts are told different things.** Letting a subagent write
+`test-report.md` is worse than letting it write nothing: the file is overwritten
+per task, so the last implementer to finish leaves a report that names the whole
+run and covers one task. A subagent is told to put its plain-language lines in
+the report it hands back and leave the file alone; the main thread, which
+survives to the end, owns the file and folds those lines in.
 
 **The script parses no test output — deliberately.** The S6 refusal of the
 kit's `post-test-analyze` ("a shell summariser of output the model already
