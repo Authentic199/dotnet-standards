@@ -40,15 +40,24 @@ the code's only job is to emit a stable, well-formed key.
    recurrence, never anticipation.
 3. **Key anatomy is `Mes.{Module}.{Rest}`.** The module segment comes from
    `[MessageDisplay(nameof(Entity))]` on `T`, falling back to `typeof(T).Name`
-   when the attribute is absent. That fallback is a trap, not a feature.
-4. **Two generics, two jobs — requests type validator messages, entities type
-   outcome messages.** A property selector can only compile against the type
-   being validated, so a validator message must be typed to the request; the
-   module segment must still read as the entity, so the request carries
-   `[MessageDisplay]`. A success or failure message has no selector and no
-   reason to name the request — it is typed to the entity, whose own type name
-   is already the module.
-5. **One style for validator messages.** Write `Messages<TRequest>.X(x => x.Prop)`.
+   when the attribute is absent. With `T` an entity the fallback *is* the
+   intended path — `Messages<Order>` yields `Mes.Order` with no attribute
+   anywhere. It is a trap only when `T` is a request, where the fallback leaks
+   the transport type into the key.
+4. **`T` is the entity — in validator messages and outcome messages alike.**
+   `Messages<Order>.Required(x => x.Code)` is the form, written inside
+   `OrderRequestValidator` and everywhere else. The selector is an expression
+   over `Messages<T>`'s own `T`, chosen freely at the call site — it does **not**
+   have to be the type being validated, and a validator returns a plain string
+   from `WithMessage(...)` either way. Two shifts, and only two:
+   - **A rule checking a *different* entity speaks as that entity, without a
+     selector** — `Messages<Category>.NotFound()`.
+   - **A request with no owning entity** — a Facades-tier request such as a media
+     upload — has nothing to type against, so it types to itself and carries
+     `[MessageDisplay(nameof(Media))]` to keep the transport name out of the key.
+     This is the *only* case that needs the attribute; on a module request whose
+     messages are entity-typed the attribute never executes.
+5. **One style for validator messages.** Write `Messages<Entity>.X(x => x.Prop)`.
    The `WithMessage(MessagesType.X)` extension infers `T` and the property name
    and emits an identical key, but it is legacy: recognise it when reading,
    never write it new. Two spellings of one key make the key space unsearchable.
@@ -57,8 +66,9 @@ the code's only job is to emit a stable, well-formed key.
 
 | Situation | Form |
 |---|---|
-| Validator rule on the request's own property | `Messages<TRequest>.X(x => x.Prop)` |
-| Rule about a property that is not on the request | `Messages<TRequest>.X(nameof(OtherEntity.Prop))` |
+| Validator rule on the request's own property | `Messages<Entity>.X(x => x.Prop)` |
+| Rule about a property the entity does not have | `Messages<Entity>.X(nameof(OtherEntity.Prop))` |
+| Validator on a Facades request with no entity behind it | `Messages<TRequest>.X(x => x.Prop)` + `[MessageDisplay]` on that request |
 | Checking that a *different* entity exists | `Messages<OtherEntity>.NotFound()` |
 | Success message on a controller action | `Messages<Entity>.Create()` / `.Update()` / `.Delete()` / `.Search()` / `.Detail()` / `.List()` |
 | Failure of an operation, thrown from a service | the same call with `success: false` → `.Failed` |
@@ -75,7 +85,6 @@ grow, and only on recurrence.
 Request, attribute and validator together:
 
 ```csharp
-[MessageDisplay(nameof(Widget))]
 public class CreateWidgetRequest
 {
     public string? Name { get; set; }
@@ -88,12 +97,12 @@ public class CreateWidgetValidator : AbstractValidator<CreateWidgetRequest>
     public CreateWidgetValidator(IRepositoryWrapper repositoryWrapper)
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage(Messages<CreateWidgetRequest>.Required(x => x.Name))
-            .MaximumLength(256).WithMessage(Messages<CreateWidgetRequest>.OverLength(x => x.Name));
+            .NotEmpty().WithMessage(Messages<Widget>.Required(x => x.Name))
+            .MaximumLength(256).WithMessage(Messages<Widget>.OverLength(x => x.Name));
 
-        // Existence of another entity is that entity's message, not the request's.
+        // Existence of another entity is that entity's message, not this one's.
         RuleFor(x => x.CategoryId)
-            .NotEmpty().WithMessage(Messages<CreateWidgetRequest>.Required(x => x.CategoryId))
+            .NotEmpty().WithMessage(Messages<Widget>.Required(x => x.CategoryId))
             .Must(id => repositoryWrapper.IsExistCategory(id!.Value))
             .WithMessage(Messages<Category>.NotFound());
     }
@@ -101,16 +110,32 @@ public class CreateWidgetValidator : AbstractValidator<CreateWidgetRequest>
 ```
 
 Keys emitted: `Mes.Widget.Required.Name`, `Mes.Widget.OverLength.Name`,
-`Mes.Widget.Required.CategoryId`, `Mes.Category.NotFound`. Note the third — the
-property segment stays on the request's own field, because that is the field the
-client must highlight; only the existence check speaks as the other entity.
+`Mes.Widget.Required.CategoryId`, `Mes.Category.NotFound`. No `[MessageDisplay]`
+anywhere — `Messages<Widget>` already yields `Mes.Widget` from the type name.
+Note the third: the property segment stays on the field the client must
+highlight, and only the existence check speaks as the other entity.
 
-A property that lives on a related entity and has no counterpart on the request
-is named with the string overload, keeping `nameof` so a rename still breaks the
-build:
+**The request with no entity behind it** — Facades tier, nothing to type
+against — is the one place the attribute earns its keep:
 
 ```csharp
-Messages<CreateWidgetRequest>.Invalid(nameof(WidgetPart.PartId));   // Mes.Widget.Invalid.PartId
+[MessageDisplay(nameof(Media))]
+public class MediaUploadRequest
+{
+    public IFormFile? File { get; set; }
+}
+
+// inside its validator — T is the request, because no entity models this
+Messages<MediaUploadRequest>.Required(x => x.File);      // Mes.Media.Required.File
+```
+
+Without the attribute that key would read `Mes.MediaUploadRequest.Required.File`.
+
+A property that lives on a related entity and has no counterpart on `T` is named
+with the string overload, keeping `nameof` so a rename still breaks the build:
+
+```csharp
+Messages<Widget>.Invalid(nameof(WidgetPart.PartId));   // Mes.Widget.Invalid.PartId
 ```
 
 Outcome messages are entity-typed. The success key is the controller's second
@@ -124,19 +149,28 @@ wrapper argument; the failure key is thrown from the service:
 throw new InternalServerException(Messages<Widget>.Create(false));                                       // Mes.Widget.Create.Failed
 ```
 
-Older code types the helper to the entity when validating a request's own
-properties — `Messages<Widget>.Required(x => x.Name)`. It emits the same key, but
-is **superseded** by the request-typed call plus `[MessageDisplay]`. Do not copy
-it into new validators.
+> **Corrected 2026-08-02, from field evidence.** This section previously called
+> the entity-typed validator message *superseded* by a request-typed call plus
+> `[MessageDisplay]`, and told readers not to copy it into new validators. That
+> was backwards: `Messages<Widget>.Required(x => x.Name)` is the house form, and
+> a session that trusted the old text rewrote correct examples in
+> `module-feature` into wrong ones before the error was caught. The claim rested
+> on the premise that *a property selector can only compile against the type
+> being validated* — false. The selector is an expression over `Messages<T>`'s
+> own `T`, picked at the call site; `WithMessage` takes the resulting string and
+> never sees the selector. Request-typed calls are the narrow Facades exception
+> above, not the rule.
 
 ## Anti-patterns
 
-- **A request class without `[MessageDisplay]`.** The module segment falls back
-  to the type name and the transport type leaks into every key —
-  `Mes.CreateWidgetRequest.Required.Name`. Nothing fails; the key is simply
-  wrong, differs from every other key for the same entity, and changes again the
-  day someone renames the class. Every request class that appears inside
-  `Messages<>` carries the attribute.
+- **A request that appears inside `Messages<>` without `[MessageDisplay]`.** The
+  module segment falls back to the type name and the transport type leaks into
+  every key — `Mes.CreateWidgetRequest.Required.Name`. Nothing fails; the key is
+  simply wrong, differs from every other key for the same entity, and changes
+  again the day someone renames the class. **Only a request that is itself the
+  `T`** carries the attribute — the Facades-tier case. Putting it on a module
+  request whose messages are entity-typed is harmless but dead: nothing ever
+  reads it.
 - **A hardcoded message or key literal** — bypasses the grammar, unknown to the
   catalogue.
 - **A new `WithMessage(MessagesType.X)` call** — legacy form (Principle 5).

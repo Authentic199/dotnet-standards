@@ -7,7 +7,7 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.60 (26 skills + 2 commands + 6 agents + 4 hook
+Shipped through **v0.3.61 (26 skills + 2 commands + 6 agents + 4 hook
 scripts)** as of 2026-07-31. **After the batch closed at 0.3.52 the same session
 kept shipping** — read these before assuming anything about the tree: 0.3.53
 narrowed the soft-delete section's `HasQueryFilter` claim (a corpus census
@@ -57,7 +57,21 @@ declared inside an entity, response or service file"*. **Resolved toward
 demonstrated another skill's rule being broken, and the example is what gets
 copied. **A sweep for further example-versus-rule conflicts across skill pairs
 is worth a session** — two found in one day, neither by review, both by field
-use.
+use. · 0.3.61 **`message-keys` taught the wrong form and it had spread to four
+skills** — the most damaging find yet, caught only because the session, trusting
+`message-keys`, rewrote `module-feature`'s *correct* validator examples into
+wrong ones and the user stopped it. `Messages<T>` takes the **entity** in
+validator rules; the skill's premise that "a selector can only compile against
+the type being validated" is false. `[MessageDisplay]`'s real job, settled by
+reading `Messages.cs`: it is read off `typeof(T)` with a `type.Name` fallback, so
+it matters **only** for a Facades-tier request with no entity behind it — on the
+twelve module requests carrying it, nothing reads it. Fixed in `message-keys`,
+`dotnet-testing` (3 examples), `api-surface`, and **`dotnet-code-review` check
+5.5, which was inverted and would have flagged conforming code**. Also: the
+nullable-request law moved into `api-surface`'s body — it lived only in
+`references/`, and a real request shipped `DateTimeOffset OccurredAt` unvalidated
+as a result. **Standing lesson: verify a sibling skill's rule against the source
+before acting on it — the examples were corpus-checked, the rule was not.**
 
 Original 0.3.52 close follows — expect `details` to print **Skills (28)** and
 **Hooks (3)** (both counting quirks below). 0.3.35–0.3.43 were

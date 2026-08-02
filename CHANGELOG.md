@@ -8,6 +8,68 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.61] — `message-keys` taught the wrong form, and it had spread to four skills, 2026-08-02
+
+**The worst defect this field exercise has found, and it was caught only because
+it made *me* break a working skill.** Reviewing a consumer module, I read
+`message-keys` and "corrected" `module-feature`'s validator examples from
+`Messages<Order>.Required(x => x.Name)` to `Messages<OrderRequest>...`. The user
+stopped it: the entity-typed form is the house rule, and I had just rewritten
+correct doctrine into incorrect doctrine by trusting a skill.
+
+**The false premise.** `message-keys` principle 4 argued *"a property selector
+can only compile against the type being validated, so a validator message must
+be typed to the request."* That is simply not true — the selector is an
+expression over `Messages<T>`'s own `T`, chosen at the call site, and
+`WithMessage` receives a finished string. `Messages<Order>.Required(x => x.Code)`
+inside `OrderRequestValidator` compiles and is what the corpus does
+(`Messages<UserRefreshToken>.Invalid(x => x.Token)` in a request validator).
+
+**What `[MessageDisplay]` actually does**, settled by reading the implementation
+rather than the skill: `Messages<T>.GetMessageBase()` reads the attribute off
+`typeof(T)` and falls back to `type.Name`. With `T` an entity the fallback *is*
+the intended path. The attribute earns its place in exactly one situation — a
+**Facades-tier request with no entity behind it**, where `T` must be the request
+(`MediaUploadRequest` + `[MessageDisplay(nameof(Media))]`, the only such call
+site in the consumer repo). On the twelve module requests that carry it, nothing
+ever reads it. `message-keys` had generalised that one exception into the
+universal rule.
+
+**Blast radius — the wrong form had propagated into four skills:**
+
+- `message-keys` — principles 3, 4 and 5, the *Which form where* table, the
+  Patterns block, the "superseded" paragraph (now an inline correction notice),
+  the string-overload example, and the `[MessageDisplay]` anti-pattern.
+- `dotnet-code-review` — **check 5.5 was inverted**: titled *"A validator message
+  typed to the entity — MEDIUM"*, it would have raised a finding against
+  conforming code. Retitled, rewritten, and carrying a note that reports citing
+  the old wording are void.
+- `dotnet-testing` — three assertion examples (SKILL.md, `unit-testing.md`,
+  `integration-testing.md`).
+- `api-surface` — the base-request bullet claiming `[MessageDisplay]` "renames the
+  key prefix for every derived request".
+
+**Kept from the aborted edit, because it was right and the user confirmed it:** a
+rule whose check is the existence of a *different* entity speaks as that entity
+and takes **no selector** — `Messages<Category>.NotFound()`, never
+`Messages<Order>.NotFound(x => x.CategoryId)`. Stated now in `module-feature`
+SKILL.md and `references/validation-rules.md`, and the examples in both follow it.
+
+**Also fixed — the nullable law was unreachable.** `api-surface`'s body never
+carried it; it lived only in `references/request-response-dtos.md`. Real
+consequence in real code: `EvaluateAccessRequest.OccurredAt` shipped as a
+non-nullable `DateTimeOffset` with no validator rule, so an omitted value binds
+to `0001-01-01` and is written to the decision row as the edge's clock. The law
+now sits in the SKILL body where the reader actually is. Same shape as 0.3.59
+fix #3: a rule placed where nobody reaches it is not shipped.
+
+**Process note.** R7 exists for this. I verified the *examples* against the
+corpus but took the *rule* from a sibling skill on faith, and the sibling was
+wrong. Reading `Messages.cs` — thirty seconds — would have settled it before the
+first edit.
+
+---
+
 ## [0.3.60] — a shipped contradiction between two skills, 2026-07-31
 
 Found the same day and the same way as 0.3.59: a consumer session rewriting its

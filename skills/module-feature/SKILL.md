@@ -181,7 +181,7 @@ public class OrderRequestValidator : AbstractValidator<OrderRequest>
             .NotEmpty().When(_ => action == "Create", ApplyConditionTo.CurrentValidator)
             .WithMessage(Messages<Order>.Required(x => x.CategoryId))
             .Must(id => repositoryWrapper.IsExistCategory(id!.Value))
-            .WithMessage(Messages<Order>.NotFound(x => x.CategoryId));
+            .WithMessage(Messages<Category>.NotFound());
     }
 }
 
@@ -198,7 +198,10 @@ public class OrderRequestMapping : Profile
   abstraction for a rule that must ask the database, an action accessor for a rule that
   binds to one action only. Every message comes from `Messages<T>`, and `T` is the
   **entity**: the selector must name a member the entity has, and a request-only member
-  takes the `string` overload instead.
+  takes the `string` overload instead. **When the rule checks a *different* entity, `T`
+  is that entity and the call takes no selector** — `Messages<Category>.NotFound()`, not
+  `Messages<Order>.NotFound(x => x.CategoryId)`. The surrounding `Required()` still
+  speaks as the owning entity, so the client keeps the field to highlight.
 - **A response that projects an entity derives `BaseEntity`** — `Id` and `CreatedAt`
   arrive by inheritance and are never redeclared. A summary, a bulk result or a
   third-party payload projects no entity and is a plain class. Tiers are named by

@@ -342,6 +342,14 @@ public static void ThrowIfShipmentInvalidForDispatch(Shipment? shipment)
 ## The message a guard chooses
 
 Every message, in a rule and in a guard, comes from `Messages<T>` where `T` is the **entity**.
+Typing the helper to the *request* class is wrong in both.
+
+**The one shift is which entity.** A rule that checks the existence of a **different**
+entity speaks as that entity, and the call takes **no selector**:
+`Messages<Region>.NotFound()`, never `Messages<Shipment>.NotFound(x => x.RegionId)`. The
+`Required()` beside it still speaks as the owning entity, so the client keeps the field to
+highlight while the failure names the thing that was missing.
+
 A guard reaches for the state members a request validator never needs — `NotAvailable()`,
 `WasUsed()`, `Expired()`, `NotAllowed(name)`, and `NotFound()` for the entity itself. Which
 overload takes a selector and which takes a `string`, and why the selector is an expression
@@ -360,14 +368,14 @@ RuleFor(x => x.Reference)
 RuleFor(x => x.RegionId)
     .NotEmpty().WithMessage(Messages<Shipment>.Required(x => x.RegionId))
     .Must(id => repositoryWrapper.IsExistRegion(id!.Value))
-    .WithMessage(Messages<Shipment>.NotFound(x => x.RegionId));
+    .WithMessage(Messages<Region>.NotFound());
 
 When(x => x.RegionId != null && repositoryWrapper.HasArea(x.RegionId.Value), () =>
 {
     RuleFor(x => x.AreaId)
         .NotEmpty().WithMessage(Messages<Shipment>.Required(x => x.AreaId))
         .Must(id => repositoryWrapper.IsExistArea(id!.Value))
-        .WithMessage(Messages<Shipment>.NotFound(x => x.AreaId))
+        .WithMessage(Messages<Area>.NotFound())
         .Must((request, id) => repositoryWrapper.IsAreaInRegion(id!.Value, request.RegionId!.Value))
         .WithMessage(Messages<Shipment>.Invalid(x => x.AreaId));
 });

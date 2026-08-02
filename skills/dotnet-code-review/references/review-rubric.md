@@ -512,15 +512,18 @@ well-formed id matching no row is a lookup *result*, and answering it the same w
 as a malformed URL leaves the caller unable to tell the two apart. The single
 carve-out is the current principal's own record, which is a 401.
 
-**5.5 A validator message typed to the entity** — *MEDIUM* · `message-keys`
+**5.5 A validator message typed to the request** — *MEDIUM* · `message-keys`
 `Find:` `grep -rn --include=*Validator*.cs "WithMessage(Messages<" src/`
-Requests type validator messages; entities type outcome messages. A rule about the
-request's own property reads `Messages<TRequest>.X(x => x.Prop)`, with the display
-attribute on that request keeping the module segment right. The entity-typed form
-emits the same key and is **superseded** — a finding in new code, not in old. The
-one exception is a rule asserting that a *different* entity exists, whose message
-is that entity's to own. **Where older material disagrees, `message-keys` governs
-— verify against it before writing the finding, not against memory.**
+`Messages<T>` takes the **entity** — in validator rules exactly as in guards and
+outcome messages. `Messages<Order>.Required(x => x.Code)` inside
+`OrderRequestValidator` is correct and is **not** a finding. Two exceptions, neither
+a defect: a rule asserting a *different* entity exists speaks as that entity with no
+selector, `Messages<Category>.NotFound()`; and a Facades-tier request with no entity
+behind it types to itself and carries `[MessageDisplay]`.
+**This check was inverted before 0.3.61** — it read "typed to the entity" and called
+the correct form superseded, so it would have flagged conforming code. If a report
+cites the old wording, the finding is void. `message-keys` governs — verify against
+it before writing the finding, not against memory.
 
 **5.6 A wrong or hand-made key** — *MEDIUM* · `message-keys`
 `Find:` `grep -rn --include=*.cs "WithMessage(\"" src/`;

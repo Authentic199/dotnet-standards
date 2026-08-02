@@ -285,7 +285,7 @@ HttpResponseMessage response = await Client.PostAsJsonAsync("api/Orders", new Cr
 response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 JsonElement body = await response.Content.ReadFromJsonAsync<JsonElement>();
 body.GetProperty("message").GetString()
-    .ShouldBe(Messages<CreateOrderRequest>.Required(x => x.Code));
+    .ShouldBe(Messages<Order>.Required(x => x.Code));
 ```
 
 A rejected request never reaches the action and never throws, so the exception
