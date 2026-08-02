@@ -213,14 +213,37 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
 - [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
   `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze
   is lifted for them and picks the order.
-- [A, 2026-07-28] Second instance of the same drift family (found by rubric
+- [A, 2026-07-28] ~~Second instance of the same drift family (found by rubric
   #1, CHANGELOG 0.3.15): `module-feature/SKILL.md:187` + validator examples at
   lines 165–172 carry the superseded entity-typed `Messages<T>` form — fix
-  together with the entry below in one Lane A warm-up chore.
-- [A, 2026-07-27] `module-feature/references/validation-rules.md:322` stale
+  together with the entry below in one Lane A warm-up chore.~~ **VOID as of
+  0.3.61 — do not action.** The S15 "ruling" this cites was itself the defect:
+  entity-typed `Messages<T>` in a validator is the house form, not superseded.
+  CHANGELOG 0.3.61 traces the false premise and the four skills it had spread
+  to. Left struck through, not deleted, so a session skimming old entries does
+  not resurrect it.
+- [A, 2026-07-27] ~~`module-feature/references/validation-rules.md:322` stale
   line ("every message… `T` is the entity" — superseded by the S15 ruling:
   requests type validator messages) — flagged in the S15 log — any Lane A
-  session may fix it as a warm-up chore.
+  session may fix it as a warm-up chore.~~ **VOID as of 0.3.61 — same reason as
+  the entry above.** The line these called "stale" was correct; 0.3.61 kept it
+  and fixed the sibling text that disagreed with it instead.
+- [solo, 2026-08-02] **`dotnet-testing` has no path for a repo without
+  NSubstitute.** The skill's only rule for a service's decision logic is *"Unit
+  test, NSubstitute at the constructor boundary"* — no fallback is written for
+  when the toolchain it assumes is absent. Surfaced in BE-Ops-Service: `Services/`
+  correctly absorbed policy-matching and scenario-selection logic that used to
+  live in separate resolver/registry classes (per `facade-module-architecture`),
+  which means that logic can now only be unit-tested through the service's
+  constructor — but the project has no NSubstitute and runs xUnit 2.5.2, not the
+  v3 the skill assumes (both stated in the project's own `CLAUDE.md`). A session
+  needing to write that test today has no rule to follow. Two arms, user's call:
+  (a) add NSubstitute via the R16 house-pattern exception (already permitted,
+  just needs the skill to say so) and write the fallback into `dotnet-testing`,
+  or (b) teach a way to keep decision logic as `public static` inside a service
+  partial so no mock is ever needed — the AccessControl spec's own
+  `AccessPolicyService.Policy.cs` already does this for the policy-matching half.
+  Not resolved here; needs a ruling before either arm is written.
 - [B→rubrics, 2026-07-27] Rubric feed: S13 error-handling candidates
   (CHANGELOG 0.3.4), S13b message-keys candidates, S12 anti-example list —
   detail in `next-session-prompt-B.md` — consumed by the rubric sessions.
