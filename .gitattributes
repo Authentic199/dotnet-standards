@@ -16,3 +16,12 @@ hooks/fleet-nudge       text eol=lf
 hooks/process-handback  text eol=lf
 hooks/run-hook.cmd      text eol=lf
 docs/field-reports/trial-extract.py text eol=lf
+
+# The Codex kit, for the same reason: install.sh is run by bash, and the two
+# generators are compared byte for byte by `sync-from-plugin.py --check`, which
+# would report permanent drift if a checkout rewrote their endings.
+codex/install.sh          text eol=lf
+codex/sync-from-plugin.py text eol=lf
+codex/agents/*.toml       text eol=lf
+codex/prompts/*.md        text eol=lf
+codex/hooks.json          text eol=lf
