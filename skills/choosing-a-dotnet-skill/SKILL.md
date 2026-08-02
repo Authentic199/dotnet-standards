@@ -86,6 +86,23 @@ Three rules, all broken in one real session on 2026-08-02:
 When the whole task is a .NET feature or a .NET review rather than one question,
 the row to use is `dotnet-feature-flow` or `dotnet-review-flow` below.
 
+## When the harness is not Claude Code
+
+The skills are harness-neutral and ship identically everywhere. Three parts of
+this plugin do not, and each one shifts work onto the session:
+
+| Absent outside Claude Code | What the session does instead |
+|---|---|
+| The hooks — nothing announces this router on the first prompt | Consult this file yourself: at session start, and again at every phase change. Nothing will remind you. |
+| The `/dotnet-feature` and `/dotnet-review` commands | Load `dotnet-feature-flow` or `dotnet-review-flow` by name. The commands were only ever thin entries into those two skills. |
+| The six named agent types the fleet spawns | `dotnet-review-flow` preflight #3 covers this — it has a stated fallback, and the fallback is not "review it all in one pass". |
+
+**The instructions file is `CLAUDE.md` on every harness.** Where a harness reads
+`AGENTS.md` — Codex does — that file is a pointer at `CLAUDE.md` carrying no
+rules of its own. A repository with neither, or with rules stranded in
+`AGENTS.md`, is `claude-md-builder`'s job, not a licence to write a second rule
+set for this harness.
+
 ## Base map — one area, one skill
 
 Ordered by build sequence: placement → behaviour → messaging → data → HTTP →
@@ -118,7 +135,7 @@ memory.
 | Reviewing performance: round-trip counts and N+1, page-size and index coverage, blocking calls, cache, lock and search cost | `dotnet-performance-review` |
 | Running the test-and-review fleet — parallel tester and reviewer subagents with verified findings — over a diff, a branch, or a set of paths whose code never changed | `dotnet-review-flow` |
 | Taking one .NET feature end to end as a single flow: brainstorm, plan, human gates, implement, test loop, review loop, commit | `dotnet-feature-flow` |
-| Writing or refreshing the repository's own `CLAUDE.md`: the commands, layout facts and hard rules a session must hold, and trimming that file back under 200 lines | `claude-md-builder` |
+| Writing or refreshing the repository's own `CLAUDE.md`: the commands, layout facts and hard rules a session must hold, trimming that file back under 200 lines, or giving the repository the `AGENTS.md` pointer a Codex session reads | `claude-md-builder` |
 
 ## When two skills both look right
 
@@ -144,6 +161,7 @@ alone picks wrong. Match the question, not the word.
 | secrets / tokens / authorization gates | deciding what the rule is — schemes, grants, the current principal, auth settings — `auth-and-security`; checking whether what is already there is safe — `dotnet-security-review` |
 | a convention or a rule | deciding what it should say — the owning knowledge skill in the base map; recording that it governs *this* repository, in its `CLAUDE.md` — `claude-md-builder`; checking whether the code follows it — the four review rubrics |
 | a Settings class | where the file lives — `facade-module-architecture`; `DatabaseSettings` — `ef-core-data-access`; `RedisSettings` — `distributed-caching`; `ElasticsearchSettings` — `elasticsearch-search`; `ConcurrencySettings` — `distributed-lock`; `SecuritySettings`, `JwtSettings` — `auth-and-security` |
+| `AGENTS.md` / `CLAUDE.md` / "the instructions file" | writing or trimming the rules — `claude-md-builder`, into `CLAUDE.md` always; `AGENTS.md` is that skill's pointer file and holds no rules; a rule's *content* — the owning knowledge skill |
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 | "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |
 | "review" | the rubric applied while reading changed code yourself — `dotnet-code-review` and its three sibling lenses; running the subagent fleet with the test loop, over a diff or over unchanged code under given paths — `dotnet-review-flow`; the whole feature process that ends in that review — `dotnet-feature-flow`; the request/receive review discipline — Superpowers |

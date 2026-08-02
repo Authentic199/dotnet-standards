@@ -115,6 +115,22 @@ a name that is absent from the roster is absent from the install. A missing name
 means the cached copy is stale or partial: STOP, name what is absent, and give the
 update-and-restart remedy.
 
+**One exception, and it is a harness fact rather than a bad install: a harness
+that ships no plugin agent types at all.** Codex is the case in hand — its plugin
+contract carries `skills/` and nothing else, so all six names are absent
+together, and no reinstall will produce them. Six absent is that signal; one or
+two absent is still a broken install. Then, with the user told which harness
+limit was hit:
+
+- The **five skills** must still all be present. They ship everywhere. If one is
+  missing, that is a stale install and the STOP stands.
+- Run the four lenses **one at a time, sequentially, in the order listed above**,
+  each against the same expanded target, writing its report before the next
+  begins. Four passes, never a merged one — the merge is exactly what Principle
+  1 forbids, and it is the shortcut this fallback exists to refuse.
+- **Say in *Not run* that the lenses shared one context.** They did, and it
+  weakens every verdict in a way the report must not hide.
+
 **4 — Determine, expand and state the review target.** The invocation argument
 decides the shape. **A diff target** — a branch, a commit range, or no argument,
 which defaults to the working tree against the repository's default branch —
@@ -338,7 +354,8 @@ contract:
 - `dotnet-standards:dotnet-performance-reviewer`
 
 All four, every round. One agent per lens, no sharing: no reviewer inherits
-another's context. **Never collapse the four into fewer spawns, and never drop one
+another's context. On a harness with no plugin agent types, the four run
+sequentially under preflight #3's exception — still four, still one lens each. **Never collapse the four into fewer spawns, and never drop one
 because "this change is not about security"** — the lenses grade different things,
 a merged pass reliably drops one, and a lens dropped by judgement is a lens whose
 absence nobody notices.

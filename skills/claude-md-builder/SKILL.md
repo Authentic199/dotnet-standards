@@ -4,8 +4,9 @@ description: >-
   This skill should be used when creating, rebuilding, refreshing or trimming a
   CLAUDE.md for a .NET repository: bootstrapping project memory, capturing the
   exact build, test and EF migration commands, recording hard rules and do-not
-  rules, cutting a bloated CLAUDE.md back under 200 lines, or turning a mistake
-  Claude repeated into a new rule. Not for: what a convention should say — the
+  rules, cutting a bloated CLAUDE.md back under 200 lines, turning a mistake the
+  agent repeated into a new rule, or giving a repository the AGENTS.md pointer a
+  Codex session looks for. Not for: what a convention should say — the
   knowledge skills; which skill owns an area — choosing-a-dotnet-skill;
   reviewing changed code — dotnet-code-review; authoring a plugin skill —
   superpowers:writing-skills; running a feature end to end — dotnet-feature-flow.
@@ -104,6 +105,16 @@ Run the phases in order. Phases 5 and 6 are not optional and not merged.
 
 `CLAUDE.md` at the repository root, or `.claude/CLAUDE.md`? Present → **update
 mode** (see *Update mode* below). Absent → continue here in create mode.
+
+**Only `CLAUDE.md` decides the mode.** An `AGENTS.md` — the file a Codex session
+reads — never does, because it is not a second memory file: it is a pointer at
+`CLAUDE.md` and nothing else (*PHASE 7*). So a repository holding `AGENTS.md`
+and no `CLAUDE.md` is a **create-mode** repository, and one more thing is true
+about it: whatever rules that `AGENTS.md` carries are content with no home yet.
+Read it, fold what survives the principles into the `CLAUDE.md` draft, and say
+in the hand-over that its body is being replaced by the pointer. Never leave two
+files stating rules — the moment they disagree, every session picks a different
+one and neither is wrong.
 
 ### PHASE 1 — Scan
 
@@ -258,11 +269,33 @@ Any answer that requires guessing is a failure of the file, not of the reader.
 Add what was missing, then trim something else to stay under 200 — and re-run
 this phase, because the trim may have broken another probe.
 
-### PHASE 7 — Write and hand over
+### PHASE 7 — Write, point `AGENTS.md` at it, hand over
 
-Write `CLAUDE.md` at the repository root. Then **show the user what changed and
-propose the commit — do not commit and do not push.** State the line count and
-which of the three probes the file answers.
+Write `CLAUDE.md` at the repository root.
+
+**Then give the repository its `AGENTS.md` pointer.** Codex reads `AGENTS.md`,
+Claude Code reads `CLAUDE.md`, and the rules must exist once. So `AGENTS.md` is
+written as a pointer with no rules in it — this exact shape, adjusted only for
+the project's own wording:
+
+```markdown
+# Agent instructions
+
+The instructions for this repository live in [`CLAUDE.md`](CLAUDE.md). **Read
+that file now** — this one carries no rules of its own and is never the place to
+add any.
+```
+
+Three things this step is not. It is **not a copy** — a duplicated rule set
+drifts within a week, and the copy is always the one being read when it does.
+It is **not a symlink** — a symlink is checked out as a one-line text file on
+Windows and the harness reads that line as the whole instruction set. And it
+does **not** apply to a repository whose `AGENTS.md` a human is maintaining as
+the primary file with real content: that is a contradiction to report (*PHASE
+1c* shape), not a file to overwrite. Ask, and take the answer.
+
+Then **show the user what changed and propose the commit — do not commit and do
+not push.** State the line count and which of the three probes the file answers.
 
 Finally, tell the user the two facts that make the file work: run `/context` to
 confirm it loaded, and add to it whenever Claude repeats a mistake.
@@ -309,7 +342,11 @@ about intent and unreliable about facts.
    code says so better), promoted to a rule (it was decided), or re-marked (still
    not built). Nothing stays provisional across two updates without being said
    out loud.
-7. **Trim and verify** (PHASES 5–6) exactly as in create mode, then hand over.
+7. **Check the `AGENTS.md` pointer** (*PHASE 7*). Missing → add it. Present but
+   carrying rules of its own → those rules are now a second memory file: list
+   them for the user, fold the survivors into `CLAUDE.md`, and reduce the file
+   to the pointer. Already a pointer → leave it alone; it does not age.
+8. **Trim and verify** (PHASES 5–6) exactly as in create mode, then hand over.
 
 ## Hard constraints
 
@@ -333,6 +370,10 @@ These are not preferences. A draft violating any of them is rejected and redraft
   names only. This holds even where the repository intentionally commits real
   credentials.
 - **Never exceed 200 lines**, and never reach the limit by deleting commands.
+- **`CLAUDE.md` is the only memory file this skill writes rules into.** Not
+  `AGENTS.md`, not `GEMINI.md`, not `.cursorrules`, not a second copy under
+  `.claude/`. Another harness's file is created only as the pointer of PHASE 7,
+  or not at all.
 - **Do not write `CLAUDE.md` files into directories the user did not name**, and
   do not commit. Proposing the commit is the last step; approving it is the
   user's.
