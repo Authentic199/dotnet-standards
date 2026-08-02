@@ -39,13 +39,21 @@ all:
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
 ships six hooks of the first kind and zero of the other two.**
 
-**All six are Claude Code only.** Codex's plugin manifest accepts `skills`,
-`apps`, `mcpServers` and `interface` — `hooks` is rejected outright by its
-validator — so a Codex install of this plugin runs none of them. Nothing here
-degrades gracefully into that harness: the compensations are written where the
-loss lands, in `choosing-a-dotnet-skill` (*When the harness is not Claude Code*)
-and in `dotnet-review-flow`'s preflight #3. Do not design a hook whose rule
-exists nowhere else.
+**The same six run on Codex, from a different file.** Codex's plugin manifest
+rejects a `hooks` field (`plugin_hooks` is a removed feature flag), but Codex's
+own hook system takes the same event names, the same matcher regexes, the same
+stdin payload and the same `hookSpecificOutput.additionalContext` reply — so
+`codex/hooks.json` registers these scripts unchanged at `~/.codex/hooks.json`,
+and `codex/install.sh` puts them there. Two differences that matter:
+
+- **Codex launches a hook command without a shell.** A bare `.cmd` path is not
+  executable, so every entry carries a `commandWindows` override running the
+  wrapper through `cmd /c`. Measured 2026-08-02: without it, all six hooks
+  silently never ran — the failure mode this file already treats as the
+  dangerous one.
+- **Codex requires each hook to be trusted** (`/hooks` in a session), keyed to
+  the script's hash. An untrusted hook is skipped silently, so it looks exactly
+  like a broken one, and editing a trusted hook un-trusts it.
 
 ---
 

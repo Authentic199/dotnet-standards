@@ -7,19 +7,28 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.64 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-02. **0.3.64 — the same plugin now installs on Codex**
+Shipped through **v0.3.65 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-02. **0.3.64–0.3.65 — the plugin installs on Codex**
 (`.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json`; verified
-installed and enabled at 0.3.64, 26 skills, by `codex plugin list`). Facts a
-later session needs: Codex's manifest **rejects `hooks`, `commands` and
-`agents`** — `skills/` is the entire shipped surface there, so any rule that
-lives only in a hook does not exist on Codex; its validator
-(`~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py`, run it on
-this repo) also checks every `SKILL.md` frontmatter; and **the Codex cache is
-built from git HEAD, not the working tree** — an uncommitted change installs as
-the previous commit's content, silently. The instructions file is unchanged on
-both harnesses: rules live in `CLAUDE.md`, and `AGENTS.md` is a pointer at it
-written by `claude-md-builder` PHASE 7 — never a copy, never a symlink.
+installed and enabled by `codex plugin list`), and **0.3.65 corrected 0.3.64's
+central claim within the same session**: a rejected manifest field is not an
+absent feature. `codex features list` is the authority — `hooks` stable/true,
+`multi_agent` stable/true, `plugin_hooks` **removed**. So hooks, agents and
+commands all exist on Codex, read from `~/.codex/hooks.json`,
+`~/.codex/agents/*.toml` and `~/.codex/prompts/*.md`; `codex/install.sh` puts
+them there and `codex/sync-from-plugin.py --check` guards the projections
+against drift. Facts a later session needs: **Codex launches a hook command
+without a shell**, so a bare `.cmd` path silently never runs — every entry needs
+`commandWindows` with `cmd /c`, and a planted canary hook is how that was
+distinguished from "Codex runs no hooks"; **the Codex cache is built from git
+HEAD, not the working tree**, so an uncommitted change installs as the previous
+commit's content; the manifest validator at
+`~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py` also checks
+every `SKILL.md` frontmatter. **Still unverified: whether the six custom agents
+resolve for spawning** — `codex exec` exposes no spawn tool at all. The
+instructions file is unchanged on both harnesses: rules live in `CLAUDE.md`, and
+`AGENTS.md` is a pointer at it written by `claude-md-builder` PHASE 7 — never a
+copy, never a symlink.
 
 **0.3.63 — every hook marker is now keyed per
 CONTEXT, not per session**, and the bug it fixes had shipped since 0.3.44: under

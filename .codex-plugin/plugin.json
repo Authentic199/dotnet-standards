@@ -1,6 +1,6 @@
 {
   "name": "dotnet-standards",
-  "version": "0.3.64",
+  "version": "0.3.65",
   "description": "Two layers. Knowledge: .NET architecture, the in-process messaging pipeline (MediatR + FluentValidation + AutoMapper), EF Core, Redis caching, Elasticsearch, controller-based Web API conventions, testing, and four review rubrics. Process integration: the dotnet-feature and dotnet-review closed-loop flows, which sit on top of the Superpowers plugin and require it.",
   "author": {
     "name": "Authentic199",

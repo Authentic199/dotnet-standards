@@ -8,6 +8,59 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.65] — Codex has hooks and subagents after all; 0.3.64 said otherwise, 2026-08-02
+
+**0.3.64 claimed the three lost components had no Codex equivalent. That was
+wrong, and the correction is this release.** The evidence for the claim was the
+plugin manifest validator, which does reject `hooks`, `commands` and `agents` —
+but a rejected *manifest field* is not an absent *feature*. `codex features list`
+on the CLI in hand (0.144.1) settles it: `hooks` **stable/true**,
+`multi_agent` **stable/true**, `plugin_hooks` **removed/false**. Only the
+plugin-bundled delivery is gone. Codex reads each component from outside the
+plugin:
+
+| Component | Where Codex reads it |
+|---|---|
+| Hooks | `~/.codex/hooks.json` or `<repo>/.codex/hooks.json` — same event names, same matchers, same stdin payload, same `hookSpecificOutput.additionalContext` reply |
+| Agents | `~/.codex/agents/*.toml` or `<repo>/.codex/agents/*.toml` |
+| Commands | `~/.codex/prompts/*.md` — user scope only, top level only |
+
+**So `codex/` ships the kit**, and `agents/*.md` and `commands/*.md` stay the
+single source of truth: `codex/sync-from-plugin.py` projects them into the two
+shapes Codex reads and `--check` fails on drift, because a silently stale
+projection simply teaches an older rule. `codex/install.sh` merges the hooks
+into an existing `hooks.json` (identifying its own entries by command path, not
+by an ownership key — Codex's hook schema is fixed and an unknown field risks the
+whole file), installs the agents and prompts, and uninstalls exactly what it
+added.
+
+**The Windows fact that cost the first attempt, and would have shipped as a
+silent no-op.** Codex launches a hook command **without a shell**, so a bare
+`.cmd` path is not executable and every hook never ran — with nothing reporting
+it. Every entry now carries a `commandWindows` override through `cmd /c`. Found
+by planting a canary hook that wrote a file: the canary fired and ours did not,
+which is the difference between "Codex does not run hooks" and "Codex could not
+run *this* command".
+
+**Measured, not assumed** (Codex CLI 0.144.1, 2026-08-02): a `codex exec` turn in
+a `.csproj` directory created this plugin's own session marker and the router
+text reached the model — found in the session rollout. All 26 skills are visible
+to the model as `dotnet-standards:<skill>` with their descriptions
+(`codex debug prompt-input`). **Not verified: the six agents.** They install and
+their TOML parses, but `codex exec` exposes no spawn tool at all, and upstream
+reports custom agents resolving differently across Codex surfaces — so
+`dotnet-review-flow` preflight #3 keeps checking the roster rather than the
+install, and its sequential-lens fallback stands. `codex/README.md` records the
+split between what was measured and what was not.
+
+**Also.** `hooks/superpowers-check` read only the Claude registry, so under Codex
+it would have warned that Superpowers was missing while it sat installed and
+enabled in the running session; it now accepts either registry. The router's
+harness section and `hooks/README.md` were rewritten from "absent" to "installed
+elsewhere, and here is what decides which you have".
+
+---
+
 ## [0.3.64] — the same plugin, installable on Codex, 2026-08-02
 
 **The ask.** Ship this plugin so Codex can install it too, and where Codex wants

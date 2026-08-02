@@ -5,16 +5,31 @@
 # acceptable for this hook: if it never runs, PHASE 0 still guards the flows.
 set -euo pipefail
 
-PLUGINS_FILE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json"
+# Two harnesses, two registries. This script is registered by Claude Code from
+# hooks/hooks.json and by Codex from codex/hooks.json, and under Codex the
+# Claude registry is either absent or stale — reading it alone would warn that
+# Superpowers is missing while it sits installed and enabled in the session
+# that is running. So: found in EITHER registry is found.
+CLAUDE_PLUGINS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json"
+CODEX_CONFIG="${CODEX_HOME:-$HOME/.codex}/config.toml"
 
-# Missing registry = nothing to say; never block a session from a hook.
-[ -f "$PLUGINS_FILE" ] || exit 0
+if [ -f "$CLAUDE_PLUGINS" ] && grep -q '"superpowers@' "$CLAUDE_PLUGINS"; then
+    exit 0
+fi
 
-grep -q '"superpowers@' "$PLUGINS_FILE" && exit 0
+# Codex records an installed plugin as [plugins."superpowers@<marketplace>"].
+if [ -f "$CODEX_CONFIG" ] && grep -q '^\[plugins\."superpowers@' "$CODEX_CONFIG"; then
+    exit 0
+fi
+
+# Neither registry exists = nothing to say; never block a session from a hook.
+if [ ! -f "$CLAUDE_PLUGINS" ] && [ ! -f "$CODEX_CONFIG" ]; then
+    exit 0
+fi
 
 cat <<'JSON'
 {
-  "systemMessage": "dotnet-standards: the Superpowers plugin is NOT installed. The /dotnet-feature and /dotnet-review workflows require it and will stop at preflight. Install: claude plugin install superpowers@claude-plugins-official (then restart the session). Knowledge skills work without it.",
+  "systemMessage": "dotnet-standards: the Superpowers plugin is NOT installed. The /dotnet-feature and /dotnet-review workflows require it and will stop at preflight. Install on Claude Code: claude plugin install superpowers@claude-plugins-official — on Codex: codex plugin add superpowers@<marketplace> (then restart the session). Knowledge skills work without it.",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": "Superpowers is not installed. dotnet-standards flow skills (dotnet-feature-flow, dotnet-review-flow) must hard-stop at PHASE 0 and give the install command: claude plugin install superpowers@claude-plugins-official. Knowledge skills are unaffected."

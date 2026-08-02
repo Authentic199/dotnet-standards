@@ -1,0 +1,83 @@
+{
+  "description": "dotnet-standards lifecycle hooks, in the shape Codex reads. Installed by codex/install.sh, which replaces __PLUGIN_ROOT__ (posix) and __PLUGIN_ROOT_WIN__ (windows) with this plugin's absolute path. Codex removed plugin-bundled hooks (feature `plugin_hooks`: removed), so these live in ~/.codex/hooks.json or <repo>/.codex/hooks.json instead of shipping inside the plugin. Codex launches a hook command WITHOUT a shell, so a bare .cmd path cannot be executed on Windows — hence commandWindows on every entry. Measured 2026-08-02: with a bare .cmd path every hook silently never ran, while `cmd /c` did.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" superpowers-check",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" superpowers-check",
+            "statusMessage": "dotnet-standards: checking Superpowers",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" router-nudge",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" router-nudge",
+            "statusMessage": "dotnet-standards: routing",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "spawn_agent|Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" fleet-nudge",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" fleet-nudge",
+            "statusMessage": "dotnet-standards: fleet check",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "skill|Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" process-handback",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" process-handback",
+            "statusMessage": "dotnet-standards: process hand-back",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "apply_patch|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" post-edit-format",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" post-edit-format",
+            "statusMessage": "dotnet format",
+            "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "shell|bash|unified_exec|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"__PLUGIN_ROOT__/hooks/run-hook.cmd\" test-report-nudge",
+            "commandWindows": "cmd /c \"__PLUGIN_ROOT_WIN__\\hooks\\run-hook.cmd\" test-report-nudge",
+            "statusMessage": "dotnet-standards: test report",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

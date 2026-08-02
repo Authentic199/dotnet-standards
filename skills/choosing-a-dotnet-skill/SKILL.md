@@ -88,14 +88,20 @@ the row to use is `dotnet-feature-flow` or `dotnet-review-flow` below.
 
 ## When the harness is not Claude Code
 
-The skills are harness-neutral and ship identically everywhere. Three parts of
-this plugin do not, and each one shifts work onto the session:
+The skills are harness-neutral and ship identically everywhere. The hooks, the
+six agents and the two commands do not travel inside the plugin — on Codex they
+are installed beside it by `codex/install.sh`, and **whether that ran decides
+what this session has**:
 
-| Absent outside Claude Code | What the session does instead |
+| If the Codex kit was installed | If it was not |
 |---|---|
-| The hooks — nothing announces this router on the first prompt | Consult this file yourself: at session start, and again at every phase change. Nothing will remind you. |
-| The `/dotnet-feature` and `/dotnet-review` commands | Load `dotnet-feature-flow` or `dotnet-review-flow` by name. The commands were only ever thin entries into those two skills. |
-| The six named agent types the fleet spawns | `dotnet-review-flow` preflight #3 covers this — it has a stated fallback, and the fallback is not "review it all in one pass". |
+| The router nudge fires on the first prompt, as on Claude Code | Nothing announces this router. Consult this file yourself: at session start, and again at every phase change. |
+| `/dotnet-feature` and `/dotnet-review` are in the slash menu | Load `dotnet-feature-flow` or `dotnet-review-flow` by name — the commands were only ever thin entries into those two skills |
+| The six agent names may resolve for spawning | `dotnet-review-flow` preflight #3 owns this case, and its fallback is four sequential lenses — never one merged pass |
+
+**Do not assume the agents exist merely because the kit was installed.** Codex
+surfaces differ in whether custom agents resolve; preflight #3 checks the roster
+rather than the install, which is the only check that cannot be fooled.
 
 **The instructions file is `CLAUDE.md` on every harness.** Where a harness reads
 `AGENTS.md` — Codex does — that file is a pointer at `CLAUDE.md` carrying no
