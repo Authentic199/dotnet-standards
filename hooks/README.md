@@ -39,6 +39,14 @@ all:
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
 ships six hooks of the first kind and zero of the other two.**
 
+**All six are Claude Code only.** Codex's plugin manifest accepts `skills`,
+`apps`, `mcpServers` and `interface` — `hooks` is rejected outright by its
+validator — so a Codex install of this plugin runs none of them. Nothing here
+degrades gracefully into that harness: the compensations are written where the
+loss lands, in `choosing-a-dotnet-skill` (*When the harness is not Claude Code*)
+and in `dotnet-review-flow`'s preflight #3. Do not design a hook whose rule
+exists nowhere else.
+
 ---
 
 ## The six hooks

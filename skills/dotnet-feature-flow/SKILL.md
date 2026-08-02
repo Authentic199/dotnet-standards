@@ -85,7 +85,10 @@ the shared definition and it is not restated at length here. In compact form:
 2. **A git repository is present**, with a resolvable base.
 3. **This plugin is complete** — the four rubric skills, `dotnet-testing` and the
    six agents present by name in this session's rosters. A missing name means a
-   stale or partial install: STOP with the update-and-restart remedy.
+   stale or partial install: STOP with the update-and-restart remedy — **unless
+   all six agent names are absent at once on a harness that ships no plugin
+   agent types**, which is that skill's stated harness exception and carries its
+   sequential-lens fallback. The five skills are still required outright.
 
 Its fourth check — state the review target — does not apply yet: there is no diff
 until PHASES 4–5. **State the feature being built instead**, in one line, and get

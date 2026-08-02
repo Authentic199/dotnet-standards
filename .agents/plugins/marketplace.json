@@ -1,0 +1,20 @@
+{
+  "name": "dotnet-standards-dev",
+  "interface": {
+    "displayName": "dotnet-standards Dev"
+  },
+  "plugins": [
+    {
+      "name": "dotnet-standards",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

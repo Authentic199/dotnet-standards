@@ -31,6 +31,7 @@ tier-3 generator.**
 | `skills/` | ✅ knowledge skills, four review rubrics, the router, two flow skills, and `claude-md-builder` — the tier-3 `CLAUDE.md` generator |
 | `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
 | `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
+| Codex | ✅ `.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json` — skills ship, hooks/commands/agents do not; see [Install → Codex](#codex) |
 
 Triage of the reference kit is complete: 94 components decided across four
 groups. The decisions live in [`docs/TRIAGE.md`](docs/TRIAGE.md); the rules that
@@ -81,6 +82,51 @@ plugin until you run the full cycle:
 The same commands exist as CLI subcommands (`claude plugin install …`,
 `claude plugin details dotnet-standards`, `claude plugin validate .`), which is
 useful for scripting and for confirming what the harness actually parsed.
+
+### Codex
+
+The same repository is also a Codex plugin — `.codex-plugin/plugin.json` plus a
+marketplace descriptor at `.agents/plugins/marketplace.json`. Nothing is
+duplicated: Codex loads the *same* `skills/` directory.
+
+```
+codex plugin marketplace add Authentic199/dotnet-standards
+codex plugin add dotnet-standards@dotnet-standards-dev
+```
+
+Then **start a new thread** — an installed plugin is picked up at thread start,
+not mid-conversation. Verify with `codex plugin list`.
+
+Working on this checkout, point the marketplace at the directory instead
+(`codex plugin marketplace add /absolute/path/to/dotnet-standards`), and after
+each edit re-run `codex plugin add …`; Codex caches by version, so bump the
+version (or append a `+codex.<token>` cachebuster) when the version has not moved.
+
+**What Codex gets, and what it does not.** Codex's plugin contract carries
+`skills/` only — `hooks`, `commands` and `agents` are not accepted fields, and a
+manifest declaring them fails validation. So on Codex:
+
+| Component | On Codex |
+|---|---|
+| `skills/` | ✅ all of them, unchanged |
+| `commands/` | ❌ — load `dotnet-feature-flow` / `dotnet-review-flow` by name; the commands were only thin entries into them |
+| `agents/` | ❌ — `dotnet-review-flow` preflight #3 detects the whole roster missing and runs the four lenses sequentially instead, and says so in the report |
+| `hooks/` | ❌ — nothing announces the router on the first prompt; `choosing-a-dotnet-skill` must be consulted deliberately |
+
+Validate the Codex manifest with Codex's own validator, which also checks every
+skill's frontmatter:
+
+```
+python3 ~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
+```
+
+### The instructions file, on both harnesses
+
+Claude Code reads `CLAUDE.md`; Codex reads `AGENTS.md`. **The rules live in
+`CLAUDE.md` on both** — `AGENTS.md` is a pointer at it with no rules of its own,
+written by `claude-md-builder` (PHASE 7) alongside the file it points at. A
+project with no `CLAUDE.md` gets one built first, then the pointer. This repo's
+own [`AGENTS.md`](AGENTS.md) is that pointer.
 
 > ⚠️ **The copy ignores `.gitignore`.** `reference/` — the kit clone and the real
 > project checkouts — is copied along with everything else, turning a ~330 KB

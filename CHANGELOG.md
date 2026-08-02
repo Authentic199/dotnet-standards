@@ -8,6 +8,59 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.64] — the same plugin, installable on Codex, 2026-08-02
+
+**The ask.** Ship this plugin so Codex can install it too, and where Codex wants
+its own instructions file, point that file at the project's `CLAUDE.md` rather
+than writing a second rule set.
+
+**What Codex's plugin contract actually is** — read off the `plugin-creator`
+skill and the `validate_plugin.py` that Codex installs at
+`~/.codex/skills/.system/`, not inferred. A plugin is `.codex-plugin/plugin.json`
+plus a marketplace descriptor at `.agents/plugins/marketplace.json`. The manifest
+accepts exactly `id`, `name`, `version`, `description`, `skills`, `apps`,
+`mcpServers`, `interface`, `author`, `homepage`, `repository`, `license`,
+`keywords` — **`hooks`, `commands` and `agents` are rejected fields**, and
+`interface` requires `displayName`, `shortDescription`, `longDescription`,
+`developerName`, `category`, `capabilities` and `defaultPrompt`. The validator
+also walks every `skills/*/SKILL.md` frontmatter. This repo passes it.
+
+**So the knowledge layer ships whole and three things do not**, each compensated
+where the loss lands rather than in a note nobody reads:
+
+- **Hooks** — nothing announces the router on a Codex first prompt.
+  `choosing-a-dotnet-skill` gained *When the harness is not Claude Code*, which
+  states the compensations as the session's own work.
+- **Commands** — `/dotnet-feature` and `/dotnet-review` were only thin entries;
+  the flow skills load by name.
+- **Agents** — the six specialist types are absent **together**, which is the
+  signal. `dotnet-review-flow` preflight #3 now separates that harness fact from
+  a stale install (six absent vs. one or two) and runs the four lenses
+  sequentially, one report each, with the shared context declared in *Not run*.
+  Never a merged pass — the merge is what Principle 1 forbids, and it is exactly
+  the shortcut this fallback exists to refuse. `dotnet-feature-flow` inherits
+  the exception through its compact restatement of the same preflight.
+
+**The instructions file — one file, one copy.** `claude-md-builder` PHASE 7 now
+writes `AGENTS.md` as a **pointer** at `CLAUDE.md` after writing `CLAUDE.md`
+itself, and a new hard constraint forbids the skill from putting rules into any
+other memory file. Three rulings inside that step: not a copy (a duplicated rule
+set drifts, and the copy is what gets read when it does); not a symlink (Windows
+checks it out as a one-line text file, which the harness then reads as the entire
+instruction set — the shape Superpowers ships and the reason this repo does not
+copy it); and not an overwrite of an `AGENTS.md` a human maintains with real
+content — that is a contradiction to report, PHASE 1c shape. PHASE 0 gained the
+matching rule: only `CLAUDE.md` decides the mode, so an `AGENTS.md`-only
+repository is a **create-mode** repository whose stranded rules get folded into
+the new `CLAUDE.md`. Update mode gained step 7, which repairs a missing or
+rule-carrying pointer.
+
+**Files.** New `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`,
+and this repo's own `AGENTS.md` pointer. Router, `claude-md-builder`, both flow
+skills, `README.md` (Codex install section) and `hooks/README.md` updated.
+
+---
+
 ## [0.3.63] — a hook's "once per session" was starving the session it was written for, 2026-08-02
 
 **Found by a user question, not by review: "does the test-report hook still run
