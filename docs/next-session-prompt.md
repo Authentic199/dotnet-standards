@@ -260,7 +260,12 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   `fleet-nudge` fired at the first review spawn, whether the specialist agents
   were used, and whether a flow was entered at all; (b) `/dotnet-review` on
   `feature/access-control-core`, to quantify what the improvised review missed —
-  the performance lens is the one that never ran. **`dotnet-feature-flow` has
+  the performance lens is the one that never ran. **Checklist ready:
+  `docs/field-reports/2026-08-02-trial-checklist.md`** — preflight (the consumer
+  is still on 0.3.58), the marker files under `/tmp/dotnet-standards/` as the
+  hard signal, the transcript reads as the soft one, and the blinding rule: the
+  trial session must never be shown the checklist or told what is being
+  measured. **`dotnet-feature-flow` has
   still never been run end to end in the field**, and 0.3.62 routes more
   traffic at it. If the trial shows the nudges ignored, the escalation ladder is
   written in the design §Risks: `permissionDecision: "ask"` on a review spawn
