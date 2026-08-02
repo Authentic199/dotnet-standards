@@ -66,6 +66,26 @@ a lock or a test library that is absent today, the owning skill governs that
 plan from its first line. A `CLAUDE.md` note that the capability is missing
 records the tree as it stands; it never retires the skill that owns it.
 
+## Composing with Superpowers process skills
+
+A Superpowers process skill running the session does not suspend this layer.
+Three rules, all broken in one real session on 2026-08-02:
+
+- **"Do NOT invoke any other skill" bars implementation skills, not this one.**
+  The same ban is stated twice more with the word *implementation* in it. A
+  knowledge skill is an input to the design, so load it before a brainstorm
+  answer, a plan step or a subagent prompt states a .NET convention.
+- **Re-read this file whenever the work changes phase** — design, code, test,
+  review. It is a lookup table, not a briefing: consulted once for the first
+  question of a session, it will not be there when the work changes nature.
+- **A subagent that reviews or tests .NET code is `dotnet-review-flow`'s**, with
+  the agents that flow names — never a general-purpose agent carrying a
+  hand-written constraint block. A process skill that hard-codes
+  `general-purpose` is naming a default, not forbidding these.
+
+When the whole task is a .NET feature or a .NET review rather than one question,
+the row to use is `dotnet-feature-flow` or `dotnet-review-flow` below.
+
 ## Base map — one area, one skill
 
 Ordered by build sequence: placement → behaviour → messaging → data → HTTP →
@@ -127,6 +147,7 @@ alone picks wrong. Match the question, not the word.
 | a validator | where the file sits beside its DTO — `api-surface`; the rule and its guards — `module-feature`; the text a failing rule emits — `message-keys` |
 | "this is slow" / performance cost | what the query, cache, lock or search shape should be — its owning skill; grading what code costs in a review — `dotnet-performance-review` |
 | "review" | the rubric applied while reading changed code yourself — `dotnet-code-review` and its three sibling lenses; running the subagent fleet with the test loop, over a diff or over unchanged code under given paths — `dotnet-review-flow`; the whole feature process that ends in that review — `dotnet-feature-flow`; the request/receive review discipline — Superpowers |
+| spawning a subagent | one that reviews or tests .NET code — `dotnet-review-flow` and the agents it names, never `general-purpose`; one that writes code — an ordinary Superpowers subagent, whose prompt must order the load of the skills this table names for what it touches |
 | "this is over-built" / "simplify this" | grading the claim in changed code — `dotnet-code-review` (its simplicity area); executing the cleanup — `/simplify`; cutting speculative steps while the plan is written — `dotnet-feature-flow`; the every-session constraint a repository carries — its own `CLAUDE.md`, built by `claude-md-builder` |
 
 ## Not yet covered

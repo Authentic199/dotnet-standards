@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# PreToolUse(Skill) hook: when a Superpowers process skill is loaded in a .NET
+# repository, say once that the two layers compose.
+#
+# WHY THIS EXISTS
+#
+# On 2026-08-02 a consumer session wrote a MediatR architecture specification
+# with no knowledge skill loaded — wrong handler placement, wrong registration
+# anchor, a folder outside the house vocabulary — while running Superpowers'
+# brainstorming. That skill says, in its own summary line, "Do NOT invoke any
+# other skill". The session read it literally and obeyed.
+#
+# The two fuller statements of that same ban scope it to IMPLEMENTATION skills
+# by name. The summary line drops the qualifier. Reading the summary in the
+# light of what it summarises is the correct reading — but that reading has to
+# arrive at the moment the process skill takes the wheel, which is what this
+# hook is for. It changes no Superpowers file and asks for none to be changed.
+#
+# Field report: docs/field-reports/2026-08-02-skill-routing-failure.md
+# Design:       docs/superpowers/specs/2026-08-02-process-handback-design.md
+#
+# COST
+#
+# Fires per Skill-tool call. The session marker is checked FIRST and the .NET
+# verdict is memoised — the first invocation writes either an `emitted` or a
+# `not-applicable` marker, and every later invocation is one `test -e`. A skill
+# outside the watched set writes no marker: the next load may be one of them.
+#
+# SILENT ABSENCE IS BENIGN — the binding rule in hooks/README.md
+#
+# With no bash, no session_id, no writable temp directory, or a CLI that does
+# not route skill loads through a tool this matcher sees, this hook does
+# nothing and the session behaves exactly as it did before it existed. It
+# guards nothing. Under-firing is the safe direction.
+#
+# NO permissionDecision, NO updatedInput — see hooks/fleet-nudge for the reason;
+# it is the same one, and it is a design decision, not an oversight.
+#
+# Usage: registered in hooks/hooks.json as
+#   "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" process-handback
+# Extensionless on purpose — Claude Code on Windows prepends `bash` to any
+# command containing ".sh". See hooks/README.md.
+
+set -euo pipefail
+shopt -s nullglob
+
+# ---------------------------------------------------------------------------
+# Read the PreToolUse payload
+# ---------------------------------------------------------------------------
+
+STDIN=""
+if [[ ! -t 0 ]]; then
+    STDIN=$(cat)
+fi
+
+if [[ -z "$STDIN" ]]; then
+    exit 0
+fi
+
+json_string_field() {
+    local key="$1" out=""
+    if command -v jq >/dev/null 2>&1; then
+        out=$(printf '%s' "$STDIN" | jq -r --arg k "$key" '.[$k] // empty' 2>/dev/null) || out=""
+    fi
+    if [[ -z "$out" ]]; then
+        out=$(printf '%s' "$STDIN" | sed -n "s/.*\"$key\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1) || out=""
+        out="${out//\\\\/\\}"
+    fi
+    printf '%s' "$out"
+}
+
+SESSION_ID=$(json_string_field session_id)
+CWD=$(json_string_field cwd)
+
+if [[ -z "$CWD" ]]; then
+    CWD="$PWD"
+fi
+
+CWD="${CWD//\\//}"
+CWD="${CWD%/}"
+
+# ---------------------------------------------------------------------------
+# Gate 1 — has this session already been told? (cheapest check, so it is first)
+# ---------------------------------------------------------------------------
+
+if [[ -z "$SESSION_ID" ]]; then
+    exit 0
+fi
+
+STATE_DIR="${TMPDIR:-/tmp}/dotnet-standards"
+if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+    exit 0
+fi
+
+SAFE_ID=$(printf '%s' "$SESSION_ID" | tr -c 'A-Za-z0-9._-' '_')
+MARKER="$STATE_DIR/process-handback-$SAFE_ID"
+SKIP_MARKER="$STATE_DIR/process-handback-na-$SAFE_ID"
+
+if [[ -e "$MARKER" || -e "$SKIP_MARKER" ]]; then
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 2 — is the skill being loaded one of the process skills?
+# ---------------------------------------------------------------------------
+#
+# Matched before the filesystem check because it rejects most calls at the cost
+# of one grep, and because a non-matching call must NOT memoise anything.
+#
+# The set is the six Superpowers skills that take the wheel for a whole phase.
+# A name this list does not carry — a knowledge skill, one of this plugin's own
+# flows, a skill from a third plugin — exits silently, which is correct: this
+# hook has nothing to say about them.
+
+if ! printf '%s' "$STDIN" | grep -Eq 'superpowers:(brainstorming|writing-plans|subagent-driven-development|test-driven-development|executing-plans|requesting-code-review)'; then
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 3 — does this working directory look like a .NET solution?
+# ---------------------------------------------------------------------------
+
+looks_like_dotnet() {
+    local candidate
+    for candidate in "$CWD"/*.sln "$CWD"/*.slnx "$CWD"/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    for candidate in "$CWD"/*/*.csproj "$CWD"/*/*/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+if ! looks_like_dotnet; then
+    : > "$SKIP_MARKER" 2>/dev/null || true
+    exit 0
+fi
+
+if ! : > "$MARKER" 2>/dev/null; then
+    exit 0
+fi
+
+find "$STATE_DIR" -maxdepth 1 -type f -name 'process-handback-*' -mtime +7 -delete 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
+# Emit — wording approved by the user 2026-08-02
+# ---------------------------------------------------------------------------
+
+cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "additionalContext": "A Superpowers process skill is being loaded in a .NET solution where dotnet-standards is installed. The two layers compose: Superpowers owns brainstorming, planning and TDD; dotnet-standards owns which .NET convention governs each step and who reviews the result. A \"do not invoke any other skill\" line in a process skill bars implementation skills — it does not suspend the knowledge layer. Before any design answer, plan step or subagent prompt states a .NET convention, route it through `dotnet-standards:choosing-a-dotnet-skill` and load the owning skill. If the whole task is a .NET feature or a .NET review, the flow that already composes both layers is /dotnet-feature or /dotnet-review. Emitted once per session."
+  }
+}
+JSON
+
+exit 0

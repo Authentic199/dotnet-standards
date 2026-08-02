@@ -70,6 +70,12 @@ either rule alone — Claude picks one arbitrarily.
 - A rule the user answered a question to produce.
 - The `When unsure` section.
 - Anything the PHASE 6 probes depend on.
+- **The `### Process` group under section 8 (R28–R31).** It reads like
+  meta-commentary about tooling rather than a rule about this repository, so a
+  trimming pass reaches for it early. Its absence is the one that cannot be
+  noticed from inside the file: a session that never reads it runs the whole
+  task through another plugin's process, and nothing in the output looks wrong
+  until a review that never applied a rubric comes back clean.
 - **The R27 preamble under section 6b, and the *load it first* clause on any
   capability-absent bullet.** Both read like rationale, so items 6 and 10 will
   reach for them first; neither may be cut. Without them the section states that

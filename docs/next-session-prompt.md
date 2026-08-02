@@ -7,9 +7,22 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.61 (26 skills + 2 commands + 6 agents + 4 hook
-scripts)** as of 2026-07-31. **After the batch closed at 0.3.52 the same session
-kept shipping** — read these before assuming anything about the tree: 0.3.53
+Shipped through **v0.3.62 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-02. **0.3.62 is the first release that changed no
+doctrine at all** — a consumer session skipped this plugin at both ends of one
+feature (a specification written with no knowledge skill loaded, then 20+ review
+rounds with no rubric and no specialist agent), and the cause was **entry and
+hand-back, not content**: `dotnet-feature-flow` owned that whole task, sat in
+the session's skill list all day, and was never opened. Two facts from it outrank
+the version number. **(1) `UserPromptSubmit` cannot catch a phase change** — the
+review rounds ran inside one autonomous `subagent-driven-development` turn, so
+the write→review transition was decided by the model and no prompt existed to
+hang a nudge on; that is why the two new hooks are `PreToolUse`, the first
+per-tool-call hooks this plugin has admitted. **(2) `CLAUDE.md` is the only
+channel that outranks a process skill already holding the wheel**, by
+Superpowers' own precedence rule — hence R28–R31, which 0.3.57's update-mode
+reconciliation back-fills into every `CLAUDE.md` already generated. Rulings:
+CHANGELOG 0.3.62. **Read these before assuming anything about the tree:** 0.3.53
 narrowed the soft-delete section's `HasQueryFilter` claim (a corpus census
 falsified "none registered anywhere"; two entities register one, for staged
 imports) · 0.3.54 **the R8 labelling pass** — 63 banked candidates ruled, 32
@@ -105,10 +118,11 @@ details`, whose inventory line lists the two commands (`dotnet-feature`,
 `dotnet-review`) among the skills. Say which number you mean, and **expect 23
 from `details`** at prove-it time — a session comparing it against 21 will think
 the install failed. **Same trap for hooks since 0.3.44: `details` prints
-`Hooks (3)` because it counts EVENTS** (SessionStart, UserPromptSubmit,
-PostToolUse) — the PostToolUse event carries two scripts (`post-edit-format`,
-`test-report-nudge`), so 4 scripts ship; the script list in the cache's
-`hooks/` dir is the number to verify.
+an EVENT count, not a script count** — since 2026-08-02 the events are
+SessionStart, UserPromptSubmit, PreToolUse and PostToolUse (**4**), while
+**6 scripts** ship: PostToolUse carries `post-edit-format` and
+`test-report-nudge`, PreToolUse carries `fleet-nudge` and `process-handback`.
+The script list in the cache's `hooks/` dir is the number to verify.
 Earlier: 0.3.21 = process-integration v1, Lane D session D1:
 `dotnet-feature-flow`, `dotnet-review-flow`, `/dotnet-feature`,
 `/dotnet-review`, six specialist agents, SessionStart `superpowers-check`,
@@ -177,7 +191,7 @@ Full rulings CHANGELOG 0.3.31.
 | **B — API & Security Surface** | `next-session-prompt-B.md` | Queue COMPLETE at S15 close (api-surface, error-handling, message-keys, dotnet-testing). Lane closed | Nothing — the B file exists to hold its Lane log for rubric harvesting. Reopen only by explicit user direction |
 | **C — Infrastructure Services** | `next-session-prompt-C.md` (mirrors the tree's CLAUDE.md) | **S17 closed 2026-07-28: `mediatr-messaging` v0.3.16 shipped** (router alignment same commit; full rulings CHANGELOG 0.3.16) | Queue empty of unblocked work — ask the user whether `observability` / `background-worker` / `http-resilience` unfreezes; if none, the lane pauses while rubrics #2–4 run solo |
 | **Rubrics — 4 solo sessions** | `next-session-prompt-rubrics.md` | **COMPLETE. Rubric #4 `dotnet-performance-review` shipped v0.3.20, 2026-07-28** (#1 v0.3.15, #2 v0.3.17, #3 v0.3.18/19 before it) — 5 areas, honesty rule verbatim, 15 graded-by rows, 12-row Refused table; router: reservation row deleted + base-map row + slow/cost disambiguation row same commit; six grade-once violations caught pre-ship, durable fix recorded (briefs carry the sibling's full check-title inventory); full log in the rubrics file | Nothing — the rubrics file exists to hold its log. **Lane D is UNLOCKED** |
-| **D — Process Integration** | `next-session-prompt-D.md` | **Dm1 (maintenance) closed 2026-07-29: `dotnet-review-flow` NO-SIGNAL shipped at v0.3.25.** Triggered by a real `/dotnet-review` run that halted on `RED — environment` and delivered no report at all. Also fixed a regression this same change introduced in `dotnet-feature-flow`. Rulings in CHANGELOG 0.3.25; spec + plan under `docs/superpowers/`. Before it: D1 shipped process-integration v1 at v0.3.21 | Lane D's *feature* queue stays PENDING by user direction. When unfrozen: session D2, the `bugfix` flow (v1.5, spec §6.3) — brief still valid in the lane file. A maintenance session on an already-shipped flow does **not** need that unfreeze; treat it as a separate track |
+| **D — Process Integration** | `next-session-prompt-D.md` | **Dm2 (maintenance) closed 2026-08-02: process handback shipped at v0.3.62** — the plugin was skipped at both ends of one consumer feature; remedy is four `claude-md-builder` rules, two `PreToolUse` hooks and description text, changing no doctrine. Rulings CHANGELOG 0.3.62; spec + plan under `docs/superpowers/`; evidence `docs/field-reports/`. Before it: **Dm1 closed 2026-07-29: `dotnet-review-flow` NO-SIGNAL shipped at v0.3.25.** Triggered by a real `/dotnet-review` run that halted on `RED — environment` and delivered no report at all. Also fixed a regression this same change introduced in `dotnet-feature-flow`. Rulings in CHANGELOG 0.3.25; spec + plan under `docs/superpowers/`. Before it: D1 shipped process-integration v1 at v0.3.21 | **First: the 0.3.62 field trial** (PENDING log) — it runs in a consumer repository, not here, and until it runs nobody knows whether the two hooks are heeded. Lane D's *feature* queue stays PENDING by user direction. When unfrozen: session D2, the `bugfix` flow (v1.5, spec §6.3) — brief still valid in the lane file. A maintenance session on an already-shipped flow does **not** need that unfreeze; treat it as a separate track |
 
 **Solo-only (never in a lane):** `project-scaffolding` (pending), the four
 rubrics, Lane D.
@@ -209,6 +223,49 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   envelope from another module (same assembly) — only from the HTTP project. A
   core module exposing capability as commands is the house pattern working as
   designed, not an exception to it.
+
+- [solo/Lane D, 2026-08-02] **Process handback — this plugin was skipped twice
+  in one consumer session, at both ends of the same feature.** A session on
+  `feature/access-control-core` wrote a MediatR architecture spec with no
+  knowledge skill loaded, then ran 20+ subagent review rounds — including the
+  final whole-branch review — without loading one of the five review skills or
+  spawning one of the six agents; every round was `general-purpose` with a
+  hand-written constraint block, so the performance lens never ran at all.
+  Verified against Superpowers 6.2.0: `brainstorming:132` bans loading any other
+  skill unqualified, all three `subagent-driven-development` templates hard-code
+  `Subagent (general-purpose)`, its final reviewer is hard-coded to
+  `requesting-code-review/code-reviewer.md`, its rubric slot is
+  `[GLOBAL_CONSTRAINTS]` copied by hand, and neither it nor `writing-plans`
+  mentions a domain plugin anywhere. **Two findings the field report missed:**
+  its remedies for Superpowers cannot be executed (no SP file may be modified,
+  and a marketplace update erases local edits), and the write→review transition
+  is **model-initiated**, so `UserPromptSubmit` — our only injection channel —
+  cannot fire there. **Nothing about this plugin's content failed**;
+  `dotnet-feature-flow` already owns the whole task and was never opened.
+  Design: `docs/superpowers/specs/2026-08-02-process-handback-design.md` ·
+  plan: `docs/superpowers/plans/2026-08-02-process-handback.md` · evidence:
+  `docs/field-reports/2026-08-02-skill-routing-failure.md`. Three layers —
+  four self-gating `claude-md-builder` rules (R28–R31, which update mode
+  back-fills into every generated `CLAUDE.md`), two new `PreToolUse` hooks
+  (`Task|Agent` and `Skill`; `additionalContext` support verified in CLI
+  2.1.220), and description/router text. Refused in the design and not to be
+  reintroduced: rewriting `subagent_type` via `updatedInput`, and any
+  `permissionDecision` gate before a measurement.
+  **SHIPPED at v0.3.62, 2026-08-02** — both frozen wordings approved by the
+  user, 23 synthetic-payload smoke tests green before ship. **What stays
+  parked is the only thing that settles it: the field trial.** Two runs, in a
+  consumer repository, neither executable from this tree — (a) a session that
+  builds a feature through `subagent-driven-development` in a .NET repo,
+  measuring whether `process-handback` fired and was acted on, whether
+  `fleet-nudge` fired at the first review spawn, whether the specialist agents
+  were used, and whether a flow was entered at all; (b) `/dotnet-review` on
+  `feature/access-control-core`, to quantify what the improvised review missed —
+  the performance lens is the one that never ran. **`dotnet-feature-flow` has
+  still never been run end to end in the field**, and 0.3.62 routes more
+  traffic at it. If the trial shows the nudges ignored, the escalation ladder is
+  written in the design §Risks: `permissionDecision: "ask"` on a review spawn
+  that named `general-purpose`, then `deny` with a remedy — neither ships
+  without that evidence.
 
 - [A, 2026-07-27] `domain-modeling`, `modern-csharp` — detail in
   `next-session-prompt-A.md` — unblocked when the user confirms the S14 freeze

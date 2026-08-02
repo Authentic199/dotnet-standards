@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# PreToolUse(Task|Agent) hook: when a subagent is spawned in a .NET repository,
+# say once that this plugin owns the review and test job.
+#
+# WHY THIS EXISTS — AND WHY router-nudge COULD NOT COVER IT
+#
+# On 2026-08-02 a consumer session ran more than twenty subagent review rounds,
+# the final whole-branch review among them, without loading one of this
+# plugin's five review skills or spawning one of its six specialist agents.
+# Every round was `general-purpose` carrying a constraint block the session
+# wrote by hand, so the performance lens was never applied at all.
+#
+# `router-nudge` fires on UserPromptSubmit and could not have caught this. The
+# review rounds ran INSIDE one autonomous turn of Superpowers'
+# subagent-driven-development: the transition from writing code to reviewing it
+# was decided by the model, not typed by the user, so there was no prompt to
+# attach to. This hook fires at the only moment that exists — the spawn.
+#
+# Field report: docs/field-reports/2026-08-02-skill-routing-failure.md
+# Design:       docs/superpowers/specs/2026-08-02-process-handback-design.md
+#
+# IT NAMES ONE FLOW AND NO AGENTS
+#
+# `dotnet-review-flow` owns the agent roster. Listing the six names here would
+# create a second roster to keep in step, which is the same reason
+# `router-nudge` names only the router.
+#
+# COST — AND WHY THE GATE ORDER DIFFERS FROM router-nudge's
+#
+# This fires per subagent spawn rather than per prompt, so the session marker
+# is checked FIRST and the .NET verdict is memoised: the first invocation of a
+# session writes either an `emitted` marker or a `not-applicable` marker, and
+# every later invocation is one `test -e`. A session in a non-.NET repository
+# pays the solution-shape check exactly once.
+#
+# SILENT ABSENCE IS BENIGN — the binding rule in hooks/README.md
+#
+# With no bash, no session_id, no writable temp directory, or a tool name this
+# CLI spells differently, this hook does nothing and the session behaves
+# exactly as it did before it existed. It guards nothing: every agent remains
+# spawnable, every skill loadable by name. Under-firing is the safe direction.
+#
+# NO permissionDecision, NO updatedInput. The PreToolUse schema permits both —
+# this hook uses neither. Rewriting `subagent_type` behind the session's back
+# would make the transcript disagree with what was spawned; blocking a spawn
+# would make a nudge into a gate. Refused in the design, with reasons.
+#
+# Usage: registered in hooks/hooks.json as
+#   "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" fleet-nudge
+# Extensionless on purpose — Claude Code on Windows prepends `bash` to any
+# command containing ".sh". See hooks/README.md.
+
+set -euo pipefail
+shopt -s nullglob
+
+# ---------------------------------------------------------------------------
+# Read the PreToolUse payload
+# ---------------------------------------------------------------------------
+
+STDIN=""
+if [[ ! -t 0 ]]; then
+    STDIN=$(cat)
+fi
+
+if [[ -z "$STDIN" ]]; then
+    exit 0
+fi
+
+# `jq` is NOT installed in the author's environment (measured S6), so the sed
+# fallback is the path that actually runs here — it is not decoration.
+json_string_field() {
+    local key="$1" out=""
+    if command -v jq >/dev/null 2>&1; then
+        out=$(printf '%s' "$STDIN" | jq -r --arg k "$key" '.[$k] // empty' 2>/dev/null) || out=""
+    fi
+    if [[ -z "$out" ]]; then
+        out=$(printf '%s' "$STDIN" | sed -n "s/.*\"$key\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1) || out=""
+        out="${out//\\\\/\\}"
+    fi
+    printf '%s' "$out"
+}
+
+SESSION_ID=$(json_string_field session_id)
+CWD=$(json_string_field cwd)
+
+if [[ -z "$CWD" ]]; then
+    CWD="$PWD"
+fi
+
+CWD="${CWD//\\//}"
+CWD="${CWD%/}"
+
+# ---------------------------------------------------------------------------
+# Gate 1 — has this session already been told? (cheapest check, so it is first)
+# ---------------------------------------------------------------------------
+
+if [[ -z "$SESSION_ID" ]]; then
+    exit 0
+fi
+
+STATE_DIR="${TMPDIR:-/tmp}/dotnet-standards"
+if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+    exit 0
+fi
+
+SAFE_ID=$(printf '%s' "$SESSION_ID" | tr -c 'A-Za-z0-9._-' '_')
+MARKER="$STATE_DIR/fleet-nudge-$SAFE_ID"
+SKIP_MARKER="$STATE_DIR/fleet-nudge-na-$SAFE_ID"
+
+if [[ -e "$MARKER" || -e "$SKIP_MARKER" ]]; then
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 2 — does this working directory look like a .NET solution?
+# ---------------------------------------------------------------------------
+#
+# Same glob ladder as router-nudge, and the same depth cap of 3. A verdict of
+# "no" is memoised so a non-.NET session evaluates this once, not once per
+# spawn.
+
+looks_like_dotnet() {
+    local candidate
+    for candidate in "$CWD"/*.sln "$CWD"/*.slnx "$CWD"/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    for candidate in "$CWD"/*/*.csproj "$CWD"/*/*/*.csproj; do
+        if [[ -e "$candidate" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+if ! looks_like_dotnet; then
+    : > "$SKIP_MARKER" 2>/dev/null || true
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 3 — does this spawn look like review or test work?
+# ---------------------------------------------------------------------------
+#
+# Matched against the whole payload rather than an extracted field: the sed
+# fallback cannot reliably pull a multi-line prompt out of nested JSON, and the
+# failure directions are not symmetric. Over-matching costs one note that tells
+# an implementation spawn it is unaffected; under-matching loses the only
+# mechanism that fires where the observed failure happened.
+#
+# A spawn that does not match writes NO marker — the next one may be a review.
+
+if ! printf '%s' "$STDIN" | grep -Eqi 'review|audit|tester|[^a-z]tests?[^a-z]|verify|general-purpose'; then
+    exit 0
+fi
+
+if ! : > "$MARKER" 2>/dev/null; then
+    exit 0
+fi
+
+# Sweep week-old markers so the directory cannot grow without bound. Runs at
+# most once per session, on the spawn that already paid for the emit.
+find "$STATE_DIR" -maxdepth 1 -type f -name 'fleet-nudge-*' -mtime +7 -delete 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
+# Emit — wording approved by the user 2026-08-02
+# ---------------------------------------------------------------------------
+
+cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "additionalContext": "A subagent is being spawned in a .NET solution where dotnet-standards is installed. If this spawn reviews or tests code, this plugin owns that job: load `dotnet-standards:dotnet-review-flow` and spawn the specialist agents it names, rather than a general-purpose agent carrying a hand-written constraint block — a process skill that hard-codes `general-purpose` is naming a default, not forbidding these. Implementation spawns are unaffected, except that their prompts must order the load of the knowledge skills that own the conventions they touch; `dotnet-standards:choosing-a-dotnet-skill` maps them. Emitted once per session."
+  }
+}
+JSON
+
+exit 0

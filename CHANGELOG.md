@@ -8,6 +8,116 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.62] — the plugin was skipped twice in one consumer session, at both ends of the same feature, 2026-08-02
+
+**The failure.** A session building an access-control module on
+`feature/access-control-core` wrote a MediatR architecture specification with
+**no knowledge skill loaded** — wrong handler placement, wrong `AddMediatR`
+anchor, a `Contracts/` folder outside the house vocabulary — and then ran **more
+than twenty subagent review rounds, the final whole-branch review among them,
+without loading one of the five review skills or spawning one of the six
+specialist agents.** Every round was `general-purpose` carrying a constraint
+block the session wrote by hand. The performance lens was therefore never
+applied at all; architecture and security ran on improvised criteria. Field
+report, written by the session that made both mistakes:
+`docs/field-reports/2026-08-02-skill-routing-failure.md`.
+
+**Verified against Superpowers 6.2.0 before anything was designed** —
+`brainstorming:132` states *"Do NOT invoke any other skill"* with no qualifier
+(`:13` and `:61` scope the same ban to *implementation* skills); all three
+`subagent-driven-development` templates hard-code `Subagent (general-purpose)`;
+its final reviewer is hard-coded to `requesting-code-review/code-reviewer.md`;
+its rubric slot is `[GLOBAL_CONSTRAINTS]`, *"copied verbatim"* by hand; and
+`grep -ri 'dotnet|domain skill|domain plugin|other plugin'` over
+`subagent-driven-development/` and `writing-plans/` returns **zero hits**.
+
+**Two findings the field report did not reach, and they reshaped the remedy.**
+(1) Its Superpowers-side fixes cannot be executed: no Superpowers file may be
+modified, and a marketplace update would erase a local patch anyway — so a
+design resting on one silently expires. (2) It proposed re-firing `router-nudge`
+when a prompt mentions review; **that cannot work**, because the twenty review
+rounds ran inside one autonomous `subagent-driven-development` turn. The
+write→review transition was decided by the model, not typed by the user, so no
+`UserPromptSubmit` ever fired. Our only injection channel was structurally deaf
+to the exact moment it was needed.
+
+**Nothing about this plugin's content failed.** `dotnet-feature-flow:200–216`
+already forces every task prompt to name the owning knowledge skills *and order
+the Skill-tool load*; the router's planning section already governs spec, plan
+and subagent-prompt writing (moved above the tables at 0.3.59); the flow that
+owned the entire task sat in the session's skill list all day and was never
+opened. **The failure is entry and hand-back, not doctrine** — so this release
+changes no rubric, no convention, and adds no skill.
+
+**The legitimacy chain this release rests on.** `using-superpowers` states its
+own precedence: *"User instructions (CLAUDE.md …) take precedence over skills."*
+A rule in the consumer repository's `CLAUDE.md` therefore outranks a process
+skill that is already holding the wheel — and `claude-md-builder` already owns
+that file's generation.
+
+**Layer 1 — four self-gating static rules, `claude-md-builder`.** New
+*Process ownership* group (R28–R31), self-gating exactly like R23: R28 the two
+flow entry points and *do not assemble that sequence by hand*; R29 review and
+test subagents are `dotnet-review-flow`'s, never `general-purpose`, and the
+criteria are the four rubrics, never a hand-written constraint block — **naming
+no agent, because that flow owns the roster**; R30 a *"do not invoke any other
+skill"* line bars implementation skills and does not suspend the knowledge
+layer; R31 re-route on every phase change, the router is a lookup table and not
+a briefing. `template.md` §8 places them as `### Process`, immediately after the
+hard constraints; `checklist.md` makes them uncuttable, because their absence is
+the one that cannot be noticed from inside the file. **0.3.57's update-mode
+reconciliation carries all four into every `CLAUDE.md` this plugin has already
+generated.**
+
+**Layer 2 — two `PreToolUse` hooks, the first per-tool-call hooks this plugin
+has admitted.** `fleet-nudge` (matcher `Task|Agent`) fires at a subagent spawn
+that looks like review or test work; `process-handback` (matcher `Skill`) fires
+when one of six Superpowers process skills is loaded. Both are gated to .NET
+solutions and emit once per session. **The mechanism was measured, not assumed**
+— read out of the CLI binary at `versions/2.1.220`: `PreToolUse` carries
+`additionalContext` alongside `permissionDecision`, `permissionDecisionReason`
+and `updatedInput`; the payload carries `tool_name` and `tool_input`; the
+subagent tool answers to both `Agent` and `Task`; `Skill` is an ordinary tool
+name. **Gate order is the reverse of `router-nudge`'s** and deliberately so:
+these fire per call, so the session marker is checked first and the .NET verdict
+is memoised on the first invocation — every later call is one `test -e`.
+23 synthetic-payload smoke tests pass before ship, covering both directions of
+every gate plus missing `session_id`, unwritable `TMPDIR` and empty stdin.
+
+**Two refusals recorded so they are not reintroduced as conveniences.**
+`updatedInput` would let a hook rewrite `subagent_type` — refused: it makes the
+transcript disagree with what was spawned, and it inverts this repository's
+*under-fire, never over-fire* hook doctrine. `permissionDecision: ask|deny`
+would make a nudge into a gate — deferred behind a measurement, with the
+escalation ladder written down.
+
+**Layer 3 — text.** `dotnet-feature-flow`'s description now says what it
+*replaces* (hand-assembling brainstorming + plan + subagent-driven development)
+and carries the phrasings people type — *"execute this plan"*, *"implement the
+plan with subagents"*; `dotnet-review-flow`'s adds *"final review before merge"*
+and *"review each task as it lands"*; both stay under 100 words (97 and 90).
+`choosing-a-dotnet-skill` gains *Composing with Superpowers process skills* and
+a *spawning a subagent* row.
+
+**A written doctrine was amended, not worked around.** `router-nudge`'s header
+said *IT NAMES THE ROUTER AND NOTHING ELSE*. That holds for **table rows** and
+still does — the emit names none. It does not hold for the choice the tables
+cannot express: a row routes a question to a skill, while both incidents were
+failures to choose a **process for the whole session**. The emit now names
+`/dotnet-feature` and `/dotnet-review`; the amendment and its reason are
+recorded in the script header and in `hooks/README.md`, per the precedent set at
+0.3.27.
+
+**Known limit, stated rather than buried:** `dotnet-feature-flow` has still
+never been run end to end in the field — the only trial was `/dotnet-review` on
+one commit. This release routes more traffic at it. The trial is parked on the
+board, and it is the only thing that settles whether any of this worked.
+
+Design: `docs/superpowers/specs/2026-08-02-process-handback-design.md` ·
+plan: `docs/superpowers/plans/2026-08-02-process-handback.md`.
+
+---
+
 ## [0.3.61] — `message-keys` taught the wrong form, and it had spread to four skills, 2026-08-02
 
 **The worst defect this field exercise has found, and it was caught only because

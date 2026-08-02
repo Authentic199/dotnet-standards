@@ -114,6 +114,12 @@ must still have seen it.
 or the questions produced. One imperative line each, falsifiable, grouped under
 short sub-headings. Put hard constraints — the ones whose violation costs data or
 a broken environment — first and mark them plainly.
+**Then `### Process` — R28–R31, immediately after the hard constraints and before
+every other group.** Four lines. They sit that high because they govern how the
+rest of this file gets read: they say which flow owns the work, who reviews it,
+and that a process skill's *"do not invoke any other skill"* does not switch the
+knowledge layer off. A reader who never reaches them runs the whole session from
+another plugin's process and never opens this one.
 *Never:* a rule an analyzer already enforces. Never a rule that cannot be checked.
 
 **9 — Gotchas.** Deliberate oddities from question 3, and traps the scan found:
