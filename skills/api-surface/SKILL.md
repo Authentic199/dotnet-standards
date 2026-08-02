@@ -286,10 +286,20 @@ public class UpdateOrderRequest : OrderRequest { }  // an empty derived class is
 folder. An empty derived class is not a smell — it exists to give the endpoint a
 named contract and its own validator.
 
+- **Every property on a request is nullable, and every required one is asserted
+  with `NotEmpty()`.** A law, not a style, and the trap is value types — `Guid`,
+  `int`, `bool`, `DateTimeOffset`, an enum. Write `DateTimeOffset OccurredAt` and
+  an omitted field arrives as `0001-01-01`, a value the model binder invented and
+  nothing downstream can tell from one the caller sent. Nullability is what makes
+  *absent* distinguishable from *sent*; optionality is the validator's statement —
+  a required property carries `NotEmpty()`, an optional one does not. Full
+  reasoning in `references/request-response-dtos.md`.
 - **A derived validator starts with `Include(new OrderRequestValidator(...))`**,
   then adds only what its own properties need.
-- **`[MessageDisplay(nameof(Order))]` sits on the base request**, once — it
-  renames the `Messages<T>` key prefix for every derived request.
+- **`[MessageDisplay(nameof(Order))]` is needed only when the request itself is
+  the `Messages<T>` argument** — the Facades-tier case with no entity behind it.
+  Module requests type their messages to the entity, so the attribute never
+  executes there; `message-keys` owns the rule.
 - **A base request declares a `Profile` only when its map needs member
   customization** — a conditional `ForMember`, an ignored member, a hashed
   value. That map ends `.IncludeAllDerived()`, which is the whole point: it

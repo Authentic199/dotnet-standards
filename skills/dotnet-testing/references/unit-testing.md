@@ -128,7 +128,7 @@ public class OrderRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage(Messages<OrderRequest>.Required(x => x.Name));
+            .WithErrorMessage(Messages<Order>.Required(x => x.Name));
     }
 }
 ```

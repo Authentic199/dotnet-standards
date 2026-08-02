@@ -161,7 +161,7 @@ error!.Message.ShouldNotBe("something else");
 response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
 JsonElement body = await response.Content.ReadFromJsonAsync<JsonElement>();
-body.GetProperty("message").GetString().ShouldBe(Messages<CreateOrderRequest>.Required(x => x.Code));
+body.GetProperty("message").GetString().ShouldBe(Messages<Order>.Required(x => x.Code));
 ```
 
 A request rejected before the action never throws, so the exception middleware
