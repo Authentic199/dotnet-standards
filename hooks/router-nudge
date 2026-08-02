@@ -38,6 +38,24 @@
 # Naming a concrete destination here would make this file a second source of
 # truth for routing the day the router's tables change.
 #
+# AMENDED 2026-08-02 — the two flow entry points are named as well
+#
+# The reasoning above holds for TABLE ROWS and still does: this hook names no
+# skill the router's tables route to. It does not hold for the one choice those
+# tables cannot express. A row routes a question to a skill; on 2026-08-02 a
+# consumer session got both of its failures one level above that — it never
+# chose a PROCESS for the session at all, ran a hand-assembled Superpowers
+# pipeline instead, and so wrote a specification with no knowledge skill loaded
+# and twenty review rounds with no rubric behind them. No row can carry that,
+# and the router itself now says so in its own body. Naming /dotnet-feature and
+# /dotnet-review here duplicates nothing that can drift: the commands are the
+# plugin's own entry points, and if they were ever renamed this file is in the
+# same repository as they are.
+#
+# Per the precedent this repository set at 0.3.27 — refusing something for a
+# reason that later stops holding is a defect, and correcting it belongs in the
+# same change — the doctrine is amended here rather than quietly worked around.
+#
 # Usage: registered in hooks/hooks.json as
 #   "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" router-nudge
 # Extensionless on purpose — Claude Code on Windows prepends `bash` to any
@@ -154,7 +172,7 @@ cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "UserPromptSubmit",
-    "additionalContext": "dotnet-standards is installed and this working directory looks like a .NET solution. Before exploring, reviewing, testing or changing C# code in it, load the skill `dotnet-standards:choosing-a-dotnet-skill` and route the task from its tables rather than from memory. Ignore this note for any request that is not about the code in this directory. Emitted once per session."
+    "additionalContext": "dotnet-standards is installed and this working directory looks like a .NET solution. Before exploring, reviewing, testing or changing C# code in it, load the skill `dotnet-standards:choosing-a-dotnet-skill` and route the task from its tables rather than from memory. When the whole task is a .NET feature or a .NET review rather than one question, the entry points are /dotnet-feature and /dotnet-review — do not assemble that process by hand from other plugins' skills. Ignore this note for any request that is not about the code in this directory. Emitted once per session."
   }
 }
 JSON

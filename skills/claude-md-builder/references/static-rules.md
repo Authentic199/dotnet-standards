@@ -162,6 +162,56 @@ not the scan can detect Superpowers in the repository.
 
 ---
 
+## Process ownership
+
+**Applies when** always — **self-gating, exactly like R23**: each rule states its
+own condition, so the group ships whether or not the scan can detect Superpowers
+in the repository.
+
+**This group exists because `CLAUDE.md` is the only place these four can bind.**
+Superpowers states its own precedence — *"User instructions (CLAUDE.md, AGENTS.md,
+direct requests) take precedence over skills"* — so a rule written here outranks
+a process skill that is already holding the wheel. A rule stating the same thing
+inside a plugin skill does not, and that is the difference the failure below
+turned on.
+
+*The failure, measured 2026-08-02.* A consumer session building a feature
+skipped this plugin at both ends of the same branch: it wrote a MediatR
+architecture spec with no knowledge skill loaded, then ran more than twenty
+subagent review rounds — the final whole-branch review among them — without
+loading one review skill or spawning one specialist agent. Full report:
+`docs/field-reports/2026-08-02-skill-routing-failure.md`.
+
+**R28** — `The .NET process in this repository has two entry points: /dotnet-feature to take a change from idea to reviewed commit, /dotnet-review to review a branch, a diff or a set of paths. Superpowers brainstorming, plan writing, TDD and subagent-driven development are phases those flows call — do not assemble that sequence by hand.`
+*Prevents:* a whole session running a hand-assembled Superpowers pipeline that no
+.NET flow ever enters. The flow that owned the entire observed task sat in the
+session's skill list all day and was never opened.
+
+**R29** — `Subagents that review or test .NET code are the ones dotnet-review-flow names, never general-purpose, and their criteria are the four rubric skills — do not hand-write a constraint block in place of a rubric.`
+*Prevents:* a review whose coverage equals whatever the coordinating session
+happened to think of. In the observed failure the performance lens was never
+applied once, and the architecture and security lenses ran on improvised
+criteria.
+*Note:* names no agent on purpose. The roster lives in `dotnet-review-flow`;
+repeating it here creates a second list to keep in step.
+
+**R30** — `A Superpowers process skill saying "do not invoke any other skill" is barring implementation skills. It does not suspend the knowledge layer: before any brainstorm answer, plan step or subagent prompt states a .NET convention, load the dotnet-standards skill that owns it.`
+*Prevents:* a specification written from memory during brainstorming, which is
+where conventions get decided with no skill looking.
+*Note:* this is ordinary reading, not an override of another plugin. Two
+statements of that ban scope it to implementation skills by name; the third is
+the one-line summary of the same rule with the qualifier dropped. Reading the
+summary in the light of what it summarises is the correct reading — and it has
+to be stated here, because the moment it matters is the moment the process skill
+holds the wheel.
+
+**R31** — `Re-route when the work changes phase — design, code, test, review. choosing-a-dotnet-skill is a lookup table consulted at each phase, not a file read once at the start of a session.`
+*Prevents:* the shape both observed incidents took. The router was in context all
+day, was consulted once for a placement question, and was never revisited when
+the work changed nature.
+
+---
+
 ## Scope, workflow and verification
 
 **Applies when** always, except where noted.

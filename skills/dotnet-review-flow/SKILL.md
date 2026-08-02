@@ -2,8 +2,8 @@
 name: dotnet-review-flow
 description: >-
   This skill should be used when running the test-and-review fleet over .NET code:
-  /dotnet-review, "review my branch", "check my changes before merge",
-  "review the modules under this folder, excluding these subfolders", "audit
+  /dotnet-review, "review my branch", "final review before merge", "review each
+  task as it lands", "review the modules under this folder", "audit
   the existing code in this project" — a branch, a range, or unchanged code:
   every tracked file under given paths, changed or not. Not for: the full feature
   process, brainstorm to commit — dotnet-feature-flow; what each lens checks —

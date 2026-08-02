@@ -27,7 +27,7 @@ tier-3 generator.**
 
 | Component | State |
 |---|---|
-| `hooks/` | ✅ three hooks, `post-edit-format` + `superpowers-check` + `router-nudge` — see [`hooks/README.md`](hooks/README.md) |
+| `hooks/` | ✅ six hooks, `post-edit-format` + `superpowers-check` + `router-nudge` + `test-report-nudge` + `fleet-nudge` + `process-handback` — see [`hooks/README.md`](hooks/README.md) |
 | `skills/` | ✅ knowledge skills, four review rubrics, the router, two flow skills, and `claude-md-builder` — the tier-3 `CLAUDE.md` generator |
 | `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
 | `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
@@ -90,8 +90,8 @@ useful for scripting and for confirming what the harness actually parsed.
 
 ### Requirements
 
-- **Git for Windows** — the one hook runs through a polyglot CMD/POSIX wrapper
-  that needs a bash. Without it the hook silently never runs; see
+- **Git for Windows** — every hook runs through a polyglot CMD/POSIX wrapper
+  that needs a bash. Without it the hooks silently never run; see
   [`hooks/README.md`](hooks/README.md) for why that is accepted.
 - **.NET SDK** on `PATH`, for `dotnet format`.
 

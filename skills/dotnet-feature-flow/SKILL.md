@@ -1,10 +1,11 @@
 ---
 name: dotnet-feature-flow
 description: >-
-  This skill should be used when taking a .NET feature from idea to commit in one
-  run: /dotnet-feature, "build this feature end to end", "implement X and get it
-  merge-ready", walking brainstorm, plan, implementation, tests, the four review
-  lenses and the git step with human gates in between. Not for: reviewing an
+  This skill should be used when taking a .NET feature from idea to commit:
+  /dotnet-feature, "build this feature end to end", "execute this plan",
+  "implement the plan with subagents" — brainstorm, plan, implementation, tests,
+  the four review lenses and the git step, with human gates between. Use it
+  instead of hand-assembling that sequence from Superpowers. Not for: reviewing an
   existing diff or branch on its own — dotnet-review-flow; which skill owns a
   convention — choosing-a-dotnet-skill; what each lens checks —
   dotnet-code-review, dotnet-architecture-review, dotnet-security-review,

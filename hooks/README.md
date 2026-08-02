@@ -1,7 +1,8 @@
 # Hooks
 
-`dotnet-standards` ships **exactly four hooks**: `post-edit-format`,
-`superpowers-check`, `router-nudge` and `test-report-nudge`.
+`dotnet-standards` ships **exactly six hooks**: `post-edit-format`,
+`superpowers-check`, `router-nudge`, `test-report-nudge`, `fleet-nudge` and
+`process-handback`.
 
 That is not an accident of scope. Nine hook components were triaged against
 Superpowers and against the Windows failure mode described below; eight were
@@ -12,7 +13,11 @@ admitted only because it passes the same test the eight failed. `router-nudge`
 refused was later falsified by observation**. `test-report-nudge` (0.3.44)
 descends from another of the eight — `post-test-analyze` — **reshaped so the
 refusal's reason keeps holding**: the script summarizes nothing; it nudges the
-model to write the report a human reads. The table rows in
+model to write the report a human reads. `fleet-nudge` and `process-handback`
+(2026-08-02) are **the first two hooks admitted on `PreToolUse`**, and they were
+admitted for a reason no earlier candidate could claim: the failure they answer
+happens at a moment no prompt-level or session-level hook can reach — see their
+entries below. The table rows in
 [Why only these hooks](#why-only-these-hooks) carry both verdicts and the
 evidence between them. If a future session thinks another hook is needed, read
 that section first.
@@ -32,11 +37,11 @@ all:
 | **Utility script** | Nowhere — invoked by a workflow or piped by hand | A human or a skill runs it |
 
 Only the first kind can collide with another plugin's hooks. **`dotnet-standards`
-ships four hooks of the first kind and zero of the other two.**
+ships six hooks of the first kind and zero of the other two.**
 
 ---
 
-## The four hooks
+## The six hooks
 
 **`post-edit-format`** — after Claude edits or writes a file, format it.
 
@@ -118,10 +123,18 @@ the router.
 | Mode | synchronous (`"async": false`) |
 
 Reads `session_id` and `cwd` from the `UserPromptSubmit` stdin JSON and emits one
-`additionalContext` line pointing at `dotnet-standards:choosing-a-dotnet-skill`
-— and at nothing else — then stays silent for the rest of that session. Naming a
-concrete destination here would make a hook script a second source of truth for
-routing the day the router's tables change.
+`additionalContext` line pointing at `dotnet-standards:choosing-a-dotnet-skill`,
+then stays silent for the rest of that session. Naming a concrete **table
+destination** here would make a hook script a second source of truth for routing
+the day the router's tables change, so it names none.
+
+**Amended 2026-08-02: the emit also names `/dotnet-feature` and
+`/dotnet-review`.** That reasoning holds for table rows and still does — it does
+not hold for the one choice the tables cannot express. A row routes a question to
+a skill; the 2026-08-02 field failure happened a level above that, in a session
+that never chose a process at all and hand-assembled one from another plugin
+instead. The commands are this plugin's own entry points and live in this
+repository, so they cannot drift out from under the hook the way a table row can.
 
 Two gates, in this order, both must pass:
 
@@ -187,6 +200,79 @@ Why it passes the rule below: it guards nothing and parses nothing. If it
 silently never runs, test output still appears in the conversation in full —
 the session is exactly the session that shipped before 0.3.44; the only loss
 is the courtesy report file.
+
+**`fleet-nudge`** — when a subagent is spawned in a .NET repository, say once
+that this plugin owns the review and test job.
+
+| | |
+|---|---|
+| Event | `PreToolUse` |
+| Matcher | `Task\|Agent` |
+| Command | `"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" fleet-nudge` |
+| Mode | synchronous (`"async": false`) |
+
+Three gates, in this order: **the session marker**, then **the .NET solution
+shape**, then **does this spawn look like review or test work** — the payload
+matching `review|audit|tester|test|verify`, or `subagent_type` being
+`general-purpose`. On a pass it emits one `additionalContext` block naming
+`dotnet-review-flow` — and **no agent**, because that flow owns the roster and a
+second copy of it here would drift.
+
+**Why the gate order is the reverse of `router-nudge`'s.** This fires per spawn,
+not per prompt, so the cheapest check goes first and the .NET verdict is
+memoised: the first invocation of a session writes either an `emitted` or a
+`not-applicable` marker, and every later invocation is one `test -e`. A session
+in a non-.NET repository pays the solution-shape check exactly once. A spawn that
+fails only the third gate writes **no** marker — the next spawn may be a review.
+
+**Why a `PreToolUse` hook exists at all, after S6 refused per-call hooks.** On
+2026-08-02 a consumer session ran more than twenty subagent review rounds — the
+final whole-branch review among them — without loading one of the five review
+skills or spawning one of the six agents, so the performance lens was never
+applied. `router-nudge` could not have caught it: those rounds ran inside one
+autonomous turn of Superpowers' `subagent-driven-development`, so the transition
+from writing code to reviewing it was **decided by the model, not typed by the
+user**. There was no prompt to hang a nudge on. The spawn is the only moment that
+exists, and that is the whole justification for the per-call tax.
+
+**What it deliberately does not do.** The `PreToolUse` schema also carries
+`permissionDecision` and `updatedInput`. This hook uses neither. Rewriting
+`subagent_type` from a hook would make the transcript disagree with what was
+spawned; blocking a spawn would turn a nudge into a gate. Both were refused in
+the design (`docs/superpowers/specs/2026-08-02-process-handback-design.md`), and
+a hard gate is the *next* escalation only if the field trial shows the nudge
+being ignored.
+
+Why it passes the rule below: it guards nothing. If it silently never runs, every
+agent is still spawnable and every skill still loadable by name — the session is
+exactly the session that shipped before this hook.
+
+**`process-handback`** — when a Superpowers process skill is loaded in a .NET
+repository, say once that the two layers compose.
+
+| | |
+|---|---|
+| Event | `PreToolUse` |
+| Matcher | `Skill` |
+| Command | `"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" process-handback` |
+| Mode | synchronous (`"async": false`) |
+
+Same marker mechanism. The middle gate is the skill name: one of
+`superpowers:brainstorming`, `writing-plans`, `subagent-driven-development`,
+`test-driven-development`, `executing-plans`, `requesting-code-review`. Anything
+else exits silently **and memoises nothing**.
+
+It answers the other half of the same field failure: an architecture
+specification written from memory during `brainstorming`, whose summary line
+reads *"Do NOT invoke any other skill"* while the two fuller statements of that
+same ban scope it to **implementation** skills by name. The emit states the
+composition — Superpowers owns brainstorming, planning and TDD; this plugin owns
+which convention governs each step and who reviews the result — and it changes no
+Superpowers file, because none may be changed and a marketplace update would
+erase the change anyway.
+
+Why it passes the rule below: it guards nothing and forbids nothing. Silent
+absence returns the session to exactly what shipped before it.
 
 Nothing else in this plugin registers a Claude Code event.
 
@@ -284,6 +370,7 @@ The other eight candidates — plus one later proposal — and why each was refu
 | `pre-commit-format` | **Refused.** A third layer on a concern `post-edit-format` prevents and `dotnet format --verify-no-changes` verifies. |
 | `UserPromptSubmit` skill index | **Refused in S6 — shipped at 0.3.27 as `router-nudge`.** The S6 verdict read: *"Fires on every prompt — a permanent per-turn token tax against a routing problem solved at zero runtime cost by skill-description discipline."* Observation falsified the premise, not the arithmetic. On 2026-07-29, a session in a consumer .NET repository — this plugin installed and enabled at project scope, every skill description loaded — answered a review request by going straight to `find`, twice, and loaded no skill at all. The token objection was then answered rather than waved off: the shipped hook emits **once per session**, behind a solution-file check, not once per prompt. **Refusing a component is not permanent. Refusing it for a reason that later stops holding is a defect, and correcting it belongs in this file, in the same change that ships the component.** |
 | The kit's `hooks.json` as shipped | **Rebuilt, not carried.** Its command form is unusable on Windows and it registers two scripts this plugin does not ship. |
+| A `PreToolUse` hook on subagent spawns and on skill loads | **Admitted 2026-08-02 as `fleet-nudge` and `process-handback`** — the first per-tool-call hooks in this plugin, and the bar they had to clear was S6's own: *is the per-call tax worth it, and if the hook silently never runs is the user still safe?* Yes to both, for one reason no earlier candidate could claim. The failure they answer — a consumer session that wrote a specification with no knowledge skill loaded and ran 20+ review rounds with no rubric behind them — happened at moments **no prompt-level or session-level hook can reach**: the write→review transition was decided by the model inside one autonomous `subagent-driven-development` turn, so no `UserPromptSubmit` fired, and `SessionStart` injection has already been measured being ignored on turn 1 (0.3.27). The tax was then answered rather than waved off: the session marker is checked **first**, the .NET verdict is memoised on the first call either way, and every later call in the session is one `test -e`. Both guard nothing, forbid nothing, and use neither `permissionDecision` nor `updatedInput` — a nudge that rewrites what was spawned makes the transcript lie. |
 | `ponytail` as a third plugin — an ambient simplicity ruleset riding `SessionStart` + `UserPromptSubmit` | **Refused 2026-07-29 — distilled into house pieces instead.** Two independent grounds, either sufficient: (1) its delivery mechanism is ambient session-start injection, the channel this repository has already measured being ignored on turn 1 (the observation behind `router-nudge`, CHANGELOG 0.3.27); (2) a generic YAGNI voice cannot distinguish sanctioned structure — the module file family, thin envelopes, Facades-axis infrastructure built ahead of need (a user ruling, 2026-07-29) — from slop, and it ships no repo-level exception mechanism to be taught the difference. What transfers shipped as house components: `dotnet-code-review` rubric area 7, `dotnet-feature-flow`'s PHASE 2 ladder and cleanup offer, and static rule R24 (`claude-md-builder`). **The refusal stops holding only if BOTH become true:** a measurement *in this environment* shows session-start injection heeded on turn 1, **and** ponytail or a successor ships a repo-level exception mechanism able to express "structure mandated by a shipped skill is exempt". Decision record: `docs/superpowers/specs/2026-07-29-write-simple-code-ownership-design.md` §3–§4. |
 
 **Adding a hook is not a small change.** It costs a per-event tax on every
@@ -302,3 +389,5 @@ not "is this useful?" but "if this silently never runs, is the user still safe?"
 | `superpowers-check` | The dependency warning hook. Extensionless. Warn-only by design (spec §5). |
 | `router-nudge` | The routing pointer hook. Extensionless. Once per session, .NET repositories only (0.3.27). |
 | `test-report-nudge` | The test-report instruction hook. Extensionless. Once per session, `dotnet test` Bash calls only (0.3.44). |
+| `fleet-nudge` | The review-fleet pointer hook. Extensionless. Once per session, review- or test-shaped subagent spawns in .NET repositories only (2026-08-02). |
+| `process-handback` | The plugin-composition hook. Extensionless. Once per session, Superpowers process-skill loads in .NET repositories only (2026-08-02). |
