@@ -18,12 +18,23 @@ it an ordinary task in ordinary words.
 
 | Signal | How it is read | Trust |
 |---|---|---|
-| **Did the hook fire?** | A marker file on disk, written by the script itself | **Hard.** Independent of anything the model says |
-| **Did the session act on it?** | The transcript — which agents were spawned, which skills were loaded | **Soft.** Read the tool calls, never the session's summary of them |
+| **Did the hook script run?** | A marker file on disk, written by the script itself | **Hard.** Independent of anything the model says |
+| **Did the hook reach the model?** | The session transcript records the emitted text verbatim | **Hard** |
+| **Did the session act on it?** | The same transcript: every `Skill` load and every subagent spawn, as tool calls | **Hard** |
+| **What the session says it did** | Its own summary | **Not evidence.** This is precisely what failed on 2026-08-02 |
 
-A session's own account of what it loaded is exactly the evidence that failed on
-2026-08-02: that session believed it had covered the review properly until the
-transcript was checked.
+**Nothing has to be measured while the run is in progress.** Claude Code writes
+each session to `~/.claude/projects/<encoded-repo-path>/<session-id>.jsonl`, one
+record per event, as it happens — so it survives context compaction and needs no
+cooperation from the session. `trial-extract.py` in this folder reads it:
+
+```
+python docs/field-reports/trial-extract.py <consumer-repo-path>
+```
+
+It prints which hooks fired (identified by the text they emitted, not by event
+name), every skill load in order, every spawn with its `subagent_type`, and a
+verdict block. Verified against real transcripts before it shipped.
 
 ---
 
@@ -86,17 +97,38 @@ transcript was checked.
 
 ---
 
-## RUN A — a feature built through subagent-driven development
+## RUN A — the original prompt, from scratch, on a fresh branch
 
-This is the run that reproduces the original failure. **Word the request the way
-it was worded on 2026-08-02** — an ordinary feature request, no process
-instructions, no mention of reviews or agents.
+**The strongest form of this trial, and the one to run:** a new branch cut from
+the commit *before* the feature existed, and the **original feature request,
+verbatim**, in a new session. Same input, known-bad baseline, both incidents
+reproduced in one run — the design phase and the review phase — and both hook
+paths exercised (`process-handback` on `brainstorming`, `fleet-nudge` at the
+first review spawn).
 
-- [ ] Give the session a feature large enough to route to
-      `subagent-driven-development` (more than three use-cases), in a .NET repo.
+**The baseline it is measured against**, from the 2026-08-02 report: 20+ review
+rounds, every one `general-purpose`; zero review skills loaded; zero specialist
+agents; the performance lens never applied.
+
+- [ ] Cut the branch from the commit **before** the feature — not from
+      `feature/access-control-core`, or there is nothing to build.
+- [ ] **New session.** Markers are keyed by session id; a session that already
+      has one gets no emit.
+- [ ] Give it the original request, in the original words. **Nothing else.** No
+      `/dotnet-feature`, no "use subagents", no "review carefully", no mention of
+      skills, hooks, or that anything is being measured. Every one of those
+      answers the question on the session's behalf.
 - [ ] Let it run to the end, including whatever review it decides to do.
 - [ ] **Do not intervene**, even when it is visibly about to repeat the failure.
       An interrupted run answers a different question.
+- [ ] Measure nothing during the run. There is nothing to catch in flight — the
+      transcript on disk holds all of it.
+
+*A cheaper variant exists — copy the finished plan into a new branch and say
+"execute this plan" — but it measures less: brainstorming never runs, so the
+design-phase incident cannot reproduce, and the plan already carries the skill
+pointers the corrected session wrote into it, which biases the implementation
+half. Use it only if a full rebuild is too expensive, and say so in the report.*
 
 ### Read the hard signal first
 
@@ -111,19 +143,27 @@ ls -la /tmp/dotnet-standards/
 | `*-na-<session-id>` | The hook ran and decided **this is not a .NET repository**. If the repo *is* .NET, the glob gate or the `cwd` field is wrong — that is a defect, report it |
 | Neither, for this session id | The hook never ran at all: `hooks.json` not loaded, no bash, CRLF, or the matcher name is wrong on this CLI |
 
-### Then read the transcript — tool calls, not prose
+### Then run the extractor — it reads the tool calls, so nobody has to
 
-- [ ] Was `dotnet-feature-flow` or `/dotnet-feature` entered at any point?
-      (`yes` / `no`)
-- [ ] Which skills were loaded, in order? List them. Specifically: were the
-      knowledge skills loaded **before** the design or plan step that used them,
-      or after?
-- [ ] How many subagents were spawned, and with which `subagent_type`? Count
-      `general-purpose` spawns separately.
-- [ ] Was `dotnet-review-flow` loaded before any review round?
-- [ ] Were any of the six specialist agents spawned? Which?
-- [ ] Was the final review done by `../requesting-code-review/code-reviewer.md`,
-      or by this plugin's fleet?
+```
+python docs/field-reports/trial-extract.py <consumer-repo-path>
+```
+
+Save its whole output; it is the report's core. Then answer by hand the two
+questions it cannot:
+
+- [ ] **Ordering.** Were the knowledge skills loaded *before* the design or plan
+      step that used them, or after the code was already written? The skill list
+      is printed in order — compare it against when the spec was produced.
+- [ ] **Who did the final review.** Superpowers'
+      `requesting-code-review/code-reviewer.md`, or this plugin's fleet? The
+      spawn descriptions in the output usually say.
+
+**Also worth one question at the very end of the trial session** — after
+everything is finished, so it changes nothing: *"trong phiên này bạn đã load
+skill nào và spawn agent loại gì?"* Compare its answer to the extractor's.
+**The gap between the two is itself a finding**, and it is the gap that hid this
+whole failure for a full session on 2026-08-02.
 
 ### The verdict for Run A
 
@@ -169,9 +209,10 @@ writing down, because it bounds how much this whole change was worth.
 One file, in the consumer repository or pasted into a plugin session, carrying:
 
 1. The marker listing, verbatim.
-2. The skill-load and subagent-spawn sequence from Run A, as tool calls.
-3. The Run B delta, by lens.
-4. One sentence on what *actually* changed in how the session worked — or that
+2. `trial-extract.py`'s full output for Run A, verbatim.
+3. The gap between what the session said it did and what the extractor found.
+4. The Run B delta, by lens.
+5. One sentence on what *actually* changed in how the session worked — or that
    nothing did.
 
 Anything that turns out to be a plugin defect goes to the PENDING log on the

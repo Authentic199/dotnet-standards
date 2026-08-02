@@ -15,3 +15,4 @@ hooks/test-report-nudge text eol=lf
 hooks/fleet-nudge       text eol=lf
 hooks/process-handback  text eol=lf
 hooks/run-hook.cmd      text eol=lf
+docs/field-reports/trial-extract.py text eol=lf
