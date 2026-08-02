@@ -102,6 +102,10 @@ Working on this checkout, point the marketplace at the directory instead
 each edit re-run `codex plugin add …`; Codex caches by version, so bump the
 version (or append a `+codex.<token>` cachebuster) when the version has not moved.
 
+> ⚠️ **The Codex cache is built from git HEAD, not from the working tree.** An
+> uncommitted edit installs as the previous commit's content and says nothing
+> about it — commit first, then install.
+
 **What Codex gets, and what it does not.** Codex's plugin contract carries
 `skills/` only — `hooks`, `commands` and `agents` are not accepted fields, and a
 manifest declaring them fails validation. So on Codex:
