@@ -115,11 +115,13 @@ a name that is absent from the roster is absent from the install. A missing name
 means the cached copy is stale or partial: STOP, name what is absent, and give the
 update-and-restart remedy.
 
-**One exception, and it is a harness fact rather than a bad install: a harness
-that ships no plugin agent types at all.** Codex is the case in hand — its plugin
-contract carries `skills/` and nothing else, so all six names are absent
-together, and no reinstall will produce them. Six absent is that signal; one or
-two absent is still a broken install. Then, with the user told which harness
+**One exception, and it is a harness fact rather than a bad install: all six
+names absent at once.** Codex is the case in hand — its plugin contract carries
+`skills/` and nothing else, so the agents are installed beside the plugin by
+`codex/install.sh`, and even then whether they resolve for spawning differs by
+Codex surface. Reinstalling the *plugin* will never produce them. Six absent is
+that signal — say that the kit may be uninstalled and name the script — while
+one or two absent is still a broken install. Then, with the user told which
 limit was hit:
 
 - The **five skills** must still all be present. They ship everywhere. If one is

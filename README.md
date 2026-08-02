@@ -31,7 +31,7 @@ tier-3 generator.**
 | `skills/` | ✅ knowledge skills, four review rubrics, the router, two flow skills, and `claude-md-builder` — the tier-3 `CLAUDE.md` generator |
 | `agents/` | ✅ six specialist agents — four read-only reviewers, two testers |
 | `commands/` | ✅ `/dotnet-feature`, `/dotnet-review` — thin entries into the flow skills; the `dotnet-` prefix avoids built-in collisions (namespacing verified against current docs, Lane D) |
-| Codex | ✅ `.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json` — skills ship, hooks/commands/agents do not; see [Install → Codex](#codex) |
+| Codex | ✅ `.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json` for the skills, `codex/` for the hooks, agents and prompts Codex reads from outside a plugin — see [Install → Codex](#codex) |
 
 Triage of the reference kit is complete: 94 components decided across four
 groups. The decisions live in [`docs/TRIAGE.md`](docs/TRIAGE.md); the rules that
@@ -106,16 +106,27 @@ version (or append a `+codex.<token>` cachebuster) when the version has not move
 > uncommitted edit installs as the previous commit's content and says nothing
 > about it — commit first, then install.
 
-**What Codex gets, and what it does not.** Codex's plugin contract carries
-`skills/` only — `hooks`, `commands` and `agents` are not accepted fields, and a
-manifest declaring them fails validation. So on Codex:
+**A Codex plugin carries `skills/` and nothing else** — `hooks`, `commands` and
+`agents` are rejected manifest fields. Every one of them still has a Codex
+equivalent; Codex just reads it from outside the plugin. One script installs
+them:
 
-| Component | On Codex |
-|---|---|
-| `skills/` | ✅ all of them, unchanged |
-| `commands/` | ❌ — load `dotnet-feature-flow` / `dotnet-review-flow` by name; the commands were only thin entries into them |
-| `agents/` | ❌ — `dotnet-review-flow` preflight #3 detects the whole roster missing and runs the four lenses sequentially instead, and says so in the report |
-| `hooks/` | ❌ — nothing announces the router on the first prompt; `choosing-a-dotnet-skill` must be consulted deliberately |
+```
+bash codex/install.sh
+```
+
+| Component | On Codex | Installed to |
+|---|---|---|
+| `skills/` | ✅ from the plugin, unchanged | — |
+| `hooks/` | ✅ same six, same scripts | `~/.codex/hooks.json` (`plugin_hooks` is a removed feature) |
+| `agents/` | ✅ projected to Codex's TOML form | `~/.codex/agents/*.toml` |
+| `commands/` | ✅ as custom prompts, same `/dotnet-feature`, `/dotnet-review` | `~/.codex/prompts/*.md` |
+
+`agents/` and `commands/` stay the single source of truth;
+`codex/sync-from-plugin.py --check` fails when the projections have drifted.
+What was measured and what was not is written down in
+[`codex/README.md`](codex/README.md) — read it before trusting the agent fleet
+there.
 
 Validate the Codex manifest with Codex's own validator, which also checks every
 skill's frontmatter:
