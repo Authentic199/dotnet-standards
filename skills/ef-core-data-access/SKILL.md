@@ -71,7 +71,7 @@ await repositoryWrapper.BeginTransactionAsync(cancellationToken);
 try
 {
     await repositoryWrapper.Repository<Order>().AddAsync(order, cancellationToken);
-    await repositoryWrapper.Repository<OrderLine>().AddRangeAsync(lines, cancellationToken);
+    await repositoryWrapper.Repository<Customer>().UpdateAsync(customer, cancellationToken);
 
     await repositoryWrapper.CommitTransactionAsync(cancellationToken);
 }
@@ -84,6 +84,37 @@ catch (Exception)
 
 Rolling back belongs in the `catch`, and the failure keeps travelling — how it
 is shaped from there is error-handling's call, not this skill's.
+
+**One graph, one `AddAsync`.** Two separate calls are the right shape only
+when the two entities are separate graphs. When the parent declares a
+navigation to the child — the
+`HasOne(...).WithMany(...)` pair configured in `IEntityTypeConfiguration`, such
+as `Order.Lines` — assign the children to that navigation and add the *parent*
+once. `AddAsync` calls `DbContext.Add`, which cascades the add across every
+untracked entity reachable through navigations and fixes up each foreign key
+itself; `BaseEntity` has already assigned the parent's `Id` in its constructor,
+so there is nothing to wait for:
+
+```csharp
+Order order = mapper.Map<Order>(request);
+order.Lines = mapper.Map<List<OrderLine>>(request.Lines);
+
+await repositoryWrapper.Repository<Order>().AddAsync(order, cancellationToken);
+```
+
+That reaches as deep as the graph does: a child that itself carries a
+navigation to a grandchild — a join entity holding the other side of a
+many-to-many, say — travels in the same add, so wire it up rather than
+inserting a level at a time.
+
+Setting the foreign key by hand and calling `AddAsync`/`AddRangeAsync` per
+entity type is what to fall back to when there is **no** such navigation to
+assign: the child points at a row that already existed before this operation,
+or the parent simply declares no collection for the relationship. Hand-setting
+a key the navigation would have filled is redundant, and it is the form that
+quietly drops half of a composite foreign key. Keys that are not part of the
+relationship — a tenant discriminator the mapping profile ignores, for
+instance — are still yours to set.
 
 ### Find is the query gate
 
