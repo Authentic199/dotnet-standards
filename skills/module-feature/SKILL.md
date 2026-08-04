@@ -62,7 +62,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
     {
-        if (await repositoryWrapper.Repository<Order>().AnyAsync(x => x.Code == request.Code!.Trim(), cancellationToken))
+        if (await repositoryWrapper.Repository<Order>().AnyAsync(x => x.Code == request.Code, cancellationToken))
         {
             throw new BadRequestException(Messages<Order>.AlreadyExist(x => x.Code));
         }
@@ -95,6 +95,16 @@ public class OrderService : IOrderService
   projection into a helper class and the next reader must assemble the operation
   from three files to see what it does. (A precondition guard may delegate to the
   module's static validation type — see *Where a validation rule lives*.)
+- **A service never normalizes an input string — no `Trim()`, no `ToLower()`, no
+  `Replace` on a request property.** The guard above compares `request.Code` as it
+  arrived, and the mapper stores the same value. The moment a guard trims and the
+  write does not, the uniqueness check answers about one string while the row holds
+  another — and the usual repair, an assignment like `request.Name = request.Name!.Trim()`
+  before the map, only spreads the same call to a second site. Whitespace that must
+  not arrive is a **validator rule** (`.NotWhiteSpace()`, `.NotEmpty()`), rejected at
+  the boundary with a `Messages<T>` message, not silently swallowed mid-operation.
+  `Trim()` is a *parsing* call: it belongs where a string was just split or sliced —
+  a header token, a comma-separated list — and nowhere else in a module.
 
 **Inside the class the order is fixed: fields, the constructor, then members.**
 A static member may sit above the non-private methods; it never sits above the

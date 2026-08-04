@@ -7,8 +7,21 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.66 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-04. **0.3.66 — a field report from a consumer
+Shipped through **v0.3.67 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-04. **0.3.67 — a second field report, and the same
+diagnosis as 0.3.66: the worked example is the doctrine.** Generated code was
+calling `Trim()` indiscriminately because `module-feature`'s one create-operation
+example opened with `x.Code == request.Code!.Trim()` and no skill said anything
+else about string normalization. The corpus refuses it — 16 `.Trim()` sites, all
+parsing except one module, and that module demonstrates the defect (guard
+compares trimmed, map stores untrimmed, "fixed" by a second `Trim()` assignment).
+Now: the examples are clean, `module-feature` bans call-site normalization and
+routes whitespace to a validator rule, `dotnet-code-review` 5.23 and
+`dotnet-performance-review` 1.12 split the parameter-side and column-side halves,
+and `claude-md-builder` R32 carries it into generated `CLAUDE.md` files. Rulings:
+CHANGELOG 0.3.67. **Standing lesson, now twice in two releases: an agent copies
+the example, not the prose — audit worked examples as if they were the rules.**
+**0.3.66 — a field report from a consumer
 repository closed a doctrine hole in `ef-core-data-access`**: the one worked
 example for saving a parent with its children set foreign keys by hand and
 called `AddAsync`/`AddRangeAsync` per entity type, using `Order` + `OrderLine`

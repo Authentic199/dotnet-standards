@@ -739,6 +739,30 @@ reported without that verdict has not been reviewed.
 A purely redundant call on a `DateTimeOffset`, with no `DateTime` behind it, is
 INFO.
 
+**5.23 A string normalized at a call site** — *MEDIUM; HIGH where a guard and the
+write it protects normalize differently* · `module-feature`
+`Find:` `grep -rn --include=*.cs "\.Trim()\|\.TrimStart(\|\.TrimEnd(\|\.ToLower()\|\.ToUpper()" src/`,
+then drop the hits that are **parsing** — a value just sliced or split, so the call
+sits next to a `Split(`, a range index, or a header read. Those are correct and
+reporting them costs the check its credibility. What survives is normalization of
+data that arrived whole, and it is a finding wherever it appears: a guard's
+comparison, an assignment before a map, a validator predicate, a mapping
+`MapFrom`.
+Two harms, and the finding must say which one applies. **The comparison and the
+write disagree** — a duplicate check on `request.Code!.Trim()` followed by a map
+that stores `request.Code` answers about a string the row never holds; the repair
+seen in the wild, assigning the trimmed value back onto the request before mapping,
+is the same defect at a second site and not a fix. And **nothing declares the
+rule** — a reader cannot tell whether whitespace is forbidden or merely tolerated,
+because the only statement of it is a call buried in one method out of many. The
+fix is one rule at the boundary: `.NotWhiteSpace()` or `.NotEmpty()` in the
+request's validator, with a `Messages<T>` message, and the call sites deleted.
+A case-folding call applied to the **entity property** inside a `Find`, `AnyAsync`
+or `Where` predicate — `x.Name.ToLower() == …` — is the same finding plus a query
+cost: the database computes the function for every candidate row instead of matching
+the stored value, so an index on that column no longer answers the predicate. Say so,
+and hand the query half to `dotnet-performance-review`.
+
 ## 6. Tests
 
 Which tier a scenario belongs to is `dotnet-testing`'s Decision Guide. This pass

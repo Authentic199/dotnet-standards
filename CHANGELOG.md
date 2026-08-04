@@ -8,6 +8,50 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.67] — `Trim()` was in the teaching example, so it was in the output, 2026-08-04
+
+**Field report: generated code calls `Trim()` everywhere.** The source is this
+plugin. `module-feature`'s one worked service — the example every agent copies
+when writing a create operation — opened with
+`AnyAsync(x => x.Code == request.Code!.Trim(), …)`, and `references/service-growth.md`
+repeated the same line. Nothing else in the plugin said a word about string
+normalization, so the example *was* the doctrine.
+
+**The corpus does not support it.** 16 `.Trim()` sites in the canonical project,
+worktrees excluded. Every one outside a single module is a **parsing** call —
+the `Bearer ` header slice, the order-by clause split, a comma-separated recipient
+list. The module sites are all one file, and that file also shows the defect the
+shape produces: the uniqueness guard compares `request.Code!.Trim()` while the
+map that follows stores `request.Code`, so the check answers about a string the
+row never holds — then repairs it with `request.Name = request.Name!.Trim()` a few
+lines down, which is the same call at a second site, not a fix.
+
+**What changed:**
+
+- **`module-feature`** — `.Trim()` is gone from both worked examples, and *The
+  service file* gains the rule: a service never normalizes an input string; no
+  `Trim()`, `ToLower()` or `Replace` on a request property. Whitespace that must
+  not arrive is a validator rule (`.NotWhiteSpace()`, `.NotEmpty()`) with a
+  `Messages<T>` message. `Trim()` is a parsing call and belongs next to the split
+  or slice that produced the string.
+- **`dotnet-code-review` check 5.23**, *A string normalized at a call site* —
+  MEDIUM, HIGH where a guard and the write it protects normalize differently. The
+  `Find:` grep drops parsing hits first, then reports which of the two harms
+  applies: the comparison disagreeing with the write, or nothing declaring the
+  rule.
+- **`dotnet-performance-review` check 1.12**, *A predicate that calls a function
+  on the column* — the other half. `x.Name.ToLower() == …` transforms the stored
+  value once per candidate row and the column's index stops answering; the
+  parameter-side call routes to 5.23 instead. Graded against the entity's
+  configuration, and noted as doubly redundant on a `citext` column.
+- **`claude-md-builder` R32** — the rule enters the static catalogue, so a
+  generated `CLAUDE.md` carries it. No analyzer flags this shape, which is why it
+  propagates: it reads as defensive hygiene.
+
+Both new greps were smoke-tested against the canonical project before shipping —
+5.23 returns 64 solution-wide hits that the parsing filter thins to the real ones,
+1.12 returns exactly the two column-side predicates.
+
 ## [0.3.66] — One graph, one `AddAsync`: the save example taught the long way round, 2026-08-04
 
 **Field report from a consumer repository, and the skill's own entity example

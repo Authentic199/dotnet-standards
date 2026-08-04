@@ -143,6 +143,23 @@ analyzer cannot protect on its own.
 
 ---
 
+## Request data
+
+**Applies when** the scan found request or DTO classes bound from HTTP — true
+wherever this stack's controllers are present.
+
+**R32** — `Never normalize a string at a call site: no Trim(), TrimStart/TrimEnd, ToLower() or ToUpper() on a request property, in a guard's comparison, in a validator predicate or in a mapping. Whitespace or casing that must not arrive is one rule in the request's validator, rejected there. Trim() is a parsing call — it is allowed only next to the split or slice that produced the string.`
+*Prevents:* the split-brain a scattered `Trim()` creates — a uniqueness guard
+comparing a trimmed value while the write stores the untrimmed one, and the
+"repair" that assigns the trimmed value back onto the request, spreading the same
+call to a second site. Also stops a case-folding call landing on an entity property
+inside a query predicate, where the database computes it per row and the column's
+index stops answering.
+*Note:* no analyzer flags this. It reads as defensive hygiene, which is why it
+propagates through a file untouched by review.
+
+---
+
 ## Communication and language
 
 **Applies when** always. This group ships in every generated file — it is the one

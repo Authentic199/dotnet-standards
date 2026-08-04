@@ -52,7 +52,7 @@ public partial class OrderService : IOrderService
 
     public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
     {
-        if (await repositoryWrapper.Repository<Order>().AnyAsync(x => x.Code == request.Code!.Trim(), cancellationToken))
+        if (await repositoryWrapper.Repository<Order>().AnyAsync(x => x.Code == request.Code, cancellationToken))
         {
             throw new BadRequestException(Messages<Order>.AlreadyExist(x => x.Code));
         }

@@ -118,6 +118,23 @@ deployment, not the request, is what pays. Where the reads are also synchronous,
 is body check 2.4, *A synchronous repository read outside a validator predicate* — cite
 one, not both.
 
+**1.12 A predicate that calls a function on the column** — *MEDIUM; HIGH where the column
+carries an index the query would otherwise use* · `module-feature` + universal
+`Find:` `grep -rnE "\.(Where|Find|AnyAsync|FirstOrDefaultAsync|CountAsync)\(" -A2 src/Infrastructure/Modules/`
+and read each lambda for a method call on the **entity side** of the comparison —
+`x.Name.ToLower()`, `x.Code.Trim()`, `x.Email.ToUpper()`. A call on the *parameter* side,
+`x.Code == request.Code.Trim()`, is a different finding and belongs to `dotnet-code-review`
+check 5.23, *A string normalized at a call site* — cite that one instead.
+
+The translated SQL wraps the column in the function, so the stored value is transformed
+once per candidate row and an index declared on the plain column no longer answers the
+predicate. It scans, and it scans harder as the table grows, while the code that caused it
+never changes again. Read the entity's `IEntityTypeConfiguration` before grading: an index
+over that column makes this HIGH, and where the column is `citext` through
+`HasCitextUnique` the fold is already in the column type, so the `ToLower()` is both the
+scan and redundant. Name the column and the index it defeats — the fix is to compare
+against the stored form, not to add an expression index.
+
 ## 2 — Blocking and async cost
 
 **2.5 `async void`** — *graded by `dotnet-code-review` 3.3, "`async void`"* · universal
