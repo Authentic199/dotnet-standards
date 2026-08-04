@@ -8,6 +8,31 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.68] — test-report-nudge: one file per run, Vietnamese ĐẠT/HỎNG, 2026-08-04
+
+**User-directed change to the report-rule wording (report-rule changes need
+approval — shown before shipping).** The rule the hook nudges the model
+toward was replaced outright: a single `test-report.md` at the repository
+root, overwritten on every settled run, threw away the progression between
+runs — the part the user actually wanted kept.
+
+**What changed in `hooks/test-report-nudge`:**
+
+- Report path is now `docs/test-report/YYYY-MM-DD-test-<what-was-tested>.md`
+  — a new file per settled run, never an overwrite. The model chooses the
+  `<what-was-tested>` slug from the run's scope.
+- Report body is fixed Vietnamese prose — command plus pass/fail/skip
+  totals, one section per test class, one plain line per test case, marked
+  **ĐẠT** or **HỎNG** (each HỎNG with one short reason) — replacing "written
+  in the language the user is conversing in" and the PASS/FAIL marks.
+- The subagent branch (added 0.3.63) is unchanged in mechanism: a subagent
+  still never writes under `docs/test-report/`, only hands ĐẠT/HỎNG lines
+  back to the dispatching session — the wording was updated to match, not
+  the ownership split itself.
+- Nothing else in the script (gates, per-context marker, marker sweep)
+  changed — this was a report-rule wording edit only, per explicit scope
+  from the user.
+
 ## [0.3.67] — `Trim()` was in the teaching example, so it was in the output, 2026-08-04
 
 **Field report: generated code calls `Trim()` everywhere.** The source is this

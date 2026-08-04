@@ -57,10 +57,13 @@
 # only loss is the courtesy report. Under-firing is the safe direction and
 # the script prefers it at every branch.
 #
-# THE REPORT FORMAT IS USER-APPROVED (2026-07-31) AND LIVES IN THE EMIT BELOW
+# THE REPORT FORMAT IS USER-APPROVED (2026-08-04) AND LIVES IN THE EMIT BELOW
 #
 # Any change to the wording of the emitted instruction is a report-rule change
-# and needs the user's approval before it ships.
+# and needs the user's approval before it ships. As of 2026-08-04: a NEW file
+# per settled run under `docs/test-report/`, never an overwrite — the
+# progression between runs is the part worth keeping — and the body is fixed
+# Vietnamese prose (ĐẠT/HỎNG), not "the language the user is conversing in".
 #
 # Usage: registered in hooks/hooks.json as
 #   "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" test-report-nudge
@@ -167,10 +170,10 @@ fi
 find "$STATE_DIR" -maxdepth 1 -type f -name 'test-report-nudge-*' -mtime +7 -delete 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# Emit — the main-thread report rule is user-approved wording (2026-07-31) and
-# is reproduced below UNCHANGED, to the character. The subagent branch added
-# 2026-08-02 does not restate the format: it deliberately hands the file to the
-# one context that owns it and asks the subagent for sentences instead.
+# Emit — the main-thread report rule is user-approved wording (2026-08-04) and
+# is reproduced below UNCHANGED, to the character. The subagent branch does
+# not restate the format: it deliberately hands the file to the one context
+# that owns it and asks the subagent for sentences instead.
 # ---------------------------------------------------------------------------
 
 if [[ -n "$AGENT_ID" ]]; then
@@ -178,7 +181,7 @@ cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "A `dotnet test` run has just completed inside a subagent. Do NOT write or overwrite `test-report.md` — that file belongs to the session that dispatched you, and a subagent writing it leaves a report naming the whole run while covering only this task. Instead, when your tests settle, include in the report you hand back: the exact command and the pass/fail/skip totals, then one line per test case stating in plain language what the test verifies — derived from the test's name and body, e.g. 'User name must not exceed 200 characters — PASS' — marked PASS or FAIL, each FAIL carrying one short reason, written in the language the user is conversing in. Emitted once per subagent."
+    "additionalContext": "A `dotnet test` run has just completed inside a subagent. Do NOT write or overwrite any file under `docs/test-report/` — that belongs to the session that dispatched you, and a subagent writing one leaves an orphaned file naming only this task. Instead, when your tests settle, include in the report you hand back: the exact command and the pass/fail/skip totals, then one line per test case stating in Vietnamese what the test verifies — derived from the test's name and body, e.g. 'Tên người dùng không được vượt quá 200 ký tự — ĐẠT' — marked ĐẠT or HỎNG, each HỎNG carrying one short reason. Emitted once per subagent."
   }
 }
 JSON
@@ -189,7 +192,7 @@ cat <<'JSON'
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "A `dotnet test` run has just completed. Standing instruction for the rest of this session: whenever a test run settles (after the final run of a red-green loop — not between iterations), write `test-report.md` at the repository root, overwriting any previous version. User-approved format: a title line with the date and time, then the exact command and the pass/fail/skip totals; then one section per test class; under each, one line per test case stating in plain language what the test verifies — derived from the test's name and body, e.g. 'User name must not exceed 200 characters — PASS' — marked PASS or FAIL, each FAIL carrying one short reason. Write the report in the language the user is conversing in. Short and human-readable: no jargon, no filler, no explanations beyond the one-line FAIL reasons. Where subagents ran tests, fold the lines they reported back into this file rather than re-deriving them. Emitted once per session."
+    "additionalContext": "A `dotnet test` run has just completed. Standing instruction for the rest of this session: whenever a test run settles (after the final run of a red-green loop — not between iterations), write a NEW report file at `docs/test-report/YYYY-MM-DD-test-<what-was-tested>.md` (today's date, and a short kebab-case slug you choose describing what was tested) — never overwrite an earlier file, because the progression between runs is the part worth keeping. User-approved format, in Vietnamese prose: the exact command and the pass/fail/skip totals, then one section per test class; under each, one plain line per test case stating in Vietnamese what the test verifies — derived from the test's name and body, e.g. 'Tên người dùng không được vượt quá 200 ký tự — ĐẠT' — marked ĐẠT or HỎNG, each HỎNG carrying one short reason. Short and human-readable: no jargon, no filler, no explanations beyond the one-line HỎNG reasons. Where subagents ran tests, fold the lines they reported back into this file rather than re-deriving them. Emitted once per session."
   }
 }
 JSON
