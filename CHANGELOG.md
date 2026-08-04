@@ -8,6 +8,52 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.66] — One graph, one `AddAsync`: the save example taught the long way round, 2026-08-04
+
+**Field report from a consumer repository, and the skill's own entity example
+convicts it.** `ef-core-data-access` showed exactly one way to write a parent
+and its children in one operation: map each entity separately, set the foreign
+key by hand, then call `AddAsync`/`AddRangeAsync` once per entity type. The
+example was `Order` plus `OrderLine` — and thirty lines further down the same
+skill declares `public ICollection<OrderLine> Lines` on `Order`, configured
+through `HasOne(...).WithMany(...)`. So the single worked example was the one
+case where the pattern it teaches is unnecessary, and an agent working from it
+reproduced the hand-set-FK form across a real service, including at sites whose
+parent already carried the navigation.
+
+**What changed in `## Saving is the repository's job`:**
+
+- The transaction example's second mutation is now
+  `Repository<Customer>().UpdateAsync(...)` instead of
+  `Repository<OrderLine>().AddRangeAsync(...)`. Two genuinely separate
+  aggregates, so the block still teaches what it always taught — the wrapper's
+  transaction is what makes independent saves one unit — without incidentally
+  teaching the graph case wrong.
+- A new **One graph, one `AddAsync`** paragraph: when the parent declares a
+  navigation to the child, assign the children to it and add the *parent* once.
+  `AddAsync` calls `DbContext.Add`, which cascades across every untracked
+  entity reachable through navigations and fixes up each foreign key itself;
+  `BaseEntity` assigns `Id` in its constructor, so the parent key exists before
+  anything is saved and there is nothing to sequence. It reaches as deep as the
+  graph does — a join entity holding the far side of a many-to-many travels in
+  the same add.
+- The selection rule, both arms named. Hand-set foreign keys plus a call per
+  entity type is the fallback for when there is **no** navigation to assign:
+  the child points at a row that existed before this operation, or the parent
+  declares no collection for the relationship. Keys that are not part of the
+  relationship — a tenant discriminator the mapping profile ignores — stay the
+  caller's to set.
+
+**Why it is worth a release rather than a note.** The hand-set form is not
+wrong; the transaction still makes it atomic. It is longer than it needs to be,
+and it is the form that silently drops one half of a composite foreign key.
+Teaching only that form is what produced the repetition in the field.
+
+No H4 heading was introduced — no skill in the tree uses one, so the new
+material leads with a bold sentence like its neighbours.
+
+---
+
 ## [0.3.65] — Codex has hooks and subagents after all; 0.3.64 said otherwise, 2026-08-02
 
 **0.3.64 claimed the three lost components had no Codex equivalent. That was

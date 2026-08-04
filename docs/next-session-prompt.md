@@ -7,8 +7,21 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.65 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-02. **0.3.64–0.3.65 — the plugin installs on Codex**
+Shipped through **v0.3.66 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-04. **0.3.66 — a field report from a consumer
+repository closed a doctrine hole in `ef-core-data-access`**: the one worked
+example for saving a parent with its children set foreign keys by hand and
+called `AddAsync`/`AddRangeAsync` per entity type, using `Order` + `OrderLine`
+— the very pair the same skill declares a navigation collection for. An agent
+reading it reproduced that form everywhere, including where the parent already
+carried the navigation. Now the transaction example uses two genuinely separate
+aggregates, and a new **One graph, one `AddAsync`** rule names both arms:
+assign to the navigation and add the parent once when the navigation exists;
+hand-set the key only when there is none (child points at a pre-existing row,
+or no collection is declared). **Standing lesson: when a skill's single worked
+example is also the case where its rule does not apply, the example is the
+teacher and it teaches the wrong thing — check worked examples against the
+skill's own entity definitions.** Rulings: CHANGELOG 0.3.66. **0.3.64–0.3.65 — the plugin installs on Codex**
 (`.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json`; verified
 installed and enabled by `codex plugin list`), and **0.3.65 corrected 0.3.64's
 central claim within the same session**: a rejected manifest field is not an
