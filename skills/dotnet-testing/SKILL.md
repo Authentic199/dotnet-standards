@@ -2,14 +2,13 @@
 name: dotnet-testing
 description: >-
   This skill should be used when writing or reviewing tests in a .NET
-  solution: adding a unit test or a WebApplicationFactory integration test,
-  creating a test project under tests/<ProjectName>.UnitTests or
-  tests/<ProjectName>.IntegrationTests, xUnit v3 [Fact]/[Theory], Shouldly
-  assertions, NSubstitute doubles for IRepositoryWrapper and facade
-  interfaces, Testcontainers fixtures, Respawn resets, a test authentication
-  handler, FluentValidation.TestHelper validator tests, the AutoMapper
-  AssertConfigurationIsValid test, test data builders, or coverage
-  collection. Not for: red-green-refactor process —
+  solution: adding a unit test or a WebApplicationFactory integration test, a
+  test project under tests/<ProjectName>.UnitTests or .IntegrationTests, xUnit
+  v3, Shouldly, NSubstitute doubles for IRepositoryWrapper, Testcontainers
+  fixtures, fixture scope, Respawn resets or disjoint test data, a flaky or
+  non-deterministic suite, a test authentication handler,
+  FluentValidation.TestHelper validator tests, AutoMapper
+  AssertConfigurationIsValid, or a test data builder. Not for: red-green-refactor process —
   superpowers:test-driven-development; validation rules — module-feature;
   endpoints, DTOs — api-surface; repositories, DbContext, migrations —
   ef-core-data-access; JWT, policies, permission internals —
@@ -93,10 +92,36 @@ lives in `superpowers:test-driven-development`.
    *Not run*) — never a tier quietly narrowed to the service layer and reported
    done.
 
+7. **A tier that varies is broken worse than a tier that is red, because a
+   varying tier hides real failures.** Instability is usually filed as a
+   reliability annoyance — slow, irritating, hard to know when green. The heavier
+   consequence is epistemic: when the total moves between runs on one commit,
+   nobody can tell which red is the code and which is the fixture, the cost of
+   triaging each one exceeds its expected value, and the whole cluster gets
+   rationalized into *known noise*. That cluster is where a genuine failure sits
+   undisturbed for as long as it likes. Measured in the field: 13 failures filed
+   as known noise, totals moving 13/59/87 on one commit; after the fixtures were
+   merged, 8 were fixture artifacts that went green untouched and 5 were real —
+   two of them production defects days old, each with a test that had been failing
+   correctly the whole time. Three operating rules follow, and the third is the
+   one no process had:
+   - **Stabilize before interpreting.** While a tier varies, a whole-suite total
+     is not evidence of anything. A filtered run of the named test is; the
+     summary line is not.
+   - **The evidence that a variance is fixed is repetition** — several
+     consecutive runs on the same commit producing the same result, not one green
+     run. Three to four runs per state is what caught a residual flake firing
+     once in three.
+   - **After stabilizing, re-triage every outstanding failure, one at a time.**
+     Never carry the old list forward. The list was assembled under conditions
+     that made it unreliable, and re-triaging it is the step that finds what was
+     hiding in it.
+
 ## Patterns
 
-The patterns live in two files, split by tier — a unit test and an integration
-test share almost no machinery, and mixing them makes both harder to find.
+The patterns live in three files — two split by tier, because a unit test and an
+integration test share almost no machinery, and one for the isolation decisions
+that sit underneath the integration tier.
 
 **Read `references/unit-testing.md` when** you are constructing a service directly
 in a test, configuring an NSubstitute double for `IRepositoryWrapper`, `IMapper`
@@ -111,6 +136,15 @@ getting a test request past authentication, deciding which body shape a response
 carries, seeding or reading state through the host, writing a flow test that
 walks a lifecycle or crosses a module boundary, deciding what to do when the real
 host seems too heavy to boot, or adding packages to either test project.
+
+**Read `references/test-isolation.md` when** the suite has — or is about to grow
+— a second `WebApplicationFactory` subclass or a second collection, when you are
+choosing between `IClassFixture`, `ICollectionFixture` and xUnit v3's assembly
+fixture, when a container starts more than once per run, when Respawn's
+serialization is what the suite is paying for, when writing a test that must run
+in parallel with its siblings, and **whenever the tier's pass count moves between
+runs on an unchanged commit** — that symptom is nearly always one of the three
+scopes, not the code under test.
 
 ## Anti-patterns
 
@@ -227,8 +261,9 @@ private static Guid _orderId;
 public async Task Order_ConfirmedAfterCreation_AdvancesThroughEachState() { /* create, get, confirm */ }
 ```
 
-Each test gets a fresh class instance and a reset database, so the state the
-second step expects is gone before it runs. Ordering attributes such as
+Each test gets a fresh class instance, and nothing carries its state to the next
+one — an emptied database under a reset, rows the next test never generated under
+disjoint data — so the state the second step expects is gone before it runs. Ordering attributes such as
 `[TestCaseOrderer]` and static fields are two ways of asking a runner to
 guarantee something it does not.
 
@@ -250,4 +285,9 @@ guarantee something it does not.
 | Arranging state for an integration test | `SeedAsync` through the host's own scope — never by calling another endpoint |
 | Snapshot testing a response | **Not used in this stack.** Responses are a versionless DTO ladder, so additive properties — the normal change here — would churn every snapshot |
 | An authorization attribute, model binding, a route template, exception status mapping, or the response JSON shape changed | Integration test through the fixture — these live only in the pipeline, and a service-layer test cannot prove them (Principle 6) |
+| The tier's pass count moves between runs on one commit | Stop reading the totals — they are not evidence while it varies. Fix the variance first (`references/test-isolation.md`), prove the fix with several consecutive runs, then re-triage every outstanding failure one at a time (Principle 7) |
+| A failure is "known noise" / "pre-existing" / "out of scope" | Only after the tier is deterministic. Before that, the label is a guess about a test nobody could classify — and it is where a real defect lives |
+| A second group of tests needs different host configuration | Parameterise the one factory, or `WithWebHostBuilder` — never a second `WebApplicationFactory` subclass in the same assembly |
+| A test must run in parallel with its siblings | Disjoint data: every value on a unique index generated, every aggregate read filtered to this test's own rows — `references/test-isolation.md` |
+| A test asserts a ceiling over a whole table, or writes a fixed configured row | Neither converts to disjoint data by generating ids. Push a per-test filter into the query, or serialize just those classes in a fixture-less `[CollectionDefinition]` |
 | The real host looks too heavy to boot for the fixture | The escape in `references/integration-testing.md`: settings to the containers, the test auth scheme, hosted services disabled. Still will not boot → a blocked tier, reported not-run — never narrowed to service-layer tests |

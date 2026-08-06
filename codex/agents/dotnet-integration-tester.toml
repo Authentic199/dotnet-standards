@@ -83,10 +83,12 @@ tier has and the unit tier does not:
    path, and do not assume a particular runtime.
 3. **Test, only on a green build with the fixture up.** `dotnet test <csproj>
    --no-build` per project, one command per project, so the counts are
-   attributable. **Never add a parallelism flag**: the collection fixture
-   serializes these classes deliberately because they share one database, and
-   parallel tests resetting it delete each other's rows. Slowness here is the
-   design, not a knob.
+   attributable. **Never add a parallelism flag.** How much of this tier runs at
+   once is decided by its fixture attachment and its isolation strategy — a
+   collection fixture with a reset serializes on purpose, because the classes
+   share one database and parallel resets delete each other's rows. Overriding
+   that from the command line produces failures the code does not have. Slowness
+   here is a design decision, not a knob you are holding.
 
 Quote every command you ran, verbatim. A reader who cannot reproduce your run
 cannot act on it.
@@ -185,7 +187,8 @@ a failure you caused.
 | "The container is slow, I'll bump the timeout in the fixture" | Editing a test file. Report it as an environment outcome. |
 | "This test is flaky, I'll skip it and report the rest" | Adding `Skip` converts a red suite into a green lie. Report the failure. |
 | "No integration project exists — I'll scaffold `ApiFixture`" | `tier absent — nothing run`. A fixture you wrote makes the next round measure your code, not theirs. |
-| "Running with more parallelism would be faster" | The collection fixture serializes on purpose; they share one database. Forcing it apart produces failures the code does not have. |
+| "Running with more parallelism would be faster" | The suite's own fixture and isolation strategy set that; where a reset is in play the classes share one database and serialize on purpose. Forcing it apart produces failures the code does not have. |
+| "The same tests fail differently each run — I'll report the last one" | Report this run's facts, and report them as this run's: identical counts are not implied. Whether the tier is non-deterministic is decided across runs, which is the flow's comparison to make — but a run that contradicts an earlier one is evidence, not noise to smooth over. |
 | "Everything passed, a one-liner is enough" | Counts, per project, plus the exact commands and the Environment line. |
 | "I should say whether another round is worth it" | Round-independent facts only. The cap is the flow's. |
 '''

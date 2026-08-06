@@ -7,8 +7,31 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.67 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-04. **0.3.67 — a second field report, and the same
+Shipped through **v0.3.68 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-05. **0.3.68 — the third field report in three
+releases, and the first one whose headline is not about a worked example.** A
+consumer repository's integration tier had a pass count that moved 13/59/87 on
+one commit; merging four fixtures into one and moving to disjoint per-test data
+made it 146/146 in 11–16s, repeatable — and then the 13 reds split 8 fixture
+artifacts / 5 real, two of them **production defects days old** (a committed
+migration deleted in a later refactor, taking a unique index with it; a column
+moved `citext` → `text` under a guard whose comment still said it relied on
+`citext`). Both had a correctly-failing test the whole time, inside a tier nobody
+believed. Now: `dotnet-testing` Principle 7 (**a varying tier is broken worse
+than a red one — totals are not evidence, proof is repeated runs, and every
+outstanding red is re-triaged one at a time after stabilizing**), the matching
+TEST-LOOP branch in `dotnet-review-flow` (confirm by re-spawn, those re-spawns
+cost no round, `non-deterministic` in the report row), a new
+`dotnet-testing/references/test-isolation.md` (one factory per assembly; the
+three fixture scopes — `ICollectionFixture` is **per collection**, which is where
+four containers came from; three isolation strategies with Respawn's
+serialization price named), `ef-core-data-access` + `dotnet-code-review` 1.11 on
+deleted committed migrations, and `claude-md-builder` R33 on PowerShell 5.1
+mangling non-ASCII source. `Xunit.AssemblyFixtureAttribute` was verified against
+the 3.2.2 assembly's own metadata — and there is **no `IAssemblyFixture<T>`**,
+the report's one wrong detail. Rulings: CHANGELOG 0.3.68. **Standing lesson:
+describing one correct configuration without its option space is an instruction
+to clone it.** **0.3.67 — a second field report, and the same
 diagnosis as 0.3.66: the worked example is the doctrine.** Generated code was
 calling `Trim()` indiscriminately because `module-feature`'s one create-operation
 example opened with `x.Code == request.Code!.Trim()` and no skill said anything

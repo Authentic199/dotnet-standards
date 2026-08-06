@@ -273,6 +273,39 @@ code that most needs one.
 tests, what changed between rounds, how many rounds ran — and ask the user. Never
 a sixth, and never relax the green bar to escape the cap.
 
+#### A tier that varies is not a tier that failed
+
+**Compare the failing set across rounds, not the count.** A tier whose failing
+tests change between two rounds without a fix aimed at them — or whose totals
+move at all on an unchanged tree — is **non-deterministic**, and that is a
+different condition from `RED — tests failed` even though it arrives wearing the
+same verdict string. `dotnet-testing` Principle 7 owns why; this flow owns what
+happens next, in this order:
+
+1. **Confirm it, and confirming means repeating.** Re-spawn that tester with the
+   identical contract against the unchanged tree, two or three times, and compare
+   the failing sets. **These re-spawns do not consume a round** — nothing was
+   fixed between them, and a cap that counts them punishes the only evidence that
+   settles the question. One green run never confirms a variance is gone either:
+   the same repetition is what closes it.
+2. **Stabilizing comes first, and it is the fix of that round.** Fixing
+   individual reds under a varying tier spends rounds on tests that may be
+   reporting the fixture. Who fixes is unchanged — the calling flow's implementer
+   embedded, nobody standalone.
+3. **Then re-triage every outstanding failure, one at a time.** Never carry
+   forward a list assembled while the tier varied — including a list this run
+   inherited as "known", "pre-existing" or "out of scope". That list was built
+   under conditions that made classification unreliable, and the re-triage is
+   what separates fixture artifacts from real defects.
+4. **Say it in the report.** The tier's row carries `non-deterministic` beside its
+   verdict, with the runs compared and what the re-triage found. A varying tier
+   reported as an ordinary red hands the reader a number that does not mean what
+   it looks like.
+
+**While a tier varies, its whole-suite totals are not evidence** — not for
+"green", not for "these N are known", not for verification-before-completion.
+Only a filtered run of a named test is, and the report says which kind it quotes.
+
 ### NO-SIGNAL
 
 Entered when a tester returns `RED — environment` or `tier absent — nothing
@@ -470,7 +503,9 @@ tree (standing code)` for a path scope — never blank, never a dash>
 that reported `tier absent — nothing run` or `RED — environment` still gets its
 row, with the verdict spelled out and dashes in the counts — never omitted, never
 merged into another row, never written as green. It appears again under *Not run*
-with what NO-SIGNAL attempted.>
+with what NO-SIGNAL attempted. A tier whose failing set moved between rounds
+carries `non-deterministic` beside its verdict and its counts are quoted as one
+run's, never as the tier's state.>
 
 ### CONFIRMED findings
 <per finding: lens · severity · file:line · fixed (what changed) or outstanding (why)>
@@ -550,6 +585,8 @@ Executing cleanup candidates belongs to `/simplify`. **Unclear ownership.**
 | The pre-build gate fails | Report the diagnostics, spawn nobody, hand it back |
 | The gate passes but a tester reports `RED — build failed` | A test project does not compile and sits outside what the solution build covered. Treat it as a build failure for that tier, not a test failure |
 | The repository has no test projects at all | Both tiers absent. NO-SIGNAL: measure the gap, offer options built from the count, then REVIEW-LOOP either way |
+| The same tier reports different failures in two rounds, or moving totals on an unchanged tree | Non-deterministic, not merely red. Re-spawn to confirm (those re-spawns cost no round), stabilize before fixing individual tests, then re-triage every outstanding failure one at a time — and stop quoting whole-suite totals until it is settled |
+| A failure list arrives labelled "known noise" or "pre-existing" | Trust it only if the tier is deterministic. Otherwise it is an unclassified list, and re-triaging it is where a hidden defect surfaces |
 | A tester reports `RED — environment` | NO-SIGNAL. Does not consume a round, and never halts the run — the report is owed regardless |
 | A repair inside NO-SIGNAL would download something | Ask first. That single question — does this acquire over the network — is the whole classifier |
 | A reviewer's CRITICAL cannot be reproduced at its `file:line` | PLAUSIBLE. Report it with the reason; do not fix and do not delete |

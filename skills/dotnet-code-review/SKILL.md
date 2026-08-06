@@ -173,7 +173,7 @@ long rubric ships a clean-looking report over an unexamined defect.
 
 ### Check coverage
 <one row per rubric area: the area, the check numbers you actually ran, and any
-check number you skipped with the reason — `1: 1.1-1.10, all run`, `5: 5.1-5.23,
+check number you skipped with the reason — `1: 1.1-1.11, all run`, `5: 5.1-5.23,
 5.9 not applicable (no partial classes touched)`. A check that cost more effort
 than the others is exactly the one that goes missing here.>
 

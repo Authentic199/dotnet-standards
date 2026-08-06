@@ -136,6 +136,31 @@ repeat them. Keys, foreign keys, uniqueness (`HasCitextUnique`) and defaults
 stay. A limit declared twice drifts twice, and the schema copy is the one that
 diverges silently.
 
+**1.11 A committed migration deleted or renamed** — *CRITICAL* ·
+`ef-core-data-access`
+`Find:` read the changed-file list for any **deletion or rename** under a
+`Migrations/` folder — a diff against a base ref means the file existed at that
+base, so it was committed. Where a shell is available and the scope is standing
+code rather than a diff, the same question over history is
+`git log --all --diff-filter=D --name-only -- "*Migrations/*"`, confirming each
+hit is reachable with `git merge-base --is-ancestor <adding-commit> HEAD`.
+The deletion does not undo the migration. `__EFMigrationsHistory` in every
+database that ran it still names it, so those keep the object while databases
+created afterwards never get it — two schemas, no error, and the model has
+silently lost whatever the migration declared. Report **what the deleted
+migration contained**, not just that a file went missing: the finding is the lost
+constraint, index or column, and it is routinely the thing a later refactor
+thought it was tidying up. **Recommend the forward repair, never a restore** — a
+restored file is skipped wherever its id is already in the history table:
+redeclare it in the entity configuration and generate a new migration that
+tolerates both populations. A rename is the same finding; the id changes, so the
+old row in the history table no longer matches anything.
+**Not a finding:** a migration added *and* removed inside the diff's own range —
+it never existed at the base and no database can have run it. Everything else
+stays CRITICAL until someone who can see the branch's history says the migration
+never left a personal branch; that is a downgrade the author makes with evidence,
+not one the reviewer assumes.
+
 ## 2. Security posture
 
 **2.1 An action with no explicit authorization decision** — *CRITICAL* ·
