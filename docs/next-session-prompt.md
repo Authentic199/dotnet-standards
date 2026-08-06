@@ -7,8 +7,15 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.68 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-05. **0.3.68 — the third field report in three
+Shipped through **v0.3.69 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-05. **A same-version collision hit at this merge**:
+this session authored the entry below as 0.3.68 in parallel with a session that
+shipped `test-report-nudge`'s report-path/wording change as its own 0.3.68 —
+one file per settled run under `docs/test-report/`, fixed Vietnamese prose with
+ĐẠT/HỎNG marks (CHANGELOG 0.3.68, unrelated to this lane's work). `main` had
+already moved by the time this session pushed, so this entry renumbered to
+0.3.69 at merge — read the version off `main`, never off your own branch, is
+now three-for-three confirmed in the field. **0.3.69 — the third field report in three
 releases, and the first one whose headline is not about a worked example.** A
 consumer repository's integration tier had a pass count that moved 13/59/87 on
 one commit; merging four fixtures into one and moving to disjoint per-test data
@@ -29,7 +36,7 @@ serialization price named), `ef-core-data-access` + `dotnet-code-review` 1.11 on
 deleted committed migrations, and `claude-md-builder` R33 on PowerShell 5.1
 mangling non-ASCII source. `Xunit.AssemblyFixtureAttribute` was verified against
 the 3.2.2 assembly's own metadata — and there is **no `IAssemblyFixture<T>`**,
-the report's one wrong detail. Rulings: CHANGELOG 0.3.68. **Standing lesson:
+the report's one wrong detail. Rulings: CHANGELOG 0.3.69. **Standing lesson:
 describing one correct configuration without its option space is an instruction
 to clone it.** **0.3.67 — a second field report, and the same
 diagnosis as 0.3.66: the worked example is the doctrine.** Generated code was

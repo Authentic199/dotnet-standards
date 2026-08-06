@@ -8,7 +8,11 @@ components change materially — not only on releases.
 
 ---
 
-## [0.3.68] — a suite that varies is where real failures hide, 2026-08-05
+## [0.3.69] — a suite that varies is where real failures hide, 2026-08-05
+
+**Version note.** Authored as 0.3.68 in parallel with the session that shipped
+`test-report-nudge`'s 0.3.68 below; renumbered at merge time per the
+same-version-collision rule — `main` had already moved.
 
 **Field report, third in three releases** (`docs/field-reports/2026-08-05-feedbacl-dotnet-testing.md`).
 A consumer repository merged four integration fixtures into one, dropped Respawn
@@ -102,6 +106,33 @@ the doctrine*. This one is its sibling: **describing one correct configuration
 without its option space is an instruction to clone it.** The four fixtures, the
 four containers and the serialization nobody wanted were all written by someone
 following the documentation exactly.
+
+---
+
+## [0.3.68] — test-report-nudge: one file per run, Vietnamese ĐẠT/HỎNG, 2026-08-04
+
+**User-directed change to the report-rule wording (report-rule changes need
+approval — shown before shipping).** The rule the hook nudges the model
+toward was replaced outright: a single `test-report.md` at the repository
+root, overwritten on every settled run, threw away the progression between
+runs — the part the user actually wanted kept.
+
+**What changed in `hooks/test-report-nudge`:**
+
+- Report path is now `docs/test-report/YYYY-MM-DD-test-<what-was-tested>.md`
+  — a new file per settled run, never an overwrite. The model chooses the
+  `<what-was-tested>` slug from the run's scope.
+- Report body is fixed Vietnamese prose — command plus pass/fail/skip
+  totals, one section per test class, one plain line per test case, marked
+  **ĐẠT** or **HỎNG** (each HỎNG with one short reason) — replacing "written
+  in the language the user is conversing in" and the PASS/FAIL marks.
+- The subagent branch (added 0.3.63) is unchanged in mechanism: a subagent
+  still never writes under `docs/test-report/`, only hands ĐẠT/HỎNG lines
+  back to the dispatching session — the wording was updated to match, not
+  the ownership split itself.
+- Nothing else in the script (gates, per-context marker, marker sweep)
+  changed — this was a report-rule wording edit only, per explicit scope
+  from the user.
 
 ---
 
