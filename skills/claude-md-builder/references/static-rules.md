@@ -160,6 +160,27 @@ propagates through a file untouched by review.
 
 ---
 
+## Windows shell and file encoding
+
+**Applies when** the session's own shell is Windows PowerShell — a property of
+the machine, not of the repository, so check the platform rather than the tree.
+Ship it whenever that holds; the damage it prevents is not stack-specific.
+
+**R33** — `Never edit a source file through the shell: no Get-Content/Set-Content round-trip, no > or >> redirection, no sed -i. Use the harness's file-edit tools. Windows PowerShell 5.1 reads a BOM-less file as ANSI (Windows-1252) and writes it back as UTF-8, re-encoding every non-ASCII byte in the file — not only the line you meant to change. If a bulk edit through the shell is unavoidable, move bytes, not text: [System.IO.File]::ReadAllBytes and WriteAllBytes with the encoding stated explicitly. Tell you did it: git diff --stat reports far more changed lines than you edited. Undo it losslessly: ReadAllBytes, strip the BOM, UTF8.GetString, GetEncoding(1252).GetBytes, WriteAllBytes.`
+*Prevents:* a whole-file mangling that presents as a product regression. In the
+observed case a `Set-Content` pass over six test files to add one attribute line
+double-encoded every non-ASCII character in them, and the test using a non-ASCII
+character as data then failed **deterministically, four runs out of four** —
+indistinguishable from a real defect, and diagnosed as one for a while.
+*Note:* the exposure scales with how much non-ASCII the repository holds, so it
+is near-total wherever comments, seed data or messages are written in a language
+other than English — the case where a reviewer is also least likely to notice the
+mangled bytes. PowerShell 7 defaults to UTF-8 and does not have this behaviour;
+the rule still ships, because the shell the session gets is not the session's
+choice.
+
+---
+
 ## Communication and language
 
 **Applies when** always. This group ships in every generated file — it is the one

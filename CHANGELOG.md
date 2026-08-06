@@ -8,6 +8,103 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.68] — a suite that varies is where real failures hide, 2026-08-05
+
+**Field report, third in three releases** (`docs/field-reports/2026-08-05-feedbacl-dotnet-testing.md`).
+A consumer repository merged four integration fixtures into one, dropped Respawn
+and moved to per-test disjoint data: a tier whose failure count moved 13/59/87 on
+one commit became 146/146 in 11–16 seconds, stable across repeated runs. Six
+defects in this plugin came out of the exercise. Item 5 is the one that matters
+most, and it is not about fixtures.
+
+**The headline: instability is an epistemic failure, not a reliability
+annoyance.** Every word this plugin had about flaky tests treated them as
+friction. The heavier consequence went unstated — when the total moves, no one
+can tell a code failure from a fixture failure, triaging each one costs more than
+it returns, and the whole cluster is rationalized into *known noise*. After
+stabilization the 13 split cleanly: 8 were fixture artifacts that went green with
+no source change, 5 were real, and 2 of those were production defects days old —
+a committed migration deleted in a later refactor, taking a unique index and the
+one-session-per-device rule out of the model, and a column switched from `citext`
+to `text` under a uniqueness guard whose comment still explained that it
+deliberately did not lower-case *because* the column was `citext`. Both had a
+test failing correctly the whole time, inside a tier nobody believed any more.
+
+**What changed:**
+
+- **`dotnet-testing` Principle 7** — *A tier that varies is broken worse than a
+  tier that is red.* The mechanism, plus three operating rules: whole-suite
+  totals are not evidence while a tier varies (only a filtered run of a named
+  test is); the proof that a variance is fixed is **several consecutive runs on
+  one commit**, never a single green; and after stabilizing, **re-triage every
+  outstanding failure one at a time** — never carry the old list forward. That
+  last step is what surfaced both production defects, and no flow had it.
+- **`dotnet-review-flow`, TEST-LOOP** — *A tier that varies is not a tier that
+  failed.* Compare the failing **set** across rounds, not the count; confirming
+  means re-spawning the tester two or three times against the unchanged tree, and
+  **those re-spawns consume no round**; stabilizing is that round's fix; then the
+  re-triage, including of any list inherited as "known" or "pre-existing". The
+  tier's report row now carries `non-deterministic` beside its verdict.
+- **New `dotnet-testing/references/test-isolation.md`** — the option space items
+  1–3 of the report say the skill never described. **One factory per assembly**:
+  a second `WebApplicationFactory` subclass is a race, because the override route
+  samples reach for (`Environment.SetEnvironmentVariable`, which wins by being
+  last) belongs to the *process* while xUnit runs collections in parallel inside
+  one; `DisableTestParallelization` does not repair it and made it worse in the
+  field (`HostFactoryResolver`: *the entry point exited without ever building an
+  IHost*); the repair is to parameterise the one factory or use
+  `WithWebHostBuilder`. **Three fixture scopes, not two**: `IClassFixture` per
+  class, `ICollectionFixture` **per collection** — which is where four containers
+  came from, and the reading of it as "once per suite" is the whole defect — and
+  xUnit v3's `[assembly: AssemblyFixture(typeof(T))]` for once per assembly.
+  **Three isolation strategies**, with Respawn's hidden price named: it forces
+  every class sharing the database to serialize. Disjoint data is the only one of
+  the three that permits parallel classes, and it ships as a contract (every
+  unique-index value generated; every aggregate read filtered to this test's own
+  rows) plus the two shapes a generated id cannot fix — a ceiling asserted over a
+  whole table, and a write into a fixed configured row, whose repair is a
+  **fixture-less `[CollectionDefinition]`** that serializes only those classes.
+- **`ef-core-data-access`, Migrations workflow** — a committed migration is never
+  deleted, renamed or rewritten, and **restoring the file is not the repair**: a
+  database whose `__EFMigrationsHistory` already names that id skips it, so the
+  object stays missing there. Redeclare in the entity configuration and generate
+  a new migration that tolerates both populations.
+- **`dotnet-code-review` check 1.11**, *A committed migration deleted or renamed*
+  — CRITICAL. A deletion in the file list is enough for a diff (the file existed
+  at the base); the sweep form is `git log --all --diff-filter=D --name-only --
+  "*Migrations/*"` with `git merge-base --is-ancestor`. The finding must state
+  **what the deleted migration contained**, and recommend the forward repair.
+- **`claude-md-builder` R33** — never edit source through the Windows shell.
+  PowerShell 5.1 reads a BOM-less file as Windows-1252 and writes UTF-8,
+  re-encoding every non-ASCII byte in the file; in the field a six-file
+  `Set-Content` pass turned one test red **deterministically, 4 runs of 4**, which
+  reads exactly like a regression. Ships with the tell (`git diff --stat` far
+  larger than the edit) and the lossless reversal. Exposure is near-total in
+  repositories whose comments are not in English.
+- **`dotnet-integration-tester`** — its parallelism ban no longer asserts that the
+  collection fixture serializes; it says the suite's own fixture and isolation
+  strategy decide, and the flag is still not the tester's to set. One
+  rationalization row added: a run contradicting an earlier one is evidence, and
+  the cross-run comparison belongs to the flow.
+
+**Verified, not recalled.** `Xunit.AssemblyFixtureAttribute(Type)` was checked
+against `xunit.v3.core` 3.2.2's own metadata and XML docs in the local NuGet
+cache: the instance is created before any test in the assembly runs,
+`IAsyncLifetime.InitializeAsync` is awaited on it, it needs a **public
+parameterless constructor**, and a test reaches it by declaring a constructor
+parameter of exactly the fixture type. There is **no `IAssemblyFixture<T>`
+interface** — the report's one inaccuracy, and the reason no interface appears in
+the shipped shape. v2 has no equivalent at all, which is why every fixture sample
+copied from a v2 codebase stops at the collection fixture.
+
+**Standing lesson.** Two releases running, the lesson was *the worked example is
+the doctrine*. This one is its sibling: **describing one correct configuration
+without its option space is an instruction to clone it.** The four fixtures, the
+four containers and the serialization nobody wanted were all written by someone
+following the documentation exactly.
+
+---
+
 ## [0.3.67] — `Trim()` was in the teaching example, so it was in the output, 2026-08-04
 
 **Field report: generated code calls `Trim()` everywhere.** The source is this

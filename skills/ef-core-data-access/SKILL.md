@@ -210,6 +210,25 @@ command is then killed halfway through writing a migration. Wait for it rather
 than moving on: a run abandoned mid-command leaves a partial migration pair
 that the next `add` builds on top of.
 
+**A migration that has been committed is never deleted, renamed or rewritten.**
+`dotnet ef migrations remove` is for a migration that exists only in your working
+tree; once the file is in a shared history it has almost certainly been applied
+somewhere, and `__EFMigrationsHistory` in that database still names it. Deleting
+it does not undo it — it produces two populations that no longer share a schema:
+databases that ran it keep the object, databases created afterwards never get it,
+and nothing reports the divergence. Observed in the field: a migration adding a
+unique index was committed in one change and deleted in a later "align module
+boundaries" refactor, and the one-session-per-device constraint it enforced left
+the model and the new databases without a single error.
+
+**The repair is forward, and restoring the deleted file is not it** — a database
+whose history table already carries that id will skip it, so the object it
+created is still missing there. Redeclare the intent in the entity configuration,
+generate a **new** migration, and make that migration tolerate both populations:
+guard the create so it is a no-op where the object already exists. Then check
+what else the deletion took with it — a migration removed to "clean up" is
+usually removed along with the model change it belonged to.
+
 Deployed environments never run the CLI. With `SqlSettings.UseAutoMigration`
 set, startup asks `GetPendingMigrationsAsync` and applies anything outstanding
 with `MigrateAsync`; with the flag off it applies nothing and logs a warning.

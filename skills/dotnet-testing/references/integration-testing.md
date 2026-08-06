@@ -5,6 +5,7 @@ can answer: the HTTP contract, the SQL a projection generates, and the effects
 that cross a module boundary.
 
 - [The integration fixture](#the-integration-fixture)
+- [One factory per assembly](#one-factory-per-assembly)
 - [Sharing containers and resetting state](#sharing-containers-and-resetting-state)
 - [Authenticating a test request](#authenticating-a-test-request)
 - [Asserting through the settled envelope](#asserting-through-the-settled-envelope)
@@ -79,6 +80,12 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 }
 ```
 
+- **Override configuration through this fixture's own sources, never through the
+  process.** `AddInMemoryCollection` inside `ConfigureAppConfiguration` is added
+  after the application's own sources and belongs to this host alone.
+  `Environment.SetEnvironmentVariable` also wins — `AddEnvironmentVariables()` is
+  the application's last source — but it wins *process-wide*, which makes it a
+  race the moment anything else in the assembly builds a host.
 - **Point the connection string at the container; do not re-register the
   `DbContext`.** Overwriting three configuration values hands the container's
   database to the registration the application actually ships — provider
@@ -131,11 +138,40 @@ blocked — the flows' `RED — environment` and *Not run* machinery exists for
 exactly this — and never narrow the tier to service-layer tests and call it done
 (Principle 6 in the skill body).
 
+## One factory per assembly
+
+**A test assembly declares exactly one class deriving from
+`WebApplicationFactory<TEntryPoint>`.** This is a constraint, not a description
+of the file above: the second one is not another fixture, it is a race, and
+nothing in its own file says the first one exists.
+
+The short mechanism — a fixture that overrides configuration through an
+environment variable overrides it for the whole **process**, and xUnit runs
+collections in parallel inside one process, so two fixtures overwrite each
+other's connection string and one migrates the other's container. Two factories
+also mean two hosts and usually two containers, paid on every run.
+`[assembly: CollectionBehavior(DisableTestParallelization = true)]` is the reflex
+fix and it is not one.
+
+When two groups of tests need different host configuration, **parameterise this
+factory or use `WithWebHostBuilder`; never clone the class.** The full mechanism,
+the field evidence and the escape both belong to
+`references/test-isolation.md`, *One factory per assembly*.
+
 ## Sharing containers and resetting state
 
 **Start the containers once for the whole suite and empty the database between
 tests.** A container start plus migrations costs seconds; deleting the rows
 costs milliseconds.
+
+The shape below is one of two coherent configurations — a collection fixture with
+a reset — and it is correct **while the assembly has exactly one collection**.
+The fixture attachment is what decides how many containers exist, the reset is
+what forces every class to run one at a time, and the two are one decision:
+`references/test-isolation.md` holds the three fixture scopes, the assembly-wide
+alternative and the three ways to keep tests off each other's rows. Read it
+before adding a second collection, before dropping the reset, and whenever the
+tier's pass count moves between runs.
 
 ```csharp
 [CollectionDefinition(nameof(ApiCollection))]
@@ -154,11 +190,16 @@ public abstract class IntegrationTestBase(ApiFixture fixture) : IAsyncLifetime
 }
 ```
 
-- **`ICollectionFixture<T>`, not `IClassFixture<T>`.** A class fixture starts a
-  container per test class. A collection fixture starts one for the collection
-  and serializes the classes in it — which is required, not incidental: they
-  share one database, and parallel tests resetting it would delete each other's
-  rows.
+- **`ICollectionFixture<T>`, not `IClassFixture<T>` — and it is the middle rung,
+  not the top one.** A class fixture starts a container per test class. A
+  collection fixture starts one per **collection** and serializes the classes in
+  it, which is what a reset requires: they share one database, and parallel tests
+  resetting it would delete each other's rows. But *per collection* is also the
+  ceiling — an assembly that grows a second collection silently grows a second
+  container. Once for the whole assembly is a third rung, xUnit v3's
+  `[assembly: AssemblyFixture(typeof(T))]`, and it imposes no serialization, so
+  it comes with the other reset strategy. Both rungs and the pairing:
+  `references/test-isolation.md`.
 - **Reset before a test, not after it.** xUnit builds a new instance per test
   method, so the base class's `InitializeAsync` runs before each one — a test
   that fails leaves its rows in place to be inspected, and a test that crashed
@@ -169,10 +210,15 @@ public abstract class IntegrationTestBase(ApiFixture fixture) : IAsyncLifetime
 - **Ignore the migrations history table.** Respawn excludes nothing by default,
   and deleting that table leaves a migrated schema that reports itself
   unmigrated to everything that asks afterwards.
-- **Reset beats re-create.** Re-creating means dropping and re-migrating —
-  seconds per test, and it throws away the warm connection pool. Respawn also
-  does not reset identity or sequence values: never assert a generated key's
-  *value*, assert the row.
+- **Reset beats re-create — but reset is not the only alternative to it.**
+  Re-creating means dropping and re-migrating: seconds per test, and it throws
+  away the warm connection pool. Respawn also does not reset identity or sequence
+  values, so never assert a generated key's *value*, assert the row. The third
+  strategy is to reset **nothing** and have every test own disjoint rows, which
+  is the only one of the three that permits parallel test classes — the price
+  Respawn charges here is the serialization of every class sharing the database.
+  Criteria, contract and the two test shapes it cannot cover:
+  `references/test-isolation.md`.
 
 ## Authenticating a test request
 
@@ -398,10 +444,11 @@ public async Task Order_ConfirmedAfterCreation_AdvancesThroughEachState()
   another, an id minted by one step and consumed by the next, a total that
   accumulates. **Anything a seeded precondition can set up is a single-endpoint
   test**, which runs faster, fails at one place and names that place.
-- **Never split a flow across three tests that depend on running in order.** The
-  reset empties the database between tests and the runner promises no order, so
-  the second test would find nothing — the machinery makes the mistake
-  impossible, which is why the whole flow belongs in one method.
+- **Never split a flow across three tests that depend on running in order.**
+  Nothing carries state between tests and the runner promises no order — under a
+  reset the second test finds an empty database, under disjoint data it looks for
+  values it never generated. The machinery makes the mistake impossible either
+  way, which is why the whole flow belongs in one method.
 - **Name it for the behaviour** — `Order_ConfirmedAfterCreation_…` — never
   `CreateGetUpdate_Works`, which names the steps and says nothing about what is
   supposed to be true at the end.
@@ -471,5 +518,5 @@ version that was current once.
 | `Microsoft.AspNetCore.Mvc.Testing` | `WebApplicationFactory` |
 | `Testcontainers.PostgreSql` | the database container — the module matching the provider |
 | `Testcontainers.Redis` | only when a tested path uses the cache |
-| `Respawn` | the between-test reset |
+| `Respawn` | the between-test reset — configuration A only; a suite isolating by disjoint data adds no package for it |
 | `coverlet.collector` | coverage |
