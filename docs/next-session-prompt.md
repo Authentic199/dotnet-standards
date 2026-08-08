@@ -7,8 +7,23 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.73 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.73 — the skill said both things, and the agent
+Shipped through **v0.3.74 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.74 — direction D ran, and is CLOSED.** The
+convention/check coverage matrix: **195 numbered checks** in the tree, not the ~90
+assumed when D was queued; **354 tokens** across all `Find:` instructions; **196**
+candidate uncovered rules in the 18 knowledge skills, **111** in bold-imperative
+form, all read, **6 shipped**. Artifact + re-runnable scripts:
+`docs/coverage-matrix/`. Headline check: **architecture 3.6, a `[Route]` on any
+controller but the base** — the rule 0.3.73's report called decisive, enforced by
+nothing; canonical project 0 hits, consumer project **2, both real, one of them in
+no report anyone had written**. **Smoke-testing changed 2 of the 6** — 5.26's only
+canonical hit is a legitimate redirect endpoint (open question for the owner:
+`api-surface` says *never `IActionResult`* with no exception and the corpus
+grounds no alternative), and 5.27's first pattern matched the *correct*
+`<Name>Regex.IsMatch(...)` usage. One candidate **rejected for noise, not for
+being wrong** (an entity handed to the search wrapper — kept as debt). **The
+queue out of the 2026-08-07 report is now just H.** Rulings CHANGELOG 0.3.74.
+Before it: **0.3.73 — the skill said both things, and the agent
 picked the wrong one.** `api-surface` contradicted itself **twelve lines apart**: a
 bullet said a controller spanning modules *"injects each module's service, and two
 or three is normal"*, the paragraph below said the owning service reaches the
