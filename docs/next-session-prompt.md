@@ -7,8 +7,23 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.76 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.76 — H's second run: the weak model fails when
+Shipped through **v0.3.77 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.77 — acting on H instead of documenting it.**
+Two rules H showed a weak model violating had **no check**, and **D had scored
+both as covered** — its token join saw `[NotSearchable]` inside an unrelated
+performance check. **The static scan and the behavioural eval find different
+things**, first concrete proof. Shipped: **1.12 extended to `ApplySearch`'s third
+argument** (a property-level policy in `searchFieldExcepts` belongs on the
+property) and **5.28, a mapping profile living in a mapping folder** (3 hits
+canonical, 1 consumer, all real; names its own `Profiles/` false positive).
+**Field note:** the consumer project has **9** `ApplySearch` sites violating 1.12,
+where the field report named three. **And a second text lever reverted** — a
+worked picture of the disguise, every cosmetic signal ticked and the three
+structural breaches marked; Haiku failed both runs. **Three failed text attempts
+now** (ordinary prose, countable stop-gate, worked picture): against a plausible
+wrong precedent at a weak model **nothing written has ever changed the outcome,
+and the rubric grep is the only control that has fired.** For this class of
+problem, stop adding rules and add the check. Rulings CHANGELOG 0.3.77. Before it: **0.3.76 — H's second run: the weak model fails when
 the wrong precedent looks reasonable.** Six more skills, 15 runs, five evals ×
 three cells. **Four valid evals; on all four the no-doctrine control FAILS and the
 doctrine PASSES** — the knowledge layer works on every skill tested. **e6
