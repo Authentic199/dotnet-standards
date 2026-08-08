@@ -7,8 +7,23 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.71 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.71 — split a skill body by trigger, not by
+Shipped through **v0.3.72 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.72 — the report is the deliverable, and it was
+unreadable.** Twelve real reports from a consumer repo, five weeks of output,
+three owner-named defects, all verified. No header block; **9 of 12 in the wrong
+language** while that consumer's own `CLAUDE.md` line 76 already required
+otherwise (this plugin had **no report-language rule anywhere** — only
+`claude-md-builder` teaching a project to write one); and essay-length findings
+caused by a shipped rule of ours — review-flow's report rule 3 forbade dropping a
+finding and said nothing about length, so complying meant writing more. All six
+report templates now carry a language rule, a seven-row header table (field set
+and layout chosen by the user; Mode and Status cut by them), a capped
+`Defect`/`Failure`/`Fix` shape — three lines, two sentences each, no fourth — and
+three named bans on process narration. Also `dotnet-review-flow` **601 → 561**
+with its first `references/` file (`failure-branches.md`: NO-SIGNAL + subagent
+failure, both entered on unmistakable events). **Verification earned its keep** —
+the pointer-reachability check found the two TEST-LOOP rows saying *Enter
+NO-SIGNAL* never named the file. Rulings CHANGELOG 0.3.72. Before it: **0.3.71 — split a skill body by trigger, not by
 topic.** `ef-core-data-access/SKILL.md` 567 → **419** via two new references
 (`schema-lifecycle.md`, `entity-configuration.md`). The criterion is the reusable
 part and it comes from 0.3.70's field report, not from a line count: *to
