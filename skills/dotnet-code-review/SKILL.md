@@ -124,7 +124,7 @@ than merge blockers, and below them is where taste lives.
 
 | # | Area | The rubric checks | Owning skill |
 |---|---|---|---|
-| 1 | **Data access** | Query shape and tracking, projection, includes, pagination, transaction boundaries, save-per-operation, the token reaching the database call, migration safety | `ef-core-data-access` |
+| 1 | **Data access** | Query shape and tracking, projection, includes, pagination, the search-field contract, transaction boundaries, save-per-operation, the token reaching the database call, migration safety | `ef-core-data-access` |
 | 2 | **Security** | Every action's authorization attribute is explicit, input is validated before use, nothing secret is in source or logs, no entity reaches the wire un-projected | `auth-and-security`, `api-surface` |
 | 3 | **Concurrency** | `CancellationToken` accepted and propagated to the end of the chain, no `.Result`/`.Wait()`/`.GetAwaiter().GetResult()` inside an async method, no scoped dependency captured by a singleton, shared mutable state, double-processing | `distributed-lock` (double-processing); the rest is general .NET, owned by no skill |
 | 4 | **Integration** | Timeouts and failure handling on outbound calls, cache invalidation after the mutation that invalidates it, index writes after the entity change, no exception swallowed into a log line | `distributed-caching`, `elasticsearch-search` |
@@ -173,7 +173,7 @@ long rubric ships a clean-looking report over an unexamined defect.
 
 ### Check coverage
 <one row per rubric area: the area, the check numbers you actually ran, and any
-check number you skipped with the reason — `1: 1.1-1.11, all run`, `5: 5.1-5.23,
+check number you skipped with the reason — `1: 1.1-1.12, all run`, `5: 5.1-5.23,
 5.9 not applicable (no partial classes touched)`. A check that cost more effort
 than the others is exactly the one that goes missing here.>
 

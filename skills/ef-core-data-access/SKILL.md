@@ -141,6 +141,17 @@ OrderResponse? response = await repositoryWrapper.Repository<Order>()
   joins it needs; reach for `Include` only when materializing entities with
   their children.
 
+The one that is got wrong most often, stated here so it survives a session that
+never opens the reference: **`ApplySearch`'s second argument is
+`request.SearchFields`** — the field set the client chose. A set written at the
+call site is a defect, not a shortcut: `QueryContainer` publishes `SearchFields`
+on every list endpoint, so a hard-coded array makes that parameter silently do
+nothing, and it turns each later change to the searchable set into a code change
+and a deploy. The two supported narrowings live elsewhere — `[NotSearchable]` on
+the response property keeps it out of the set `ApplySearch` derives when the
+client sends none, and the third argument, `searchFieldExcepts`, drops a field at
+one call site.
+
 Read `references/query-conventions.md` before building a list or search
 endpoint, or when touching `QueryContainer`, the `$`-prefixed filter
 operators, `ApplyFilter`/`ApplySearch`/`ApplySort` or `ToPagedListAsync`.

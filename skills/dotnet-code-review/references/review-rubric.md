@@ -161,6 +161,28 @@ stays CRITICAL until someone who can see the branch's history says the migration
 never left a personal branch; that is a downgrade the author makes with evidence,
 not one the reviewer assumes.
 
+**1.12 A search stage that names its own fields** — *MEDIUM* ·
+`ef-core-data-access`, *The search shape* + `list-query-pipeline`, *Keyword
+search and the default field set*
+`Find:` `grep -rn -A2 --include=*.cs "\.ApplySearch(" src/`, then read the
+**second** argument at each hit. Conforming values are the request's own
+`SearchFields` and `null`. Anything else — an array or collection literal, a
+`nameof` list, a constant, a local built earlier in the method — is the finding.
+The second argument is the caller's field set, and `QueryContainer` publishes
+`SearchFields` on every list endpoint. A set written at the call site makes that
+published parameter do nothing, with no error and nothing in the response to say
+so, and it turns each later change to the searchable set into a code change and a
+deploy. The two supported narrowings are elsewhere: `[NotSearchable]` on the
+response property removes it from the set `ApplySearch` derives when the client
+sends none, and the third argument, `searchFieldExcepts`, drops a field at one
+call site. Where the narrowing is deliberate — a gate whose caller must not
+choose — the site has to say so and reject or intersect the incoming
+`SearchFields` explicitly; silence leaves a restriction and an accident looking
+identical, and the reviewer cannot tell them apart either.
+**Not a finding:** the pipeline's own `QueryExpressionExtension.cs`, where the
+`IEnumerable` overload forwards its parameter, and a test of the extension that
+supplies a literal set on purpose — which is why the grep is scoped to `src/`.
+
 ## 2. Security posture
 
 **2.1 An action with no explicit authorization decision** — *CRITICAL* ·
