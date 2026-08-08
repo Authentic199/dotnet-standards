@@ -7,8 +7,22 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.74 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.74 — direction D ran, and is CLOSED.** The
+Shipped through **v0.3.75 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.75 — direction H ran, and is CLOSED. The queue
+from the 2026-08-07 report is now EMPTY.** 11 agent runs, one task, six grep
+assertions — `docs/coverage-matrix/h-eval-results.md`. **Wave 1 was thrown away**:
+its control passed, so it did not reproduce the defect. Wave 2 does. Results:
+Opus 5 fails with **no** doctrine and passes with **either** version; Sonnet
+passes either way; **Haiku fails all five runs — no doctrine, old text, new text,
+and twice with a purpose-built stop-gate.** Four findings: doctrine works;
+**0.3.73's text fixes remain unverified** (v0.3.72 passed identically); below a
+model threshold the text does not participate at all; and **prose could not move
+that threshold**, so the gate was **reverted unshipped** — H's first payoff was a
+deletion. Consequence worth carrying: **for a weak-model session the review layer
+is not a backstop, it is the only control that fires** — check 3.6 catches all
+five Haiku outputs with a one-line grep. H does **not** reproduce the field
+failure's cause (attention across a six-task session, not information). Rulings
+CHANGELOG 0.3.75. Before it: **0.3.74 — direction D ran, and is CLOSED.** The
 convention/check coverage matrix: **195 numbered checks** in the tree, not the ~90
 assumed when D was queued; **354 tokens** across all `Find:` instructions; **196**
 candidate uncovered rules in the 18 knowledge skills, **111** in bold-imperative
@@ -784,6 +798,20 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   good news. 0.3.73's four text changes are what should flip them; if any stays
   red, the corresponding change was too weak — strengthen it rather than relax the
   criterion.
+
+- [solo, 2026-08-08] **H is closed, and it left three named follow-ups.** (a)
+  **Seven skills still untested** — `ef-core-data-access`, `error-handling`,
+  `message-keys`, `list-query-pipeline`, `automapper-mapping`, `dotnet-testing`,
+  and the `ef-core` search-field case whose fixture is already built. Each has a
+  greppable canonical shape; the recipe is in `h-eval-results.md` and rebuilding
+  a fixture took under an hour. (b) **0.3.73's four text changes are unverified
+  and should stay labelled so** until an eval discriminates them — v0.3.72 passed
+  identically at every tier tested. (c) **The open design question H raised:** if
+  the knowledge layer does not reach a weak model at all, what is it for on those
+  sessions, and should the rubric checks be generated *from* the knowledge rules
+  rather than written beside them? Direction D's matrix is the input to that
+  question. **Do not re-run H expecting a rate** — one or two runs per cell shows
+  a threshold, not a frequency, and the Haiku cells are already five-for-five.
 
 ## Standing rules (unchanged, summarized)
 
