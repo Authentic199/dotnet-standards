@@ -385,8 +385,29 @@ every time**; write `None.` when a section is empty, because an absent section i
 ambiguous between *checked, found nothing* and *did not check* — and in a security review
 that ambiguity is the whole distinction.
 
+**Report language.** Write the report in the language the reviewed project's
+`CLAUDE.md` sets for talking to the user. If it sets none, write in the language
+the user is using in this session. Identifiers, paths, commands, file names and
+quoted code stay in English. **The field labels below are English because this
+skill is written in English — they are field names, not fixed strings. Translate
+them.** A report in the wrong language is a defect even when every finding in it
+is correct.
+
+**The header table is not optional and every row appears.** A row that cannot
+apply carries `—`; a blank cell is a defect.
+
 ```markdown
-## Security review: <scope>
+# Security review: <scope> — <one line on what it covers>
+
+| | |
+|---|---|
+| **Date** | <yyyy-MM-dd> |
+| **Branch** | `<branch>` (<n> commits) |
+| **Base** | `<sha>` on `<base branch>`, or `the empty tree (standing code)` for a path scope |
+| **Worktree** | `<path>`, or `—` |
+| **Scope** | <n> files — <what they are> |
+| **Excluded** | <paths or shapes left out, or `—`> |
+| **Method** | <which layers ran; and that every CRITICAL/HIGH was re-checked at the cited `file:line`> |
 
 > This is static analysis, not a penetration test. It catches known patterns and
 > house-doctrine violations; it does not catch business-logic flaws, complex
@@ -396,17 +417,19 @@ that ambiguity is the whole distinction.
 <mode (diff or sweep) · layers run · PASS / FAIL and the findings that decide it>
 
 ### CRITICAL
-- **<title>** — `<file>:<line>` · check <n.n>
-  <what is exposed> · <the reach: unauthenticated / any caller / another family / admin> · <why it matters> · <the change that closes it> · <owning skill>
+**<title>** — `<file>:<line>` · check <n.n>
+- **Defect:** <what is exposed>
+- **Failure:** <the reach — unauthenticated / any caller / another family / admin — and what it yields>
+- **Fix:** <the change that closes it> · <owning skill>
 
 ### HIGH
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### MEDIUM
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### INFO
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### Layer coverage
 1 Packages · 2 Secrets · 3 Injection · 4 Auth posture · 5 CORS · 6 Data protection
@@ -418,6 +441,23 @@ that ambiguity is the whole distinction.
 ### What's Good
 - <the protections worth repeating>
 ```
+
+**Every finding is a header line and at most three labelled lines, and each of
+those lines is at most two sentences.** A finding has no fourth line. Anything
+longer is an appendix — put it under `## Notes` at the end and reference it by the
+finding's title. A `Failure:` line that cannot be written is not a finding: drop
+it to INFO or cut it.
+
+**Three things never appear in a finding**, because each is process narration
+rather than information:
+
+- **How the review reached it** — no *"the reviewer asked for…"*, no *"verified by
+  running…"*. State the conclusion; evidence the reader must re-check goes in
+  `## Notes`.
+- **A paragraph arguing the severity** — the severity is the heading the finding
+  sits under, and the `Failure:` line is its whole argument.
+- **Anything already in the header table** — the branch, the base and the scope
+  are stated once, at the top, and never again.
 
 Five rules for the findings themselves:
 

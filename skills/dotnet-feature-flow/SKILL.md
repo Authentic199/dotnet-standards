@@ -420,6 +420,14 @@ lists, unfixed MEDIUM and INFO, and *Not run* section are most of what the run
 bought, and a paraphrase is this flow asserting a result it did not produce. This
 flow adds a wrapper above it. Every line appears; write `None.` when empty.
 
+**Report language.** Write this summary in the language the project's `CLAUDE.md`
+sets for talking to the user. If it sets none, write in the language the user is
+using in this session. Identifiers, paths, commands, file names and quoted code
+stay in English. **The field labels below are English because this skill is
+written in English — they are field names, not fixed strings. Translate them.**
+The block report carried through under *Review block* brings its own header table
+and obeys the same rule, so this wrapper does not repeat those rows.
+
 ```markdown
 ## Feature: <what was built>
 

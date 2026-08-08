@@ -8,6 +8,106 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.72] — the report is the deliverable, and it was unreadable, 2026-08-08
+
+**Evidence: 12 real reports** in a consumer repository's `docs/code-review/`,
+produced by this plugin's flow over five weeks. The owner named three defects.
+All three verified, and the third had a cause inside this plugin's own text.
+
+**1 — No header block.** A flow-produced report opens `Mode: … · Base: …` and a
+prose `Scope:` paragraph. No date except in the filename, no branch as a field, no
+link to the spec, plan or test report. The owner's two hand-shaped reports carry
+seven to ten labelled fields.
+
+**2 — Mixed language: 9 of 12 English, 3 Vietnamese.** The consumer's own
+`CLAUDE.md` line 76 already required otherwise — *"Talk to the user in Vietnamese:
+chat replies, questions, summaries, **and any prose document written for the
+user**"*. **This plugin had no language rule for reports anywhere**; the only
+mention of Vietnamese in the whole tree was in `claude-md-builder`, which teaches
+a project to *write* that rule. So the plugin taught the rule and then ignored it,
+because the English skeleton in the skill body is a stronger signal to a model
+than a line in a project file.
+
+**3 — Findings written as essays, and the cause was a shipped rule.**
+`dotnet-review-flow`'s report rule 3 read *"Nothing a subagent learned is dropped.
+The user paid for six fresh-context passes; a summary that keeps only the blockers
+throws away most of what was bought."* It forbids dropping and says nothing about
+length, and the `### CONFIRMED findings` placeholder was one uncapped line — so
+the way to comply was to write more. A real finding ran eight lines including
+*"The reviewer asked for confirmation that…"* and *"This is a widening of a
+decision the owner already took with full information"* — process narration, not
+information.
+
+**What changed, in all six report templates** (`dotnet-review-flow`,
+`dotnet-feature-flow`, `dotnet-code-review`, `dotnet-architecture-review`,
+`dotnet-security-review`, `dotnet-performance-review`):
+
+- **A report-language rule**, identical in all six: the report is written in the
+  language the reviewed project's `CLAUDE.md` sets for talking to the user, or
+  failing that the language the user is using in the session. Identifiers, paths
+  and quoted code stay English. It says explicitly that **the skeleton's labels are
+  field names to be translated, not fixed strings** — that sentence is the fix for
+  the modelling problem, not the rule itself.
+- **A seven-row header table** — Date, Branch, Base, Worktree, Scope, Excluded,
+  Method — every row present, `—` where inapplicable, blank never. Field set and
+  two-column layout chosen by the project owner against their own two exemplars;
+  **Mode and Status were considered and cut by them.** `dotnet-feature-flow` takes
+  the language rule but no table: its wrapper already carries branch and merge
+  state, and the block report it embeds brings its own header.
+- **A capped finding shape** — a header line plus at most three labelled lines
+  (`Defect:` / `Failure:` / `Fix:`), each at most two sentences, no fourth line.
+  Longer material becomes a `## Notes` appendix referenced by id. **A finding with
+  no writable `Failure:` line is not a finding** — drop it to INFO or cut it. The
+  caps are countable on purpose; "be concise" is advice a weak model discards.
+- **Three named bans**, each of them process narration: how the review reached the
+  finding, a paragraph arguing the severity, and anything already in the header
+  table.
+- **Rule 3 rewritten** to close the loophole that produced the essays: *"Nothing a
+  subagent learned is dropped — **and nothing is padded either** … Dropping a
+  finding and inflating one are both failures of this rule, and the second is the
+  one that actually happens."*
+
+**Also: `dotnet-review-flow` 601 → 561**, and it now has `references/` where it had
+none. `NO-SIGNAL` and `When a subagent fails` (~100 lines) moved to
+`references/failure-branches.md`. Both are contingency branches, and 0.3.71's
+criterion is at its strongest here — a contingency is entered on an unmistakable
+event (`RED — environment`, a subagent that returned nothing), which is the
+opposite of the false-certainty case that keeps a reference closed. Three rules
+that change what you do *before* reaching the branch stay in the body.
+
+**Verification found and fixed a real defect, which is the point of running it.**
+The pointer-reachability check — *for every moved rule, which token in the body
+makes an agent open the file at the right moment?* — showed the two TEST-LOOP
+table rows that say **"Enter NO-SIGNAL"** never named the file, and the pointer sat
+50 lines further down. Fixed at all three entry points, including the Decision
+Guide row. A second catch during the move: the `verification-before-completion`
+paragraph closes the *whole shared block* and had been carried into the reference
+with the section above it; returned to the body.
+
+**Honest limits.** The token-survival check that worked for 0.3.71 is weak here —
+the moved block holds 6 backticked tokens because it is prose, not API names, so
+it proves almost nothing. And **no behavioural test was run**: whether a report
+produced under these rules is actually shorter and in the right language is
+unknown until `/dotnet-review` runs against a real branch. That comparison is
+direction H, still queued.
+
+**Cost, stated rather than buried.** Four review skills grew:
+`dotnet-security-review` 508 → 548, `dotnet-performance-review` 504 → 544,
+`dotnet-architecture-review` 465 → 505, `dotnet-code-review` 270 → 310. The report
+rules are duplicated in six places instead of pointed at from one, deliberately —
+a report format behind a pointer is the shape that was already being ignored. The
+project owner made that trade explicitly: the line-count heuristic loses to the
+document they read every day.
+
+**Process note.** The three-way loop was waived by the user for this change, with
+the wording approved directly. The boundary proposed and accepted alongside it,
+recorded because it will recur: **the loop applies where text is authored or a
+rule's meaning changes, not where settled text is relocated verbatim** — running
+two independent authors over shipped doctrine invites exactly the relitigation
+`CLAUDE.md`'s SETTLED section forbids.
+
+---
+
 ## [0.3.71] — split a skill body by trigger, not by topic, 2026-08-08
 
 `ef-core-data-access/SKILL.md` had reached **567 lines** against a sibling norm of

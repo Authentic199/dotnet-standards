@@ -353,8 +353,29 @@ appears every time**; write `None.` when a section is empty, because an absent
 section is ambiguous between *checked, found nothing* and *did not check* — and in
 an audit that ambiguity is the whole distinction.
 
+**Report language.** Write the report in the language the reviewed project's
+`CLAUDE.md` sets for talking to the user. If it sets none, write in the language
+the user is using in this session. Identifiers, paths, commands, file names and
+quoted code stay in English. **The field labels below are English because this
+skill is written in English — they are field names, not fixed strings. Translate
+them.** A report in the wrong language is a defect even when every finding in it
+is correct.
+
+**The header table is not optional and every row appears.** A row that cannot
+apply carries `—`; a blank cell is a defect.
+
 ```markdown
-## Architecture review: <scope>
+# Architecture review: <scope> — <one line on what it covers>
+
+| | |
+|---|---|
+| **Date** | <yyyy-MM-dd> |
+| **Branch** | `<branch>` (<n> commits) |
+| **Base** | `<sha>` on `<base branch>`, or `the empty tree (standing code)` for a path scope |
+| **Worktree** | `<path>`, or `—` |
+| **Scope** | <n> files — <what they are> |
+| **Excluded** | <paths or shapes left out, or `—`> |
+| **Method** | <which audits ran; and that every CRITICAL/HIGH was re-checked at the cited `file:line`> |
 
 ### Summary
 <mode (diff or sweep) · what was audited · PASS / FAIL and the findings that decide it>
@@ -364,17 +385,19 @@ PASS / FAIL — one line per audit: project graph · namespace leaks ·
 presentation boundary · facades and modules · composition root
 
 ### CRITICAL
-- **<title>** — `<file>:<line>` · check <n.n>
-  <what crosses what> · <why it matters> · <the move that fixes it> · <owning skill>
+**<title>** — `<file>:<line>` · check <n.n>
+- **Defect:** <what crosses what>
+- **Failure:** <what the crossing lets happen, or what it stops being possible>
+- **Fix:** <the move> · <owning skill>
 
 ### HIGH
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### MEDIUM
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### INFO
-- **<title>** — `<file>:<line>` · check <n.n> …
+**<title>** — `<file>:<line>` · check <n.n> … (same three lines)
 
 ### Audit coverage
 1 Project graph · 2 Namespace leaks · 3 Presentation boundary · 4 Facades/Modules · 5 Composition root
@@ -383,6 +406,23 @@ presentation boundary · facades and modules · composition root
 ### What's Good
 - <the placement and wiring decisions worth repeating>
 ```
+
+**Every finding is a header line and at most three labelled lines, and each of
+those lines is at most two sentences.** A finding has no fourth line. Anything
+longer is an appendix — put it under `## Notes` at the end and reference it by the
+finding's title. A `Failure:` line that cannot be written is not a finding: drop
+it to INFO or cut it.
+
+**Three things never appear in a finding**, because each is process narration
+rather than information:
+
+- **How the review reached it** — no *"the reviewer asked for…"*, no *"verified by
+  running…"*. State the conclusion; evidence the reader must re-check goes in
+  `## Notes`.
+- **A paragraph arguing the severity** — the severity is the heading the finding
+  sits under, and the `Failure:` line is its whole argument.
+- **Anything already in the header table** — the branch, the base and the scope
+  are stated once, at the top, and never again.
 
 Three rules for the findings themselves:
 
