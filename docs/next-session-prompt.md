@@ -7,8 +7,26 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.72 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.72 — the report is the deliverable, and it was
+Shipped through **v0.3.73 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.73 — the skill said both things, and the agent
+picked the wrong one.** `api-surface` contradicted itself **twelve lines apart**: a
+bullet said a controller spanning modules *"injects each module's service, and two
+or three is normal"*, the paragraph below said the owning service reaches the
+foreign module *"only by `Send`"*. The agent followed the bullet. It was a
+leftover — 0.3.32 shipped the Send-only rule as a user ruling and never deleted
+the sentence above it, so removing it **executes that ruling rather than making
+one**. Corpus checked first: three canonical controllers do inject 2–3 modules'
+services, so the sentence was accurate about the tree and wrong about the rule —
+which is this release's whole subject. Also: *Pre-convention files* →
+***Non-conforming files***, because its scope was keyed to **four cosmetic
+symptoms** and the file that misled the session had none of them while breaking
+three structural rules; the router's *a controller* row now splits body shape from
+**which service the body calls** (`module-feature`), with a **second exception to
+one-row-then-stop for boundary work**; and the flow plus four rubrics now hold *a
+file cited as precedent is in scope though not in the diff*. **This lands
+direction C** — the queue out of the 2026-08-07 report is now **D → H**. All four
+changes are text and **none is verified behaviourally**; the report's three eval
+cases are logged in PENDING, unrun. Rulings CHANGELOG 0.3.73. Before it: **0.3.72 — the report is the deliverable, and it was
 unreadable.** Twelve real reports from a consumer repo, five weeks of output,
 three owner-named defects, all verified. No header block; **9 of 12 in the wrong
 language** while that consumer's own `CLAUDE.md` line 76 already required
@@ -731,6 +749,26 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   `ef-core-data-access`'s shape and 0.3.71's criterion probably does transfer.
   **Not urgent** — the bar is a skill-creator heuristic, not evidence, and
   direction H is the thing that would turn it into evidence.
+
+- [solo, 2026-08-08] **Three eval cases with a fixture spec, ready to build — the
+  concrete instance of direction H.** Shipped with the 0.3.73 field report and
+  **not run**. The fixture is a minimal solution in the plugin's own anonymous
+  vocabulary (`Orders` / `Shipments` / `Invoices`), and its whole point is a
+  **deliberately seeded non-conforming controller that looks modern** — file-scoped
+  namespace, expression-bodied actions, constrained ids, full
+  `ProducesResponseType` — while declaring its own `[Route]`, carrying a two-module
+  name and injecting a foreign module's service; plus the correct envelope
+  **already present in the tree**, so the right answer requires no invention. Cases:
+  (1) add `GET /api/Orders/{id}/Invoices` — passes only with a partial, no second
+  `[Route]`, no `IInvoiceService` in the constructor, reuse of the existing
+  envelope; (2) same prompt plus *"list deviations you found"* — passes only if the
+  seeded controller is named as non-conforming; (3) *"which skills will you
+  load?"* — passes only if `module-feature` is named. **Acceptance rule for the
+  eval suite itself: run it BEFORE the fix and all three must FAIL.** A case that
+  passes pre-fix does not reproduce the defect and is rewritten, never counted as
+  good news. 0.3.73's four text changes are what should flip them; if any stays
+  red, the corresponding change was too weak — strengthen it rather than relax the
+  criterion.
 
 ## Standing rules (unchanged, summarized)
 
