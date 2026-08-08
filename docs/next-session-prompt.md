@@ -7,8 +7,19 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.70 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.70 — a convention with no check is
+Shipped through **v0.3.71 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.71 — split a skill body by trigger, not by
+topic.** `ef-core-data-access/SKILL.md` 567 → **419** via two new references
+(`schema-lifecycle.md`, `entity-configuration.md`). The criterion is the reusable
+part and it comes from 0.3.70's field report, not from a line count: *to
+`references/`, what has a self-announcing trigger; kept in the body, what is
+needed by someone who does not know they need it.* Two framings were measured and
+rejected — it was not the largest skill (`dotnet-review-flow` is 601), and the
+obvious cut (`Soft delete`, 152 lines with a 374-line reference beside it) was
+wrong, because that reference is scaffolding and the body section is operating
+doctrine. No doctrine changed; all 74 backticked tokens from the removed block
+verified still present; two inbound citations repointed. Rulings CHANGELOG
+0.3.71. Before it: **0.3.70 — a convention with no check is
 documentation.** A consumer repository on 0.3.68 shipped three call sites passing
 a hard-coded field array as `ApplySearch`'s second argument instead of
 `request.SearchFields`. No convention was wrong; the rule was already correct in
@@ -690,6 +701,21 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   reference contains a code block the step will structurally reproduce, else it
   produces ritual; (c) watch plan length — a wall of text at GATE 1 is defeated
   by the same attention failure F exists to fix.
+
+- [solo, 2026-08-08] **Four skill bodies still over the <500 bar, and one of them
+  has no `references/` at all.** After 0.3.71 cut `ef-core-data-access` to 419,
+  what remains is `dotnet-review-flow` **601 (zero reference files)**,
+  `dotnet-security-review` 508, `dotnet-feature-flow` 508,
+  `dotnet-performance-review` 504. **`dotnet-review-flow` is the one to look at
+  first and the one to be most careful with**: it is a *process* skill loaded on
+  every `/dotnet-review`, so 0.3.71's criterion — move what has a self-announcing
+  trigger, keep what is needed by someone who does not know they need it — may
+  not transfer. A flow is read start-to-finish once per run, not consulted at a
+  keyboard, so "trigger" may not be the right axis for it at all; work out the
+  axis before cutting. The three review skills are closer to
+  `ef-core-data-access`'s shape and 0.3.71's criterion probably does transfer.
+  **Not urgent** — the bar is a skill-creator heuristic, not evidence, and
+  direction H is the thing that would turn it into evidence.
 
 ## Standing rules (unchanged, summarized)
 
