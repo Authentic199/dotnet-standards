@@ -7,8 +7,20 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.75 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-08. **0.3.75 — direction H ran, and is CLOSED. The queue
+Shipped through **v0.3.76 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.76 — H's second run: the weak model fails when
+the wrong precedent looks reasonable.** Six more skills, 15 runs, five evals ×
+three cells. **Four valid evals; on all four the no-doctrine control FAILS and the
+doctrine PASSES** — the knowledge layer works on every skill tested. **e6
+(`dotnet-testing`) is DISCARDED**: its control passed, so it reproduces no defect,
+and it was the only fixture built **without a wrong precedent in it** — that skill
+is still untested. **The finding across all 22 runs:** Haiku is 1-pass /
+6-fail, and the split is not by skill or rule size but by **what the wrong
+precedent looks like** — every failure is a precedent that reads as correct code,
+and the single pass is `throw new Exception(...)`, the one that is recognisably
+bad on sight. **The risk is not a model tier, it is a repository containing
+plausible non-conforming code**, and every project this plugin installs into has
+some. Consequences logged in PENDING. Rulings CHANGELOG 0.3.76. Before it: **0.3.75 — direction H ran, and is CLOSED. The queue
 from the 2026-08-07 report is now EMPTY.** 11 agent runs, one task, six grep
 assertions — `docs/coverage-matrix/h-eval-results.md`. **Wave 1 was thrown away**:
 its control passed, so it did not reproduce the defect. Wave 2 does. Results:
@@ -812,6 +824,21 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   rather than written beside them? Direction D's matrix is the input to that
   question. **Do not re-run H expecting a rate** — one or two runs per cell shows
   a threshold, not a frequency, and the Haiku cells are already five-for-five.
+
+- [solo, 2026-08-08] **The three things H's second run says to do next, in order
+  of evidence behind them.** (a) **Name the costume.** In every passing
+  doctrine cell the agent passed by *saying out loud* that the neighbour was
+  non-conforming. A skill's most valuable sentence may be the one describing what
+  a plausible-looking violation looks like — not the rule, the **disguise**. That
+  is now cheap to test: the fixtures and graders take under an hour to rebuild and
+  the recipe is in `h-eval-results.md`. (b) **`dotnet-testing` is still untested** —
+  e6's control passed because its fixture carried no wrong precedent; rebuild it
+  with one (a second `WebApplicationFactory` already present, or a fixture cloned
+  per test class) and re-run. (c) **Do not spend more runs on the
+  doctrine-version axis** — two runs of it produced no separation at any tier;
+  the model axis and the precedent-shape axis are where the signal is. **And the
+  standing caution:** one run per cell is a threshold, not a rate, and nothing in
+  H reproduces the field failure's real cause — attention across a long session.
 
 ## Standing rules (unchanged, summarized)
 
