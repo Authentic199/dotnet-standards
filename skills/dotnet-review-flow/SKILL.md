@@ -196,6 +196,15 @@ splits the fleet, not the suite** — TEST-LOOP is not chunked, so only REVIEW-L
 cap is counted per chunk. Findings merge into **one** report for the whole scope,
 and any chunk declined or halted by a cap is named under *Not run*.
 
+**A file the change cites as precedent is in scope, even when it is not in the
+diff.** When a shape is justified by *"this matches the existing X"*, X is
+checked against the skills before the justification is accepted — a reviewer who
+reads only the diff cannot see the file the diff is imitating, and imitation is
+how one non-conforming file becomes three. **Where existing code contradicts a
+loaded skill, the contradiction is the finding**; the code does not become the
+rule. If you cannot tell whether the deviation was deliberate, report it and say
+so — never resolve it by imitation.
+
 **Recompute the diff after every fix round**, before re-spawning. A reviewer
 handed a stale diff reports findings that no longer exist and misses the ones the
 fix introduced.

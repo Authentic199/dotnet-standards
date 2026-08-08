@@ -9,6 +9,15 @@ justified only when hunting consumers of a symbol the diff altered. A finding
 that is pre-existing and outside the change is INFO, per `SKILL.md`. Do not
 re-derive this at each check.
 
+**A file the change cites as precedent is in scope, even when it is not in the
+diff.** When a shape is justified by *"this matches the existing X"*, X is
+checked against the skills before the justification is accepted — a reviewer who
+reads only the diff cannot see the file the diff is imitating, and imitation is
+how one non-conforming file becomes three. **Where existing code contradicts a
+loaded skill, the contradiction is the finding**; the code does not become the
+rule. If you cannot tell whether the deviation was deliberate, report it and say
+so — never resolve it by imitation.
+
 **Tool, stated once.** Every check is a manual instruction: a `grep` to run or a
 file to open. No analysis server is assumed. Patterns are written for
 `grep -rn --include=*.cs`; paths are written as `src/Modules/<Module>/`,

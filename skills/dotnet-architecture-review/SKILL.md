@@ -70,6 +70,15 @@ conformance is unknown. Whether the code *inside* a correctly placed file is
 right is the breadth pass, `dotnet-code-review`, which routes here when layering
 is what the change is mostly about.
 
+**A file the change cites as precedent is in scope, even when it is not in the
+diff.** When a shape is justified by *"this matches the existing X"*, X is
+checked against the skills before the justification is accepted — a reviewer who
+reads only the diff cannot see the file the diff is imitating, and imitation is
+how one non-conforming file becomes three. **Where existing code contradicts a
+loaded skill, the contradiction is the finding**; the code does not become the
+rule. If you cannot tell whether the deviation was deliberate, report it and say
+so — never resolve it by imitation.
+
 ## Core Principles
 
 1. **The compiler enforces the chain; nothing enforces the two axes.** `Core`,
