@@ -819,6 +819,48 @@ cost: the database computes the function for every candidate row instead of matc
 the stored value, so an index on that column no longer answers the predicate. Say so,
 and hand the query half to `dotnet-performance-review`.
 
+**5.24 A `CancellationToken` defaulted on an action** — *MEDIUM* · `api-surface`
+`Find:` `grep -rn --include=*.cs "cancellationToken = default" src/Web/Controllers/`
+MVC always supplies the token from `HttpContext.RequestAborted`, so the default is
+unreachable on an action and the `= default` says the opposite of what is true: it
+reads as *this endpoint may run without cancellation*. The fix is deleting two
+words. It is MEDIUM rather than INFO because the same two words on a **service**
+method are how a token stops being passed down a chain, and a reviewer who accepts
+them at the endpoint accepts them everywhere.
+
+**5.25 An action parameter with no binding source** — *MEDIUM* · `api-surface`
+`Find:` read the signature of every action the diff adds or changes. Each parameter
+carries `[FromRoute]`, `[FromQuery]`, `[FromBody]` or `[FromForm]`; the only
+exception is `CancellationToken`.
+There is no grep for this one — the defect is an *absent* attribute, so the check is
+a read, and the diff bounds it to a handful of signatures. An unstated source is
+resolved by MVC's own inference rules, which means the endpoint's contract is
+decided by a convention the file does not show and a reader has to know. It also
+moves when a parameter's type changes.
+
+**5.26 An action returning `IActionResult` or a bare type** — *MEDIUM* ·
+`api-surface`
+`Find:` `grep -rn --include=*.cs "IActionResult" src/Web/Controllers/`, then read
+any action whose return type is not `Task<ActionResult<SuccessResultWrapper<T>>>`.
+The wrapper is the response contract, and `api-surface` states the rule with no
+exception — *never `IActionResult`, never a bare DTO*. The hit worth a conversation
+rather than a fix is an endpoint returning something the envelope was not built to
+carry, a redirect or a raw file stream. **Report that one too**, with what it
+returns and why: an undocumented exception living in the tree is how the rule
+erodes, and whether the rule grows an exception is the owning skill's call, not
+this rubric's.
+
+**5.27 A regular expression built at a call site** — *MEDIUM* · `common-extensions`
+`Find:` `grep -rnE --include=*.cs "new Regex\(|[^A-Za-z0-9_]Regex\.(IsMatch|Match|Matches|Replace)\(" src/` and discard hits inside the regex extension itself.
+Every pattern in the solution lives in one place, as a `static partial` member with
+`[GeneratedRegex]`, so the pattern is compiled at build time and a malformed one is
+a compile error instead of a runtime throw on a request. A pattern string at the
+call site is the finding; a named pattern constant that lives outside that home is
+the same finding, one step milder.
+**Not a finding:** a call through a generated member — `SomeNameRegex.IsMatch(...)`.
+That is the correct usage, and it is why the pattern above anchors on a
+non-identifier character before `Regex.` rather than matching the bare word.
+
 ## 6. Tests
 
 Which tier a scenario belongs to is `dotnet-testing`'s Decision Guide. This pass
@@ -884,6 +926,17 @@ FluentAssertions v8 and later require a paid commercial licence, so introducing 
 is a purchasing decision rather than a package bump; Shouldly is the house
 assertion library and NSubstitute the house double library. Moq is not used. A new
 test package of any kind is a decision, not a detail — name it in the review.
+
+**6.9 More than one `WebApplicationFactory` in a test assembly** — *HIGH* ·
+`dotnet-testing`, `references/test-isolation.md`
+`Find:` `grep -rn --include=*.cs ": WebApplicationFactory<" tests/` and count per
+test project. **Two or more in one assembly is the finding**, and a second one is
+not "another fixture" — it is a second host, a second container set and a second
+database, started in parallel with the first. That is where a tier's timing and its
+failure count start moving between runs, which `dotnet-testing` Principle 7 grades
+as worse than a red tier: the totals stop being evidence. Where two groups genuinely
+need different host configuration, the fix parameterises the one factory rather than
+cloning the class.
 
 ## 7. Simplicity and over-build
 

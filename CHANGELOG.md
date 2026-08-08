@@ -8,6 +8,77 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.74] — direction D: 195 checks, 196 candidate gaps, 6 shipped, 2026-08-08
+
+**Direction D run for the first time** — the convention/check coverage matrix
+queued out of the 2026-08-07 field report. Static, no agent runs. Artifact and
+re-runnable scripts: `docs/coverage-matrix/`.
+
+**The inventory was more than double the estimate.** **195 numbered checks**, not
+the ~90 assumed when D was queued: `dotnet-code-review` 73, `dotnet-security-review`
+46, `dotnet-performance-review` 51, `dotnet-architecture-review` 25. Across them,
+**354 distinct tokens** appear inside `Find:` instructions.
+
+**Method.** Join on **tokens, not prose**: a rule in a knowledge skill is a
+candidate gap when nothing any rubric tells a reviewer to grep for overlaps the
+tokens that rule names. 18 knowledge skills, code blocks dropped, paragraphs kept
+only when they carry a normative marker *and* a code-shaped backticked token.
+**196 candidates**, **111** in the house's bold-imperative rule form, all read
+once, **6** shipped.
+
+**Shipped, every grep smoke-tested against two real projects first:**
+
+- **`dotnet-architecture-review` 3.6** — *a `[Route]` on any controller but the
+  base.* The rule 0.3.73's field report identified as decisive and **no check
+  enforced**. Canonical project: **0 hits**. Consumer project: **2** — both real,
+  and one of them appears in no report anyone has written. It is 3.5's sibling
+  seen from the other side: a separate controller for a nested route family cannot
+  exist without declaring its own route, so either check alone catches the shape.
+- **`dotnet-code-review` 5.24** — a `CancellationToken` defaulted on an action.
+  Canonical: 3 real actions.
+- **5.25** — an action parameter with no binding source. No grep exists for an
+  *absent* attribute, so it is written as a read, bounded by the diff.
+- **5.26** — an action returning `IActionResult` or a bare type.
+- **5.27** — a regular expression built at a call site.
+- **6.9** — more than one `WebApplicationFactory` in a test assembly, which is a
+  second host and a second container set, and therefore the shape behind
+  `dotnet-testing` Principle 7's varying tier.
+
+**Smoke-testing changed two of the six, and neither was visible from the text:**
+
+1. **5.26's only canonical hit is legitimate** — a redirect endpoint. `api-surface`
+   says *never `IActionResult`* with **no exception**, and the corpus grounds no
+   alternative shape for a redirect or a raw file stream. The check therefore
+   **reports** that case instead of demanding a fix, and states that whether the
+   rule grows an exception belongs to the owning skill. **Open question for the
+   owner, raised rather than settled.**
+2. **5.27's first pattern was wrong.** `Regex\.IsMatch\(` also matches
+   `SomeNameRegex.IsMatch(...)` — the *correct* call through a generated member —
+   and produced three false positives. The shipped pattern anchors on a
+   non-identifier character, and the check names that shape as an explicit
+   non-finding.
+
+**One candidate was rejected for noise rather than for being wrong**: *an entity
+handed to the search wrapper* (`elasticsearch-search`). Every pattern tried also
+matched legitimate EF repository calls inside search services — 9 hits canonical,
+4 consumer, essentially all false. A real rule with no honest grep yet; **kept as
+debt rather than shipped noisy**, per 0.3.58.
+
+**Two candidates turned out already covered** — an enum outside `Enums/`
+(architecture 4.5) and a two-module controller name (architecture 3.5). The 3.5
+case is instructive: it **did** fire on the new controller in the incident and
+missed the pre-existing one only because that file was not in the diff — which is
+what 0.3.73's precedent-in-scope rule addresses. **A check can exist and still not
+reach the defect**, which is the limit of what D can measure.
+
+**What D cannot claim.** The join is token-based, so a rule whose tokens appear in
+an unrelated grep scores covered when it is not, and a rule phrased without
+backticks is invisible. Triage was one reading, not exhaustive. And **that a check
+exists is not evidence a reviewer runs it** — direction H remains the only
+instrument for that.
+
+---
+
 ## [0.3.73] — the skill said both things, and the agent picked the wrong one, 2026-08-08
 
 **Field report from a consumer repository**, three incidents in one session,
