@@ -61,6 +61,15 @@ codebase needs a sweep. `dotnet-code-review` section 2, *Security posture*, is t
 breadth pass and routes here. **That section is not restated:** checks 2.1–2.7 and 1.7
 keep their home and their numbers, and every seam below cites them.
 
+**A file the change cites as precedent is in scope, even when it is not in the
+diff.** When a shape is justified by *"this matches the existing X"*, X is
+checked against the skills before the justification is accepted — a reviewer who
+reads only the diff cannot see the file the diff is imitating, and imitation is
+how one non-conforming file becomes three. **Where existing code contradicts a
+loaded skill, the contradiction is the finding**; the code does not become the
+rule. If you cannot tell whether the deviation was deliberate, report it and say
+so — never resolve it by imitation.
+
 ## Core Principles
 
 1. **Every report opens with the honesty rule, verbatim, in these words:** *This is

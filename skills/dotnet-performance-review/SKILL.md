@@ -78,6 +78,15 @@ graded**, and the only place they do. `dotnet-security-review` also routes rate-
 DoS questions here; what this rubric can and cannot say about them is settled in *Refused —
 and why*, not silently dropped.
 
+**A file the change cites as precedent is in scope, even when it is not in the
+diff.** When a shape is justified by *"this matches the existing X"*, X is
+checked against the skills before the justification is accepted — a reviewer who
+reads only the diff cannot see the file the diff is imitating, and imitation is
+how one non-conforming file becomes three. **Where existing code contradicts a
+loaded skill, the contradiction is the finding**; the code does not become the
+rule. If you cannot tell whether the deviation was deliberate, report it and say
+so — never resolve it by imitation.
+
 Checks are numbered **per area and never reused**; `references/performance-checks.md` continues
 each area's numbering where this body stops, so `1.9` means one thing in this skill and
 nowhere else. Patterns assume `grep -rn --include=*.cs` unless stated.

@@ -195,20 +195,41 @@ Permission constants are composed by concatenation: resource + optional
 sub-resource + action. **How the policy is parsed and enforced belongs to
 `auth-and-security`**; this skill fixes only the call shape at the endpoint.
 
-### Pre-convention files
+### Non-conforming files
 
-Older controllers predate these rules and typically break four at once:
-block-scoped `namespace { }`, block-bodied endpoints, bare `{id}`, and no
-`<summary>` or `ProducesResponseType` — sometimes with a misspelled action name.
+Older controllers often break four rules at once: block-scoped `namespace { }`,
+block-bodied endpoints, bare `{id}`, and no `<summary>` or
+`ProducesResponseType` — sometimes with a misspelled action name.
 **Do not take the neighbouring endpoint as the template.** Match this file, not
 the file you are editing. Fix surrounding endpoints only when you are already
 changing them; a name or attribute fix is safe, but changing a *route* is a
 breaking change (see *Versioning*).
 
+**Non-conformance is not signalled by how a file looks.** Those four are the
+*common* symptoms, not the definition, and reading them as a checklist is how
+this section gets skipped. A file with file-scoped namespaces, expression-bodied
+actions, `{id:guid}` constraints and complete `ProducesResponseType` attributes
+can still break a **structural** rule — its own `[Route]`, a two-module name, a
+foreign module's service in its constructor. Those are the expensive ones, and
+they are invisible to a glance at style. Check the file against **this skill**,
+never against your impression of how modern it looks.
+
+**A file you cite as precedent enters scope, whether or not you are editing it.**
+*"The existing X already does it this way"* is a claim about the tree, never
+evidence about the rule; where the two disagree, the tree is the finding. Cite a
+file and you have taken responsibility for checking it.
+
+**A non-conforming file you decline to change is written down, not passed over.**
+Say which rule it breaks and why the fix is out of scope. Silence is
+indistinguishable from conformance, and the next author reads the file as the
+template — which is how one non-conforming file becomes three.
+
 **Read `references/endpoint-anatomy.md` when** writing or reviewing an endpoint,
 choosing a route for something that is not plain CRUD, or picking a
-`[HasPermission]` shape — it carries the full worked controller and the
-annotated pre-convention file.
+`[HasPermission]` shape — it carries the full worked controller and one
+annotated non-conforming file, which happens to be an old one. Read that
+anti-example for what it teaches, not as the profile of a non-conforming file:
+the structural breaches above wear no such costume.
 
 ## Controller partials
 
@@ -224,10 +245,16 @@ Terminals/
 
 - **`: BaseController` appears on the suffix-less core file and nowhere else.**
 - **The constructor injects service interfaces and nothing else** — no
-  repository, no `DbContext`, no mapper, no unit of work. "Nothing else" bars
-  non-service dependencies; it does not mean exactly one service. A controller
-  whose route family spans modules injects each module's service, and two or
-  three is normal.
+  repository, no `DbContext`, no mapper, no unit of work.
+- **The services it injects belong to the controller's own module.** More than
+  one is fine when a module publishes several — but every one of them is that
+  module's. **A route family reaching another module's concept does not add that
+  module's service here**: the owning module's service reaches it by `Send`ing
+  the foreign envelope, per the ownership rule below. Envelopes are
+  `internal sealed` precisely so a controller *cannot* take the shortcut — so
+  finding yourself injecting a second module's service to make an action compile
+  is the rule firing, not an obstacle to route around. Two modules in one
+  constructor is a defect to report, never a norm to copy.
 - **Fields and the single constructor live in the core file.** A role part that
   needs another service does not declare a second constructor — the core file's
   constructor takes it.
@@ -252,6 +279,13 @@ Four anti-patterns, all of which compile:
 | Base list on a role part instead of the core file | The core file stops being the one declaration point; reviewers cannot tell which file is core |
 | Base list repeated on every part | Legal C# — the compiler merges them silently — but now every part claims to be the core file |
 | `OrderShipmentsController` (two-module name) | Neither module owns it. The route family is `OrdersController.Shipments.cs`; its operations are `OrderService.Shipments.cs`, reaching the foreign module only by `Send` |
+
+**A separate controller for a nested route family cannot exist without its own
+`[Route]`, and *Routes* forbids that outright** — the URL prefix is declared in
+`BaseController` and nowhere else. So this is not a judgement call between two
+legal shapes: only one shape is legal. An existing separate controller for a
+nested family is a defect, and citing it as *"the pattern we already use"* is
+citing a rule violation as a rule.
 
 ## Request DTOs
 

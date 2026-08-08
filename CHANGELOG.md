@@ -8,6 +8,109 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.73] — the skill said both things, and the agent picked the wrong one, 2026-08-08
+
+**Field report from a consumer repository**, three incidents in one session,
+**after the skill was loaded**, and the third one message after the agent had
+itself written that the behaviour was a violation. Every claim in the report was
+re-checked against the files before anything changed here; all six held.
+
+**The headline is a textual contradiction, twelve lines apart.** `api-surface`,
+*Controller partials*, said this in a bullet list:
+
+> *"…it does not mean exactly one service. A controller whose route family spans
+> modules injects each module's service, and two or three is normal."*
+
+and this in the paragraph below it:
+
+> *"…whose only reach into the foreign module is a `Send` of that module's
+> envelope"*
+
+Same situation, two mutually exclusive shapes. The agent followed the bullet —
+imperative, in a list, in the section it was already reading — and injected a
+second module's service into a controller. `module-feature` settles it and
+explains why the loser is not merely unstylish: **envelopes are `internal
+sealed`, so a controller physically cannot `Send` one**, which is what makes the
+direct-call rule enforceable rather than advisory. The bullet taught the exact
+shortcut that design exists to block.
+
+**The bullet was a leftover.** 0.3.32 shipped the two-module-name rule as a user
+ruling — *"whose only reach into the foreign module is a `Send`"* — and added the
+ownership paragraph without deleting the sentence twelve lines above it. Removing
+it now executes that ruling rather than making a new one. **Corpus note, checked
+before acting:** three controllers in the canonical project do inject two or
+three modules' services, so the deleted sentence described the tree accurately —
+it was accurate about the corpus and wrong about the rule, which is precisely the
+confusion this release is about. Those sites became defects the day 0.3.32
+shipped; no new anti-example is labelled here.
+
+**Second finding, and the more general one: the anti-imitation guard was keyed to
+cosmetics.** `api-surface`'s *Pre-convention files* opened by defining its scope
+as files that *"typically break four at once: block-scoped `namespace { }`,
+block-bodied endpoints, bare `{id}`, and no `<summary>` or
+`ProducesResponseType`"*. The file that misled the session had **none of the
+four** — file-scoped namespace, expression-bodied actions, constrained id
+parameters, complete attributes and XML summaries — while breaking three
+structural rules: its own `[Route]`, a two-module name, and a foreign module's
+service in its constructor. It read as modern, so the one section that says *do
+not copy your neighbour* never fired. **A file can be spelled correctly and
+structured illegally, and the structural breaches are the expensive ones.**
+
+**Third: the router sent the deciding question to the wrong skill.** The
+*a controller* row assigned **"action body"** to `api-surface` — but the body of a
+cross-module action is `module-feature`'s *Call the service, or send a message?*
+decision. Asked which skills to load, the session named `api-surface` and
+`facade-module-architecture` and not `module-feature`, the skill holding the rule
+it was about to break. The *one row, then stop* law actively enforced that: one
+row fitted, and its only exception was for planning rather than writing.
+
+**What changed:**
+
+- **`api-surface`** — the contradicting bullet replaced: the constructor injects
+  the services of the controller's **own** module, several are fine when a module
+  publishes several, and a second module's service in a constructor is a defect to
+  report rather than a norm to copy, with the `internal sealed` mechanism named so
+  the rule reads as enforcement and not preference.
+- **`api-surface`, *Pre-convention files* → *Non-conforming files*** — the four
+  symptoms are now stated as *common*, not definitional, followed by: **structural
+  breaches wear no costume**; **a file cited as precedent enters scope whether or
+  not you are editing it** (*"X already does it this way"* is a claim about the
+  tree, never evidence about the rule); and **a non-conforming file you decline to
+  fix gets written down**, because silence is indistinguishable from conformance.
+  A new line under the anti-pattern table closes the specific trap: a separate
+  controller for a nested route family **cannot exist without its own `[Route]`**,
+  which *Routes* forbids outright — so it is not a choice between two legal shapes,
+  and citing one as *"the pattern we already use"* is citing a violation as a rule.
+- **`choosing-a-dotnet-skill`** — the *a controller* row now splits body *shape*
+  (`api-surface`) from **which service the body calls** (`module-feature`); a new
+  row covers `api/<Parents>/{id}/<Children>` and names both skills as mandatory;
+  and *one row, then stop* gains a **second exception: boundary work always loads
+  `module-feature`**, with the trap named — *do not settle "this task does not
+  touch a service" before loading the skill that defines what touching one means.*
+- **`dotnet-review-flow` spawn contract and the four rubrics** — **a file the
+  change cites as precedent is in scope even when it is not in the diff**, and
+  **where existing code contradicts a loaded skill, the contradiction is the
+  finding**. In the incident, one lens graded the shape HIGH and the breadth lens
+  graded it INFO on the reasoning that *"the existing controller already does it,
+  so this is one decision for both"* — a reviewer reading only the diff cannot see
+  the file the diff is imitating.
+
+**This lands direction C** from the 2026-08-07 field report, which the user had
+queued third and which arrived with its own evidence: *a precedent in the
+repository is not a row in these tables — it answers a question about the tree's
+history, not about which skill owns the decision, and a wrong neighbour is copied
+exactly as readily as a right one.* It sits in `choosing-a-dotnet-skill`, loaded
+first, as that report proposed.
+
+**Honest limits.** All four changes are text; **none is verified behaviourally.**
+The report ships three eval cases with a fixture spec — a scratch solution seeded
+with a *modern-looking* non-conforming controller — designed to fail before the
+change and pass after. They have not been run. Until they are, this release rests
+on the same evidence the last three did: the contradiction is provably in the
+files, and the fix provably removes it.
+
+---
+
 ## [0.3.72] — the report is the deliverable, and it was unreadable, 2026-08-08
 
 **Evidence: 12 real reports** in a consumer repository's `docs/code-review/`,

@@ -26,6 +26,22 @@ If exactly one base-map row fits, load it and stop — *unless* the work is bein
 planned rather than written, which is the case above. If none fits, see *When
 nothing here fits*.
 
+**Second exception: work that crosses a module boundary always loads
+`module-feature` as well.** A route, a file or a call that reaches a concept
+another module owns is boundary work, whatever else it is. The boundary rule —
+call the service directly, reach a foreign capability by message — lives in
+`module-feature` and nowhere else, so "one row, then stop" would stop exactly
+short of it. **Do not settle "this task does not touch a service" before loading
+it:** that judgement is the thing the skill defines, and making it first is how
+the boundary gets crossed with nothing looking.
+
+**A precedent in the repository is not a row in these tables.** *"The file next
+to this one already does it that way"* answers a question about the tree's
+history, not about which skill owns the decision — and a wrong neighbour is
+copied exactly as readily as a right one. Route from the situation, load the
+skill, and check the neighbour against it. Where the neighbour and the skill
+disagree, the neighbour is the defect.
+
 Each row names a **single entry point, never a sequence**. A task spanning
 several areas routes to the skill owning its *first* decision; that skill's own
 `Not for:` list carries the work onward. A whole new feature, for instance,
@@ -151,7 +167,8 @@ alone picks wrong. Match the question, not the word.
 | The shared token | The split |
 |---|---|
 | 401 / 403 | thrown as `UnAuthorizedException` / `ForbiddenException` — `error-handling`; putting `[HasPermission]` on an action — `api-surface`; schemes, policies, what that attribute enforces — `auth-and-security` |
-| a controller | which folder its file goes in — `facade-module-architecture`; the route, action body and attributes — `api-surface`; `try`/`catch` and building an error inside one — `error-handling` |
+| a controller | which folder its file goes in — `facade-module-architecture`; the route, the attributes and the *shape* of the action body — `api-surface`; **which service that body calls, and how it reaches a module that is not this one — `module-feature`, *Call the service, or send a message?***; `try`/`catch` and building an error inside one — `error-handling` |
+| a route under another module's id (`api/<Parents>/{id}/<Children>`) | the route template, the partial and the file name — `api-surface`; **which service the action calls and how the owning module reaches the foreign one — `module-feature`**. Both, always: the first decides the URL, the second decides whether the code is legal |
 | an exception | which to throw and how it becomes a response — `error-handling`; the text it carries — `message-keys`; one raised because a resource was already being processed — `distributed-lock`; where the class itself lives — `facade-module-architecture` |
 | mapping / `ProjectTo` | projecting inside a query — `ef-core-data-access`; where the profile file sits beside its DTO — `api-surface`; how to write the mapping itself — `automapper-mapping` |
 | "message" | text a user will read — `message-keys`; an in-process command, query or event envelope — `module-feature`; dispatching that envelope and the handler that receives it — `mediatr-messaging` |
