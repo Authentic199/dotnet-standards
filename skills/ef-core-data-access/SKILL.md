@@ -156,127 +156,29 @@ Read `references/query-conventions.md` before building a list or search
 endpoint, or when touching `QueryContainer`, the `$`-prefixed filter
 operators, `ApplyFilter`/`ApplySearch`/`ApplySort` or `ToPagedListAsync`.
 
-## DbContext
+## Context, provider, migrations, seeding
 
-`ApplicationDbContext` stays thin on purpose: options in the constructor, and
-nothing in the model but two overrides.
+`ApplicationDbContext` stays thin: options in the constructor, two overrides,
+and **no `DbSet` properties** — entities reach the model through
+`ApplyConfigurationsFromAssembly`, so adding an entity means adding its
+configuration and this file never changes. `ConfigureConventions` routes every
+`DateTimeOffset` through a UTC converter in both directions, and no entity can
+opt out. The provider is a configuration value rather than a compile-time
+choice, and each arm points at its own `Migrators.<Provider>` assembly.
 
-```csharp
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-    modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-    modelBuilder.HasPostgresExtension("citext");
-}
-```
+Two rules from this area bite hardest when nobody thought to look them up, so
+they are here rather than in the reference. **A committed migration is never
+deleted, renamed or rewritten** — deleting it does not undo it, and the repair is
+always a *new*, forward migration that tolerates both populations
+(`dotnet-code-review` 1.11 is the check). And **the EF CLI builds the solution
+first, so both commands need an explicit, generous timeout**: a run killed
+halfway leaves a partial migration pair that the next `add` builds on top of.
 
-There are no `DbSet` properties. Entities reach the model through
-`ApplyConfigurationsFromAssembly`, which picks up every
-`IEntityTypeConfiguration<T>` in the assembly — so adding an entity means
-adding its configuration, and this file never changes. The second override,
-`ConfigureConventions`, routes `Properties<DateTimeOffset>()` through a
-`ValueConverter<DateTimeOffset, DateTimeOffset>` calling `ToUniversalTime()`
-in both directions: every timestamp is stored and read as UTC, and no entity
-can opt out.
-
-## Settings and provider
-
-Configuration binds once and fails at startup rather than at first query:
-
-```csharp
-services.AddOptions<DatabaseSettings>()
-    .BindConfiguration(nameof(DatabaseSettings))
-    .Configure(x => x.SqlSettings.ConnectionStrings.OverrideConnection())
-    .ValidateDataAnnotationsRecursively()
-    .ValidateOnStart();
-```
-
-`SqlSettings` carries `DbProvider`, `ConnectionStrings.DefaultConnection` and
-the `UseAutoMigration` flag, and implements `IValidatableObject` so a missing
-key is reported by its full configuration path instead of as a null reference
-later. `OverrideConnection()` appends `ApplicationName=<machine name>;` when
-the connection string lacks one, so a database session is traceable to the
-host that opened it. The same `DatabaseSettings` root also carries the cache
-and search sections, which belong to distributed-caching and
-elasticsearch-search.
-
-The provider is a configuration value, not a compile-time choice: the pooled
-context is registered from those options, and `UseDatabase` switches on
-`DbProviderKeys`, points each arm at its own migrations assembly with
-`options.MigrationsAssembly($"Migrators.{dbProvider}")`, and throws on an
-unrecognised value.
-
-## Migrations workflow
-
-Create migrations locally with the EF CLI — `-p` is the migrator project for
-the provider you run, `-s` the host project, `-c` the context:
-
-```bash
-dotnet ef migrations add <Name> -p src/Migrators/Migrators.PostgreSql -s src/Web -c ApplicationDbContext
-dotnet ef database update -p src/Migrators/Migrators.PostgreSql -s src/Web -c ApplicationDbContext
-```
-
-**Both commands build the solution first, so give them an explicit, generous
-timeout** — on a cold tree the build alone outruns a default one, and the
-command is then killed halfway through writing a migration. Wait for it rather
-than moving on: a run abandoned mid-command leaves a partial migration pair
-that the next `add` builds on top of.
-
-**A migration that has been committed is never deleted, renamed or rewritten.**
-`dotnet ef migrations remove` is for a migration that exists only in your working
-tree; once the file is in a shared history it has almost certainly been applied
-somewhere, and `__EFMigrationsHistory` in that database still names it. Deleting
-it does not undo it — it produces two populations that no longer share a schema:
-databases that ran it keep the object, databases created afterwards never get it,
-and nothing reports the divergence. Observed in the field: a migration adding a
-unique index was committed in one change and deleted in a later "align module
-boundaries" refactor, and the one-session-per-device constraint it enforced left
-the model and the new databases without a single error.
-
-**The repair is forward, and restoring the deleted file is not it** — a database
-whose history table already carries that id will skip it, so the object it
-created is still missing there. Redeclare the intent in the entity configuration,
-generate a **new** migration, and make that migration tolerate both populations:
-guard the create so it is a no-op where the object already exists. Then check
-what else the deletion took with it — a migration removed to "clean up" is
-usually removed along with the model change it belonged to.
-
-Deployed environments never run the CLI. With `SqlSettings.UseAutoMigration`
-set, startup asks `GetPendingMigrationsAsync` and applies anything outstanding
-with `MigrateAsync`; with the flag off it applies nothing and logs a warning.
-Both branches log, so the startup log — not the database — answers "did this
-deployment migrate?".
-
-## Initialization and seeding
-
-After migrations settle, startup resolves the initializer, which guards on
-`Database.CanConnectAsync(cancellationToken)` and runs the seeders only if the
-database answers. Seed data ships as `IDataSeedContributor` implementations,
-placed in the module that owns the data:
-
-```csharp
-public class OrderStatusSeeder : IDataSeedContributor
-{
-    public async Task SeedAsync(CancellationToken cancellationToken)
-    {
-        if (await repositoryWrapper.Repository<OrderStatus>().AnyAsync(cancellationToken: cancellationToken))
-        {
-            return;
-        }
-
-        await repositoryWrapper.Repository<OrderStatus>().AddRangeAsync(statuses, cancellationToken);
-    }
-}
-```
-
-A Scrutor scan registers every contributor as transient and the runner awaits
-each in turn with the boot token, so ordering between contributors is not
-something to rely on. Seeders run on **every** start, which is why each one
-decides what is already there — bail out when the table is populated, as
-above, or reconcile row by row when the seed set grows.
-
-`IDataSeedContributor` is the only public type here, by design: modules
-contribute seed data, and the initializer and runner stay `internal` because
-nothing outside persistence should drive initialization.
+Read `references/schema-lifecycle.md` **before typing `dotnet ef migrations add`,
+`dotnet ef database update`, `AddOptions<DatabaseSettings>`, `UseAutoMigration`
+or `IDataSeedContributor`** — it carries the two context overrides, the settings
+and provider wiring, the whole migration workflow including the forward-repair
+procedure, and why every seeder must decide what is already there.
 
 ## Entities and configurations
 
@@ -285,13 +187,11 @@ The configuration sits beside the class it configures, so a reviewer reads the
 shape and its mapping without opening a second file, and
 `ApplyConfigurationsFromAssembly` finds it with no registration step.
 
-**An enum the entity uses is not in that file.** Every enum a capability owns
-lives in `Enums/`, one per file — placement is `facade-module-architecture`'s
-rule, and it is stated there as *never declared inside an entity, response or
-service file*. The example below shows `FulfilmentStatus` only so the mapping
-line reads; it belongs in `Enums/FulfilmentStatus.cs`.
-Every public property carries an XML `<summary>` — the documentation law lives
-in `api-surface` and covers entities alongside the DTOs they feed.
+**An enum the entity uses is not in that file** — every enum a capability owns
+lives in `Enums/`, one per file, never inside an entity, response or service
+file; that placement is `facade-module-architecture`'s rule. Every public
+property carries an XML `<summary>`, and that documentation law is
+`api-surface`'s, covering entities alongside the DTOs they feed.
 
 ```csharp
 public class Order : BaseEntity
@@ -304,6 +204,7 @@ public class Order : BaseEntity
 
     public ICollection<OrderLine> Lines { get; set; } = default!;
 
+    // FulfilmentStatus lives in Enums/FulfilmentStatus.cs, not here
     public FulfilmentStatus Status { get; set; } = FulfilmentStatus.Pending;
 
     public Order SetCustomer(Guid customerId)
@@ -311,19 +212,6 @@ public class Order : BaseEntity
         CustomerId = customerId;
         return this;
     }
-}
-
-// Enums/FulfilmentStatus.cs — a separate file, shown here only for readability
-public enum FulfilmentStatus
-{
-    /// <summary>
-    /// Accepted, not yet shipped.
-    /// </summary>
-    Pending = 1,
-    /// <summary>
-    /// Shipped to the customer.
-    /// </summary>
-    Shipped = 2,
 }
 
 public class OrderConfiguration : IEntityTypeConfiguration<Order>
@@ -344,73 +232,37 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 }
 ```
 
-**`BaseEntity`** closes `BaseEntity<TId>` over `Guid` and assigns `Id` in its
-constructor from a sequential GUID generator, so the id exists the moment you
-`new` the entity — children can be wired up, and the id returned, before
-anything is saved. The generic base contributes `CreatedAt`, defaulted to
-`DateTimeOffset.UtcNow`. Reach for `BaseEntity<TId>` only if a key genuinely
-cannot be a GUID — **and that rule binds every type deriving from the base, not
-entities alone.** Response families root at `BaseEntity` too (`api-surface`,
-`references/request-response-dtos.md`), so a response written `: BaseEntity<Guid>`
-where the closed `BaseEntity` exists is the same defect in a different layer —
-the generic form is never a choice when the key is a `Guid`. A reviewer of
-either layer flags it.
+Every `Configure` opens with `HasBaseEntity().UnderscoreTable()` — primary key on
+`Id`, then the table name snake-cased from the type (`OrderLine` becomes
+`order_line`).
 
-**Text a human reads** — codes, names, plates — is `citext`, so lookups and
-uniqueness ignore case. `HasCitextUnique(x => x.Code)` sets the column type
-and the unique index together and takes an optional filter;
-`HasColumnType("citext")` alone fits a case-insensitive column that need not
-be unique.
+Three rules the schema gets wrong when nobody thinks to check. Each produces a
+line a reviewer deletes, not a lookup:
 
-**Length and business conditions live in the validator, not the schema.** The
-request's FluentValidation rules own maximum length and every business-shaped
-condition, so the configuration does not restate them: no `HasMaxLength`, no
-`HasColumnType("varchar(n)")`, and no business check constraint — a `CK_*`
-comparing one column against another is a validator rule wearing schema
-clothes. A limit declared twice drifts twice, and the schema copy is the one
-that diverges silently. What the schema keeps is structure the database itself
-needs: keys, foreign keys, uniqueness (`HasCitextUnique`), defaults.
-
-**With `Nullable` enabled, requiredness is the type's job too.** EF derives
-required from a non-nullable property — a value type or a non-nullable
-reference — so `IsRequired()` on one restates what the model already says and
-is never written. The property's own `?` is the single source of optionality;
-a configuration line duplicating it is the line a reviewer deletes.
-
-**Open every `Configure` with `HasBaseEntity().UnderscoreTable()`** — primary
-key on `Id`, then the table name snake-cased from the type (`OrderLine`
-becomes `order_line`). The two are independent, so one order across the
-solution is a convention worth keeping rather than a requirement.
-
-**Foreign keys are explicit pairs**: a `Guid CustomerId` — nullable when the
-link is optional — beside a nullable reference navigation, declared with
-`HasOne`/`WithMany`/`HasForeignKey` rather than left to convention, and
-finished with an `OnDelete` chosen on purpose. Collection navigations are
-non-nullable and initialized `= default!`, as `Lines` above. The question
-`OnDelete` answers is *what should happen to this row when its target is
-deleted?*
-
-| Answer | Behaviour |
-|---|---|
-| It cannot outlive the target | `Cascade` — child rows, membership and log tables |
-| The target must not be deletable while this points at it | `Restrict` — shared catalogue or configuration rows |
-| It survives, having kept what it needs | `SetNull` — optional FK on a history row |
-
-`SetNull` needs a nullable FK, only makes sense when the row still carries a
-usable snapshot of what it pointed at, and is by a wide margin the rarest of
-the three. Composite uniqueness is a plain index over an anonymous type —
-`builder.HasIndex(x => new { x.OrderId, x.LineNumber }).IsUnique()` — which is
-how a natural key gets enforced when the surrogate `Id` is not the real one.
-
-**Enums are int-backed with explicit values starting at 1**, so stored numbers
-never shift when a member is inserted later, and each member carries an XML
-doc line. Pin a default with a property initializer, `HasDefaultValue`, or
-both: the initializer covers entities created in code, `HasDefaultValue` rows
-inserted around it.
+- **Length and business conditions live in the validator, not the schema.** No
+  `HasMaxLength`, no `HasColumnType("varchar(n)")`, and no business check
+  constraint — a `CK_*` comparing one column against another is a validator rule
+  wearing schema clothes. A limit declared twice drifts twice, and the schema
+  copy is the one that diverges silently. What the schema keeps is structure the
+  database itself needs: keys, foreign keys, uniqueness, defaults.
+- **With `Nullable` enabled, requiredness is the type's job.** EF derives
+  required from a non-nullable property — a value type or a non-nullable
+  reference — so `IsRequired()` restates what the model already says and is never
+  written. The property's own `?` is the single source of optionality.
+- **Text a human reads** — codes, names, plates — **is `citext`**, so lookups and
+  uniqueness ignore case. `HasCitextUnique` sets the column type and its unique
+  index together; `HasColumnType("citext")` alone leaves the column searchable
+  and unindexed.
 
 Small fluent setters like `SetCustomer` that assign and `return this` are as
 far as entity behaviour goes here; anything that makes a decision belongs to
 domain-modeling.
+
+Read `references/entity-configuration.md` **before typing `HasOne`, `OnDelete`,
+`HasIndex`, `HasDefaultValue` or `BaseEntity<`** — it carries the base-class
+choice and the cross-layer rule that binds responses to it, the explicit
+foreign-key pair, the `OnDelete` decision table, composite uniqueness and how
+enums are stored.
 
 ## Soft delete
 

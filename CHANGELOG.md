@@ -8,6 +8,72 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.71] — split a skill body by trigger, not by topic, 2026-08-08
+
+`ef-core-data-access/SKILL.md` had reached **567 lines** against a sibling norm of
+117–450 and skill-creator's <500 bar. Measured first, and two of the three
+obvious framings turned out to be wrong.
+
+**It was not the largest.** Five skills sit at or above 500: `dotnet-review-flow`
+601 (**with no `references/` at all**), `ef-core-data-access` 567,
+`dotnet-security-review` 508, `dotnet-feature-flow` 508,
+`dotnet-performance-review` 504. Only `ef-core-data-access` is touched here;
+`dotnet-review-flow` is a process skill loaded on every `/dotnet-review` and the
+criterion below may not apply to it — logged, not fixed.
+
+**The obvious cut was the wrong cut.** `## Soft delete` was the largest section
+(152 lines) and already had a 374-line `references/soft-deletes.md` beside it, so
+it read as duplication. It is not: the reference is **scaffolding** — `ISoftDelete.cs`,
+`IHidden.cs`, `GlobalQueryFilterExtension.cs`, the node visitor, wiring, checklist
+— and the body is **operating doctrine**: the filter belongs to the repository,
+deleting is an update, uniqueness must ignore deleted rows, the filter covers the
+root set only. Different readers. Moving it down would have rebuilt the exact gap
+0.3.70 closed.
+
+**The criterion actually used, and it comes from 0.3.70's field report rather
+than from a line count:**
+
+> **To `references/`: what has a trigger that announces itself.** You know when
+> you are adding a migration. A token-shaped pointer (direction A) is enough.
+> **Kept in the body: what is needed by someone who does not know they need it.**
+> That is the real failure mode — false certainty — and no pointer reaches it,
+> because nobody goes looking for what they believe they already know.
+
+**What moved** — `references/schema-lifecycle.md` (new, 130 lines): the two
+`ApplicationDbContext` overrides, `DatabaseSettings` binding and provider
+selection, the full migration workflow, initialization and seeding.
+`references/entity-configuration.md` (new, 80 lines): `BaseEntity` vs
+`BaseEntity<TId>` and its cross-layer rule, the `HasBaseEntity().UnderscoreTable()`
+opening, the explicit foreign-key pair, the `OnDelete` decision table, composite
+uniqueness, enum storage.
+
+**What deliberately stayed** — the whole repository/wrapper section and the whole
+soft-delete section, untouched; and out of the moved areas, the four rules that
+bite when unlooked-up: a committed migration is never deleted (the repair is a
+new forward migration), the EF CLI builds first so both commands need a generous
+timeout, no `HasMaxLength`/`IsRequired()` in a configuration, and human-read text
+is `citext`. The canonical entity + configuration example stays in the body per
+direction B.
+
+**Result: 567 → 419**, inside the sibling norm. Both new pointers are
+token-shaped — *"before typing `dotnet ef migrations add` …"*, *"before typing
+`HasOne`, `OnDelete`, `HasIndex` …"* — not *"when working with migrations"*,
+which is the phrasing the field report identifies as unactionable.
+
+**Verification, not eyeballing.** Every one of the 74 backticked tokens in the
+removed 256-line block was checked to still exist somewhere in the skill
+directory; all 74 do. Two inbound cross-skill citations named sections that moved
+and were repointed at the new files: `dotnet-performance-review`'s
+`references/performance-checks.md` 1.11 (*DbInitializer seeding*) and its
+`SKILL.md` 1.5 (*Entity configuration*).
+
+**Deliberately not done:** splitting the skill in two. That costs a router edit,
+a new description and a `Not for:` line in every sibling — too much blast radius
+for a line count. **No doctrine changed in this release**; every rule that existed
+before still exists, in the body or in a reference.
+
+---
+
 ## [0.3.70] — a convention with no check is documentation, 2026-08-08
 
 **Field report** (`docs/field-reports/2026-08-07-search-fields-and-missed-references.md`).

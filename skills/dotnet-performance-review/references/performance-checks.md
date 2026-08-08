@@ -104,7 +104,8 @@ is a multi-step mutation rather than a bulk one, the finding is atomicity and be
 the two you mean.
 
 **1.11 A seeding or initialization path built from per-row reads** — *MEDIUM* ·
-`ef-core-data-access`, *DbInitializer seeding* + universal
+`ef-core-data-access`, `references/schema-lifecycle.md`, *Initialization and
+seeding* + universal
 `Find:` open the database initializer and every seeding path it calls, then read each loop
 body for a per-item existence probe or a per-item save.
 
