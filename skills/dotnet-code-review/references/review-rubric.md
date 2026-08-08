@@ -188,6 +188,14 @@ call site. Where the narrowing is deliberate — a gate whose caller must not
 choose — the site has to say so and reject or intersect the incoming
 `SearchFields` explicitly; silence leaves a restriction and an accident looking
 identical, and the reviewer cannot tell them apart either.
+**The third argument is the same rule one slot over.** `searchFieldExcepts` carries
+the *filter's* keys — so a field the caller filtered explicitly is not also swept by
+the keyword. A **property-level** policy there (*"this column must never be
+keyword-searched"*) is the finding, however reasonable the comment beside it reads:
+that fact belongs to the property, as `[NotSearchable]`, where it holds for every
+call site instead of the one someone remembered. The two mechanisms look
+interchangeable at a call site and are not · `list-query-pipeline`, *Decision Guide*
+
 **Not a finding:** the pipeline's own `QueryExpressionExtension.cs`, where the
 `IEnumerable` overload forwards its parameter, and a test of the extension that
 supplies a literal set on purpose — which is why the grep is scoped to `src/`.
@@ -860,6 +868,22 @@ the same finding, one step milder.
 **Not a finding:** a call through a generated member — `SomeNameRegex.IsMatch(...)`.
 That is the correct usage, and it is why the pattern above anchors on a
 non-identifier character before `Regex.` rather than matching the bare word.
+
+**5.28 A mapping profile living in a mapping folder** — *MEDIUM* ·
+`automapper-mapping`
+`Find:` `grep -rln --include=*.cs "CreateMap<" src/ | grep -i "/Mappings\?/"`
+Profiles are never collected. A map lives in the file that declares its source type
+— with entity-to-response as the named exception, living in the response file — and
+the mapping facade holds exactly one file, an empty marker profile. A central
+profile is the shape that grows: it is the only file that has to be opened to
+answer *"is this type mapped?"*, it drifts out of step with the DTOs it maps, and
+every new DTO teaches the next author to append to it. **The comment on such a file
+is usually its own evidence** — *"the profile the project has been growing"* is a
+description of the defect, not a justification.
+**Not a finding:** a folder named `Profiles/` holding *business* profile types — a
+user's profile, an account profile. The pattern above is deliberately anchored on
+`Mapping`/`Mappings`, because `Profile` is a domain noun in many solutions and
+grepping for it produces mostly false hits.
 
 ## 6. Tests
 

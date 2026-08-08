@@ -8,6 +8,56 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.77] — two gaps H found that D had scored as covered, 2026-08-08
+
+**Acting on H instead of documenting it.** The previous two releases changed no
+rule; this one does, and the rules come from cells H failed.
+
+**H found two rules with no check, and D had scored both as covered.** Haiku
+violated `list-query-pipeline`'s `[NotSearchable]` rule (e4) and
+`automapper-mapping`'s colocated-profile rule (e5). Neither had a rubric check.
+D's token join had marked them covered because `[NotSearchable]` happens to appear
+inside `dotnet-performance-review` 1.5's prose about index coverage — a false
+negative of exactly the kind D's own write-up listed as its limitation. **The
+static scan and the behavioural eval find different things**, and this is the first
+concrete demonstration.
+
+- **`dotnet-code-review` 1.12 extended to the third argument.**
+  `searchFieldExcepts` carries the *filter's* keys. A **property-level** policy
+  there — *"this column must never be keyword-searched"* — is the finding however
+  reasonable the comment beside it reads: that fact belongs on the property as
+  `[NotSearchable]`, where it holds at every call site rather than the one someone
+  remembered. The two mechanisms look interchangeable at a call site and are not.
+- **`dotnet-code-review` 5.28 — a mapping profile living in a mapping folder**,
+  MEDIUM, `automapper-mapping`. Smoke-tested: 3 hits on the canonical project, 1 on
+  the consumer project, all real. The check names its own false positive — a
+  `Profiles/` folder holding *business* profile types — which is why the pattern
+  anchors on `Mapping`/`Mappings` instead.
+
+**Field note while smoke-testing 1.12:** the consumer project carries **9
+`ApplySearch` call sites whose second argument is not the request's `SearchFields`**
+— `BoothService`, `DeviceService`, `DeviceTypeService`, `CustomerService`,
+`EventRegistrationService` among them. The field report that opened this thread
+named three.
+
+**A second text lever tested and reverted — the same verdict as 0.3.75's
+stop-gate.** H's one positive signal was that every passing doctrine cell passed by
+*saying out loud* that the neighbour was non-conforming, which suggested naming the
+**disguise** rather than restating the rule. `api-surface` got a worked example of
+a non-conforming controller with every cosmetic signal ticked and the three
+structural breaches marked, plus *"two or three such files side by side is not a
+convention — it is one mistake copied"*. **Haiku failed both runs.** Reverted
+unshipped.
+
+**So the conclusion hardens, and it is now three failed attempts deep:** against a
+plausible-looking wrong precedent at a weak model, **no tested way of writing the
+text changed the outcome** — not ordinary rule prose, not a countable stop-gate at
+the top of the file, not a worked picture of the defect. The rubric grep is the
+only control that has ever fired. **For this class of problem, stop adding rules to
+the knowledge skill and add the check.**
+
+---
+
 ## [0.3.76] — the weak model fails when the wrong precedent looks reasonable, 2026-08-08
 
 **Direction H, second run: six more skills, 15 agent runs, five evals**, three
