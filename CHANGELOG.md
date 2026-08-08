@@ -8,6 +8,69 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.76] — the weak model fails when the wrong precedent looks reasonable, 2026-08-08
+
+**Direction H, second run: six more skills, 15 agent runs, five evals**, three
+cells each — Opus with no doctrine (validity control), Opus with doctrine, Haiku
+with doctrine. The doctrine-version axis was dropped; the first run showed it does
+not discriminate and the model axis does. Full data:
+`docs/coverage-matrix/h-eval-results.md`. **No rule changed in this release.**
+
+| Eval | Skills | no doctrine | doctrine | Haiku |
+|---|---|---|---|---|
+| e2 | `ef-core-data-access` | FAIL | PASS | **FAIL** |
+| e3 | `error-handling` + `message-keys` | FAIL | PASS | **PASS** |
+| e4 | `list-query-pipeline` | FAIL | PASS | **FAIL** |
+| e5 | `automapper-mapping` | FAIL | PASS | **FAIL** |
+| e6 | `dotnet-testing` | **PASS** | PASS | PASS |
+
+**e6 is discarded, not reported as a win.** Its control passed, so it does not
+reproduce a defect, and the acceptance rule is explicit that such a case is
+rewritten rather than counted. The cause is in the fixture: e6 was the only one
+built **without a wrong precedent in it**. `dotnet-testing` remains untested.
+
+**Four valid evals, and on all four the control fails and the doctrine passes.**
+The knowledge layer does its job on every skill tested.
+
+**The finding, over all 22 runs to date.** Haiku's record is **1 pass, 6 fails**,
+and the split is not by skill, by rule size, or by how the rule is written. Sort
+by **what the wrong precedent looks like** and it separates cleanly: five failures
+against modern-looking controllers declaring their own `[Route]`; one against a
+hard-coded search-field array; one against a call-site `searchFieldExcepts`
+carrying a comment that justifies it; one against a central mapping profile
+commented *"the profile the project has been growing"*. The single pass is
+`throw new Exception("… not found.")` — **the one precedent that is recognisably
+bad on sight**, which every model rejects from general training without needing
+house doctrine.
+
+> **The weak model does not fail because it is weak. It fails when the wrong
+> precedent looks reasonable.** Where the precedent is visibly bad or absent it
+> follows the skill; where the precedent could plausibly *be* the convention it
+> copies — and neither 781 lines of prose, nor the stop-gate 0.3.75 tested and
+> reverted, nor 0.3.73's rewrites moved that.
+
+This is the 2026-08-07 field report's *precedent laundering* with a measurement
+attached, and it **relocates the problem**: the risk is not a model tier, it is a
+repository containing plausible non-conforming code — and every project this
+plugin installs into has some.
+
+**Three consequences, recorded for the sessions that act on them:**
+
+1. **The rubric check is the control that actually fires.** 3.6, 1.12 and their
+   siblings catch these outputs by grep with no comprehension required.
+2. **0.3.73's precedent-in-scope rule is aimed correctly but acts at review time.**
+   Nothing tested here prevents the authoring mistake.
+3. **A skill's most valuable sentence may be the one that names what the wrong
+   precedent looks like.** In every passing doctrine cell, the agent passed by
+   *saying out loud* that the neighbour was non-conforming — a behaviour the text
+   can ask for by name, and one that is now cheap to test.
+
+**Limits.** One run per cell (Haiku's `api-surface` cell has five) — a threshold,
+not a rate. The evals grade produced source, not a build. And the field failure's
+real cause, attention across a long session, is still reproduced by none of this.
+
+---
+
 ## [0.3.75] — direction H: the text does not reach a weak model, 2026-08-08
 
 **Direction H run for the first time.** 11 agent runs, one task, six grep
