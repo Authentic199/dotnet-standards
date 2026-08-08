@@ -7,8 +7,25 @@ below if it parks work.** Keep entries to 2–4 lines; depth stays in the
 per-lane files. Do not let this file go stale — it is the first thing a
 returning session reads.
 
-Shipped through **v0.3.69 (26 skills + 2 commands + 6 agents + 6 hook
-scripts)** as of 2026-08-05. **A same-version collision hit at this merge**:
+Shipped through **v0.3.70 (26 skills + 2 commands + 6 agents + 6 hook
+scripts)** as of 2026-08-08. **0.3.70 — a convention with no check is
+documentation.** A consumer repository on 0.3.68 shipped three call sites passing
+a hard-coded field array as `ApplySearch`'s second argument instead of
+`request.SearchFields`. No convention was wrong; the rule was already correct in
+`ef-core-data-access/references/query-conventions.md`. **Nine per-task reviews
+plus four whole-branch lenses — breadth on the strongest model — read those sites
+and reported nothing, because no rubric check existed to fail.** Shipped: rubric
+**1.12** (grep smoke-tested on two real projects; corpus census first — 96
+`ApplySearch(` occurrences across four projects, zero non-conforming in
+production code), the rule lifted into `ef-core-data-access`'s **body**, and
+`list-query-pipeline`'s *"must **never** be swept → `[NotSearchable]`"* row split
+because the skill's own reference already contradicted it — the attribute is
+consulted only where `ApplySearch` derives the set, so an explicit `SearchFields`
+still reaches the property, and in the consumer repo that row nearly closed an
+open credential-probing concern. Field report + the eight directions A–H:
+`docs/field-reports/2026-08-07-search-fields-and-missed-references.md`; **the
+user-approved queue out of it is D → C → H**, logged in PENDING. Before it, at
+0.3.69: **a same-version collision hit at that merge**:
 this session authored the entry below as 0.3.68 in parallel with a session that
 shipped `test-report-nudge`'s report-path/wording change as its own 0.3.68 —
 one file per settled run under `docs/test-report/`, fixed Vietnamese prose with
@@ -616,6 +633,63 @@ Format: `- [lane, date] what was parked — where the detail lives — what unbl
   orphan already logged below — belongs in `dotnet-code-review`'s rubric, needs a
   session that owns it and will write the check in the rubric's own numbered
   format.
+
+- [solo, 2026-08-08] **A convention/check coverage matrix — direction D, and the
+  next session's work.** 0.3.70 closed one instance: a hard-coded field array in
+  `ApplySearch`'s second slot, a rule already correct in
+  `ef-core-data-access/references/query-conventions.md`, and **no rubric check to
+  fail it** — 9 per-task reviews plus 4 whole-branch lenses, breadth on the
+  strongest model, all silent. The general claim is testable: enumerate every
+  **syntactically detectable** rule across the 20 knowledge skills, cross it
+  against the ~90 rubric checks, and treat each gap as plugin debt. Static work,
+  no agent runs. Two orphan entries above (5.21/5.22-shaped, `Guid.NewGuid()`)
+  are pre-found members of that set. Evidence:
+  `docs/field-reports/2026-08-07-search-fields-and-missed-references.md`.
+  **User-approved queue: D, then C, then H.**
+
+- [solo, 2026-08-08] **Direction C — name repository precedent as an adversary.**
+  The consumer session's own first-person account of *why* it skipped a
+  `references/` file: a sibling service was already open, so nothing felt
+  missing. References get opened on felt uncertainty; the failure mode is **false
+  certainty**, borrowed from the nearest precedent. Ship one sentence in **one**
+  place, not a paragraph duplicated into 20 skills — `choosing-a-dotnet-skill`
+  (loaded first) plus `dotnet-feature-flow`'s implement step: *precedent in the
+  repo is evidence about the repo's history, not about the convention; diff it
+  against the owning skill's shape before copying.* Cheap. Whether it works is
+  what H measures.
+
+- [solo, 2026-08-08] **Direction H — measure "the body loses to a precedent",
+  probe on 3 skills.** `skill-creator` already ships the harness
+  (`scripts/run_eval.py`, `run_loop.py`, `aggregate_benchmark.py`, grader +
+  analyzer agents, variance analysis, viewer) comparing `with_skill` /
+  `without_skill`. H needs **a third configuration `body_only`** — `SKILL.md`
+  present, `references/` hidden — and, critically, a scratch repo carrying a
+  **plausible-but-wrong precedent** in a sibling file. Without that precedent it
+  only measures "does the skill work". Assertions are greppable, not judged
+  (e.g. `.ApplySearch(request.SearchKeyword, request.SearchFields`). The payoff
+  is **attribution, not a score**: `body_only` clean-repo fails → the rule is in
+  the wrong file (direction B, per rule); `body_only` fails only with the
+  precedent → direction C is the fix and is now measurable; both fail → the rule
+  is written badly. Candidate skills: `ef-core-data-access` (known answer as of
+  1.12), `module-feature` (largest body), `list-query-pipeline` (control — its
+  overclaim was just fixed). Cost is real: ~100+ agent runs for 3 skills × 4
+  configs × repeats for variance. Limit to state up front: a synthetic repo
+  measures a **necessary** condition, not a sufficient one.
+
+- [solo, 2026-08-08, NOT queued] **Direction F — plans must paste the canonical
+  shape, not name the file.** `dotnet-feature-flow:150` already requires the
+  `references/` file to be recorded and **that weaker form failed in the field** —
+  the plan named references for some tasks, omitted `query-conventions.md` for
+  the search task, and nobody noticed. F's real argument is falsifiability: a
+  named file is an unverifiable claim about what the author read; a pasted shape
+  is an artifact GATE 1 can check. **Deferred by user decision pending H's data**,
+  because it is the only direction that adds friction to every feature session.
+  If it is ever taken: (a) it has no teeth alone — pair it with the conformance
+  sweep diffing the shipped call site against the pasted snippet, or it buys
+  reassurance rather than correct code; (b) scope it to steps whose owning
+  reference contains a code block the step will structurally reproduce, else it
+  produces ritual; (c) watch plan length — a wall of text at GATE 1 is defeated
+  by the same attention failure F exists to fix.
 
 ## Standing rules (unchanged, summarized)
 
