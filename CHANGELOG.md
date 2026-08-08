@@ -8,6 +8,66 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.75] — direction H: the text does not reach a weak model, 2026-08-08
+
+**Direction H run for the first time.** 11 agent runs, one task, six grep
+assertions, no judgement in the grading. Full write-up:
+`docs/coverage-matrix/h-eval-results.md`. **This release ships a document and a
+deletion; no rule changed.**
+
+**Wave 1 was thrown away, and that is the pilot working.** The first fixture kept
+a *correct* sibling beside the wrong one and told the agent to explore the repo
+first. All four configurations passed — **including the control with no doctrine
+at all.** Per the acceptance rule the field report shipped with these cases, a
+case that passes before the fix does not reproduce the defect: it is rewritten,
+never counted as good news. The second fixture removed the correct sibling, added
+a *second* wrong controller so the wrong shape reads as the house pattern, deleted
+every `mediator.Send` example from the tree, and reframed the prompt as *"task 3
+of 6, moving quickly"*. That one reproduces the defect.
+
+**Results, across three model tiers:**
+
+| Model | Doctrine | Verdict |
+|---|---|---|
+| Opus 5 | none | **FAIL** |
+| Opus 5 | v0.3.72 (before the 0.3.73 fixes) | PASS |
+| Opus 5 | v0.3.74 (current) | PASS |
+| Sonnet 5 | v0.3.74 | PASS |
+| Sonnet 5 | v0.3.74 + a stop-gate at the top of `api-surface` | PASS |
+| Haiku 4.5 | none / v0.3.72 / v0.3.74 / +gate ×2 | **FAIL ×5** |
+
+**Four findings, and the last one changes how this plugin should be read.**
+
+1. **Doctrine works.** With no conventions file a strong model copies the wrong
+   neighbour and calls the copy consistency — *"mirrors `OrderPaymentsController`
+   and `OrderRefundsController` exactly"*.
+2. **0.3.73's text fixes remain unverified.** v0.3.72, with the *"two or three is
+   normal"* contradiction intact and the section still named *Pre-convention
+   files*, passed exactly like v0.3.74. One run even used the old section name
+   while refusing the precedent. The fixes may be right; this eval cannot say so.
+3. **Below a model threshold the text does not participate at all.** Five Haiku
+   runs, three doctrine variants, one identical wrong file every time. 781 lines
+   of conventions lost to one neighbouring file.
+4. **Prose could not move that threshold, so the reviewer is the enforcement.** A
+   four-question stop-gate — countable, imperative, at the very top of the file,
+   each question ending in **stop** — was written against exactly this failure.
+   Haiku failed with it, twice; Sonnet passed without it. **It was reverted
+   unshipped.** Keeping text that failed its only test is the
+   *documentation-not-enforcement* pattern this plugin exists to argue against —
+   **H's first payoff was a deletion.** Meanwhile `dotnet-architecture-review`
+   check **3.6**, shipped hours earlier at 0.3.74, catches every one of those five
+   Haiku outputs with a one-line grep and no comprehension required. For a
+   weak-model session the review layer is not a safety net behind the knowledge
+   layer; **it is the only control that fires.**
+
+**What H cannot claim.** It does not reproduce the field failure's cause: that
+incident happened at a strong model *with the v0.3.72 text loaded*, and here that
+same text passes. The difference is attention budget across a six-task session,
+not information, and no fixture change manufactures that. One task, one skill
+pair, one or two runs per cell — enough to see a threshold, not to state a rate.
+
+---
+
 ## [0.3.74] — direction D: 195 checks, 196 candidate gaps, 6 shipped, 2026-08-08
 
 **Direction D run for the first time** — the convention/check coverage matrix
