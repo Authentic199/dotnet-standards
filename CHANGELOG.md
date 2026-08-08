@@ -8,6 +8,64 @@ components change materially — not only on releases.
 
 ---
 
+## [0.3.70] — a convention with no check is documentation, 2026-08-08
+
+**Field report** (`docs/field-reports/2026-08-07-search-fields-and-missed-references.md`).
+A consumer repository on 0.3.68 shipped three call sites that passed a field
+array written at the call site as `ApplySearch`'s second argument instead of
+`request.SearchFields`. **No convention was wrong.** The rule was already in
+`ef-core-data-access`'s `references/query-conventions.md`, correctly stated. What
+was missing was anything that would fail.
+
+**The measurement that makes this release.** Nine per-task reviews plus four
+whole-branch lenses — breadth on the strongest available model — read those three
+call sites and reported nothing; several quoted the hard-coded array back as a
+valid description of the endpoint. Not a model failure: **there was no check, so
+there was nothing to fail.** Generalized: a convention that lives only in a
+knowledge skill, with no corresponding rubric check, has nothing enforcing it.
+
+**Corpus evidence gathered before writing the check.** Across the four projects
+under `reference/projects/`, worktree duplicates excluded: 96 `ApplySearch(`
+occurrences; the only ones not passing a request's own `SearchFields` are
+`QueryExpressionExtension.cs` itself, where the `IEnumerable` overload forwards
+its parameter, and one unit test of the extension supplying a literal set on
+purpose. Zero counter-examples in production code across four projects — which is
+why the new check is scoped to `src/` and carries both of those as stated
+non-findings.
+
+**What changed:**
+
+- **`dotnet-code-review` rubric 1.12** — *A search stage that names its own
+  fields*, MEDIUM, owned by `ef-core-data-access` + `list-query-pipeline`.
+  `grep -rn -A2 --include=*.cs "\.ApplySearch(" src/`, then read the second
+  argument; conforming values are `SearchFields` and `null`. The finding carries
+  its own fix — `[NotSearchable]` for the derived set, `searchFieldExcepts` for
+  one call site — and requires a deliberate narrowing to *say so* at the site,
+  because silence leaves a restriction and an accident indistinguishable. Grep
+  smoke-tested against two real projects before shipping, per the 0.3.58 rule.
+  `SKILL.md`'s area table and its `1: 1.1-1.11` coverage example updated.
+- **`ef-core-data-access` body** now states the `ApplySearch` second-argument rule
+  directly, instead of only pointing at `references/query-conventions.md`. First
+  application of the field report's direction B — canonical shape in the body,
+  rationale in the reference — shipped here as a single-rule probe, not a policy.
+- **`list-query-pipeline` decision guide** — the row reading *"must **never** be
+  swept by free-text search → `[NotSearchable]`"* was an overclaim, and the
+  skill's own `references/property-info-extension.md` already said so: the
+  attribute is consulted only where `ApplySearch` derives the field set, and a
+  caller naming the property in `SearchFields` still reaches it. In the consumer
+  repository that row came close to closing a credential-probing concern that was
+  still open. Split into two rows — the derived-set case keeps the attribute; the
+  *must never be reachable at this gate* case routes to a decision in that gate's
+  own service.
+
+**Recorded, not decided.** The field report's part 2 is a first-person account of
+*why* a `references/` file goes unopened — a precedent already in context, a
+trigger sentence at the end of a long section, the need arising mid-writing, and
+a summary good enough to feel sufficient. Eight directions (A–H) are logged in
+the report. Only B is touched here, and only once.
+
+---
+
 ## [0.3.69] — a suite that varies is where real failures hide, 2026-08-05
 
 **Version note.** Authored as 0.3.68 in parallel with the session that shipped

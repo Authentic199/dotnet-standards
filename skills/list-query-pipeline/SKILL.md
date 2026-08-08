@@ -439,7 +439,8 @@ project is the same file, and correcting it is a rename, not a redesign.
 | `ApplyFilter` / `ToPagedListAsync` does not resolve | Check for `using Infrastructure.Facades.Common.Extensions;` first. If the files genuinely are absent, recreate all three from `references/` — never write a local substitute |
 | The project already has the pipeline | Use it as-is. Port a fix from `references/` only for the specific defect you are there to fix |
 | A client needs a condition the ten operators cannot express | Compose an ordinary `Where` before the chain; add an operator only if it is general, and update `api-surface`'s table in the same change |
-| A string property must never be swept by free-text search | `[NotSearchable]` on the response property — not a code change in `ApplySearch`, and not `searchFieldExcepts` at one call site |
+| A string property must not be swept by the **derived** field set | `[NotSearchable]` on the response property — not a code change in `ApplySearch`, and not `searchFieldExcepts` at one call site |
+| A string property must never be reachable by keyword at some gate | Not this attribute. It is consulted only where `ApplySearch` derives the set itself, so a caller that names the property in `SearchFields` still reaches it. A hard stop is a decision in that gate's own service — reject or intersect the incoming `SearchFields` there, and say why at the site |
 | One call site must skip a field the others search | `searchFieldExcepts`. That is what the parameter is for |
 | The project ships the other attribute spelling | Recreate *new* files as `NotSearchableAttribute`; leave an established name alone mid-task, and check which one the search stage actually honours |
 | Filtering or searching across a one-to-many | Needs the `GetDataHolders` collection form. If the project's copy is single-valued-only, port the collection form from `references/` rather than special-casing the endpoint |
