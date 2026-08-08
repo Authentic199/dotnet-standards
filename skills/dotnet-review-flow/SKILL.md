@@ -254,10 +254,10 @@ Each tester ends on one of six verdict strings. Branch on them:
 | Verdict | Do this |
 |---|---|
 | `GREEN` | This tier is done |
-| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Enter **NO-SIGNAL**, then carry the tier into the final report under *Not run* |
+| `tier absent — nothing run` | Does not block the loop, and **is not a pass.** Enter **NO-SIGNAL** (`references/failure-branches.md`), then carry the tier into the final report under *Not run* |
 | `RED — tests failed` | Fix and rerun — see who fixes, below |
 | `RED — build failed` | Fix the build; no test result exists to interpret yet |
-| `RED — environment` | **Enter NO-SIGNAL. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
+| `RED — environment` | **Enter NO-SIGNAL — open `references/failure-branches.md` now. This does not consume a round.** No container runtime, an unreachable image, an artifact lock: there is nothing in the code to fix, so an identical rerun is not the answer — repair, or record and continue, is |
 | `RED — timed out` | Report the command and the budget; a run killed at a limit is not a failing suite. Retry once with a larger budget, then halt the loop — **the report is still owed.** This does not enter NO-SIGNAL: unlike a blocked or absent tier, a timeout can be the code's own fault |
 
 **Who fixes:** embedded mode, the calling flow's implementer — the loop reruns
@@ -306,72 +306,25 @@ happens next, in this order:
 "green", not for "these N are known", not for verification-before-completion.
 Only a filtered run of a named test is, and the report says which kind it quotes.
 
-### NO-SIGNAL
+### NO-SIGNAL and a subagent that dies — `references/failure-branches.md`
 
-Entered when a tester returns `RED — environment` or `tier absent — nothing
-run`. Both mean one thing — **no evidence about the code under review, and
-nothing in the code to fix** — so from here the flow treats them identically.
-Splitting them is what let one of them deliver a report and the other deliver
-nothing.
+Two contingency branches live in that file, and **each is entered on an event you
+cannot miss**: a tester returning `RED — environment` or `tier absent — nothing
+run`, and a spawned subagent that errors or returns nothing. **Open the file the
+moment you read either one** — before deciding anything about the run.
 
-> **NO-SIGNAL may end in a question. It may never end in nothing delivered.**
-> Whether repair succeeds, fails, or waits on an answer, REVIEW-LOOP still runs
-> and the report is still produced. The lenses never depended on the tiers.
+Carry these three without opening it, because they change what you do *before*
+you get there:
 
-**1 — State it so the user can act on it.** Name what is missing and why, in
-words that support a decision. A verdict string and an error code are a
-symptom, not a diagnosis. A user who cannot tell what is being asked does not
-answer, and an unanswered question is exactly how a run ends with nothing.
-
-**2 — Measure before offering. Numbers, not adjectives.**
-
-| Entry | Measure |
-|---|---|
-| `RED — environment` | What is blocking, taken from the tester's *Environment* section; whether it is repairable here; which rung of the table below it falls on |
-| `tier absent — nothing run` | How many types in scope have no test, which tiers exist versus are empty, and whether the missing tier needs infrastructure stood up — that last one changes the size of the job by an order of magnitude |
-
-"This would be a large job" is unusable. "Module X: 14 types, 0 tests" is a
-decision input.
-
-**3 — Repair, at most twice.** One question classifies every action: **does it
-acquire something over the network?**
-
-| Do it | Ask first | Never |
-|---|---|---|
-| Start containers whose images are already local | **Anything acquired over the network** — a missing package, an image not yet pulled | Anything irreversible on the user's machine |
-| Re-run the pair **serially** — unit first, then integration — on an artifact lock, and note the serialization | Install software on the machine | Anything needing administrator rights |
-| Re-run a diagnostic command, read configuration — never a test suite; the tiers are re-run only by re-spawning the testers | Edit project files, change ports, delete build caches | Anything governed by policy the user does not own |
-| | | Edit a test to dodge a failure — the testers' ban, and it does not loosen because the coordinator is the one holding the pen |
-
-**Two attempts, then explain and ask.** One attempt is one repair pass
-followed by one re-spawn of the testers, however many individual actions
-that pass contained — the cap governs the reruns, not the actions inside
-them. Every other loop here is capped; an uncapped repair loop spends a
-session invisibly. An ordinary build restoring its own packages is building,
-not repairing, and this table does not govern it — a build that **fails
-because acquisition failed** is what enters here.
-
-**4 — Offer options built from the measurement. Never a bare yes/no.** The list
-is generated from what step 2 counted; it is not written down here, because a
-fixed menu cannot know what was measured. It always includes *do nothing,
-record it in the report*, and it includes a partial option whenever the
-measurement decomposes into parts — one module rather than four, the unit tier
-rather than both. Yes/no forces a user who has an hour to choose between
-nothing and everything.
-
-If the user accepts writing tests, **this session writes them** — the same
-mechanism as the end-of-report offer, on the same authority: the user's answer.
-What a test looks like belongs to `dotnet-testing`; none of it is taught here.
-**This offer is standalone only.** Embedded under `dotnet-feature-flow`, tests
-are written as the feature is built and the calling flow owns that. The repair
-ladder above applies in both modes.
-
-**If NO-SIGNAL changed the tree — tests written, a project file edited — re-enter
-TEST-LOOP and recompute the diff before REVIEW-LOOP.** Reviewers handed a diff
-that predates the tests just written are grading something nobody will ship.
-
-**Then continue to REVIEW-LOOP regardless.** Every tier that produced no signal
-goes into *Not run* with what was attempted and what the user chose.
+- **A tier with no signal never halts the flow.** NO-SIGNAL may end in a question;
+  it may never end in nothing delivered. REVIEW-LOOP runs and the report is
+  produced either way.
+- **If NO-SIGNAL changed the tree, re-enter TEST-LOOP and recompute the diff
+  before REVIEW-LOOP** — reviewers handed a stale diff are grading something
+  nobody will ship.
+- **Classify a subagent failure before retrying.** A deterministic environment
+  failure is never retried; a transient one is retried once with the identical
+  prompt. Retrying a deterministic failure burns the round and changes nothing.
 
 ### REVIEW-LOOP
 
@@ -441,33 +394,6 @@ For triaging what comes back — arguing with a finding, telling a technical
 disagreement from a performative one — load
 `superpowers:receiving-code-review` rather than improvising.
 
-### When a subagent fails
-
-A subagent fails in one of two ways, and they are handled differently —
-**classify before retrying**:
-
-**A deterministic environment failure is never retried.** An error naming a
-missing tool (`No such tool available`), a skill that would not load, or an
-agent that could not start at all: the same spawn meets the same defect every
-time, so the retry proves nothing — and a retry that "succeeds" is worse than
-one that fails, because success means the agent improvised around the defect in
-a way this flow never sees and cannot audit. The same command then yields
-different runs depending on whether an agent chose to improvise. **STOP and
-surface it to the user**: the defect is in the install or in an agent's
-definition, and it is fixed there, not by respawning.
-
-**A transient failure is retried once, with the identical prompt.** A timeout,
-an API error, an empty return, or a return that is not the report shape: retry
-once. Same contract, same wording — a reworded retry tests a different thing
-and its result is not comparable.
-
-Still failing: **surface it to the user by name**, say what is now unknown, and
-list it under *Not run*. **Never silently drop a lens or a tier, and never
-substitute this session's judgement for one that did not run.** A four-lens report
-missing one lens is a three-lens report, and a report missing the security lens
-looks exactly like a report where security found nothing — the most expensive
-ambiguity this flow can ship.
-
 Before declaring the block complete, invoke
 `superpowers:verification-before-completion` and follow it. This flow's output is
 a claim that the suite is green and the lenses are clean; that skill turns the
@@ -482,11 +408,29 @@ PHASE 0 and the pre-build gate stop *before* the block and hand back diagnostics
 instead; everything after them owes this report. Every section appears; write
 `None.` when empty.
 
-```markdown
-## Review: <scope label>
+**Report language.** Write the report in the language the reviewed project's
+`CLAUDE.md` sets for talking to the user. If it sets none, write in the language
+the user is using in this session. Identifiers, paths, commands, file names and
+quoted code stay in English. **The field labels below are English because this
+skill is written in English — they are field names, not fixed strings. Translate
+them.** A report in the wrong language is a defect even when every finding in it
+is correct.
 
-Mode: standalone / embedded in dotnet-feature-flow · Base: <ref, or `the empty
-tree (standing code)` for a path scope — never blank, never a dash>
+**The header table is not optional and every row appears.** A row that cannot
+apply carries `—`; a blank cell is a defect.
+
+```markdown
+# Review: <scope label> — <one line on what it covers>
+
+| | |
+|---|---|
+| **Date** | <yyyy-MM-dd> |
+| **Branch** | `<branch>` (<n> commits) |
+| **Base** | `<sha>` on `<base branch>`, or `the empty tree (standing code)` for a path scope |
+| **Worktree** | `<path>`, or `—` |
+| **Scope** | <n> files — <what they are> |
+| **Excluded** | <paths or shapes left out, or `—`> |
+| **Method** | <which lenses and testers ran, in independent contexts; and that every CONFIRMED CRITICAL/HIGH was re-checked at the cited `file:line`> |
 
 ### Verdicts
 | Lens | Verdict | CONFIRMED CRITICAL/HIGH | Unfixed MEDIUM/INFO |
@@ -508,11 +452,15 @@ carries `non-deterministic` beside its verdict and its counts are quoted as one
 run's, never as the tier's state.>
 
 ### CONFIRMED findings
-<per finding: lens · severity · file:line · fixed (what changed) or outstanding (why)>
+**<id> · <lens> · <SEVERITY> · `<file>:<line>` · fixed (what changed) / outstanding (why)**
+- **Defect:** <what is wrong>
+- **Failure:** <the concrete input or state, then the wrong result>
+- **Fix:** <the correct shape, or who decides when the call is not this flow's>
 
 ### PLAUSIBLE findings
-<per finding: lens · severity · file:line · why verification could not reproduce it,
-in the reviewer's own wording>
+**<id> · <lens> · <SEVERITY> · `<file>:<line>`**
+- **Claim:** <the reviewer's finding, in the reviewer's own wording>
+- **Not reproduced:** <what verification tried and what it saw instead>
 
 ### Unfixed MEDIUM and INFO
 <by lens, unranked, carried through untouched>
@@ -528,7 +476,7 @@ TEST-LOOP <n> of 5 · REVIEW-LOOP <n> of 3 · Chunks <n> · NO-SIGNAL <attempted
 what the user chose, or "not entered"> · <cap hit? say so> · <commands the flow ran>
 ```
 
-Four rules for the report:
+Five rules for the report:
 
 1. **A green run reports the numbers.** "All clean" with no counts is
    indistinguishable from a suite that discovered nothing and a fleet that never
@@ -537,10 +485,22 @@ Four rules for the report:
    coverage line — audits, layers, areas — and each tester reports what did not
    run. Fold them into *Not run*; do not summarize them away. What the fleet did
    not examine is the most perishable thing it learned.
-3. **Nothing a subagent learned is dropped.** The user paid for six fresh-context
-   passes; a summary that keeps only the blockers throws away most of what was
-   bought.
-4. **The report is written to a file, not only to the chat.** Write it to
+3. **Nothing a subagent learned is dropped — and nothing is padded either.** The
+   user paid for six fresh-context passes, so a summary keeping only the blockers
+   throws away most of what was bought. But keeping a finding means keeping its
+   **Defect / Failure / Fix**, not its reviewer's prose: **each of those lines is
+   at most two sentences, and a finding has no fourth line.** Anything longer is
+   an appendix — put it under `## Notes` at the end and reference it by the
+   finding's id. Dropping a finding and inflating one are both failures of this
+   rule, and the second is the one that actually happens.
+4. **Three things never appear in a finding**, because each is process narration
+   rather than information. **How the review reached it** — no *"the reviewer
+   asked for…"*, no *"verified by running…"*; state the conclusion and put
+   evidence the reader must re-check in `## Notes`. **A paragraph arguing the
+   severity** — the severity is on the header line and the `Failure:` line is its
+   whole argument. **Anything already in the header table** — the branch, the base
+   and the scope are stated once, at the top, and never again.
+5. **The report is written to a file, not only to the chat.** Write it to
    `docs/code-review/<yyyy-MM-dd>-<scope-label>.md` inside the reviewed
    repository, creating the folder if absent. The chat shows the same content;
    the file is the durable copy.
@@ -587,7 +547,7 @@ Executing cleanup candidates belongs to `/simplify`. **Unclear ownership.**
 | The repository has no test projects at all | Both tiers absent. NO-SIGNAL: measure the gap, offer options built from the count, then REVIEW-LOOP either way |
 | The same tier reports different failures in two rounds, or moving totals on an unchanged tree | Non-deterministic, not merely red. Re-spawn to confirm (those re-spawns cost no round), stabilize before fixing individual tests, then re-triage every outstanding failure one at a time — and stop quoting whole-suite totals until it is settled |
 | A failure list arrives labelled "known noise" or "pre-existing" | Trust it only if the tier is deterministic. Otherwise it is an unclassified list, and re-triaging it is where a hidden defect surfaces |
-| A tester reports `RED — environment` | NO-SIGNAL. Does not consume a round, and never halts the run — the report is owed regardless |
+| A tester reports `RED — environment` | NO-SIGNAL — `references/failure-branches.md`. Does not consume a round, and never halts the run — the report is owed regardless |
 | A repair inside NO-SIGNAL would download something | Ask first. That single question — does this acquire over the network — is the whole classifier |
 | A reviewer's CRITICAL cannot be reproduced at its `file:line` | PLAUSIBLE. Report it with the reason; do not fix and do not delete |
 | A reviewer returns a finding with no `file:line` | PLAUSIBLE by definition — there is nothing to verify against |

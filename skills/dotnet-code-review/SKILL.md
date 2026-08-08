@@ -152,24 +152,47 @@ actually executed, not from the areas you meant to cover; a check silently
 skipped because it needed a second file opened is the single most common way a
 long rubric ships a clean-looking report over an unexamined defect.
 
+**Report language.** Write the report in the language the reviewed project's
+`CLAUDE.md` sets for talking to the user. If it sets none, write in the language
+the user is using in this session. Identifiers, paths, commands, file names and
+quoted code stay in English. **The field labels below are English because this
+skill is written in English — they are field names, not fixed strings. Translate
+them.** A report in the wrong language is a defect even when every finding in it
+is correct.
+
+**The header table is not optional and every row appears.** A row that cannot
+apply carries `—`; a blank cell is a defect.
+
 ```markdown
-## Code review: <scope>
+# Code review: <scope> — <one line on what it covers>
+
+| | |
+|---|---|
+| **Date** | <yyyy-MM-dd> |
+| **Branch** | `<branch>` (<n> commits) |
+| **Base** | `<sha>` on `<base branch>`, or `the empty tree (standing code)` for a path scope |
+| **Worktree** | `<path>`, or `—` |
+| **Scope** | <n> files — <what they are> |
+| **Excluded** | <paths or shapes left out, or `—`> |
+| **Method** | <which rubric areas ran; and that every CRITICAL/HIGH was re-checked at the cited `file:line`> |
 
 ### Summary
 <1-3 sentences: what changed, the blast radius scored and why, the merge recommendation>
 
 ### CRITICAL
-- **<title>** — `<file>:<line>`
-  <what is wrong> · <why it matters> · <how to fix> · <owning skill, if a convention>
+**<title>** — `<file>:<line>`
+- **Defect:** <what is wrong>
+- **Failure:** <the concrete input or state, then the wrong result>
+- **Fix:** <the correct shape> · <owning skill, if a convention>
 
 ### HIGH
-- **<title>** — `<file>:<line>` …
+**<title>** — `<file>:<line>` … (same three lines)
 
 ### MEDIUM
-- **<title>** — `<file>:<line>` …
+**<title>** — `<file>:<line>` … (same three lines)
 
 ### INFO
-- **<title>** — `<file>:<line>` …
+**<title>** — `<file>:<line>` … (same three lines)
 
 ### Check coverage
 <one row per rubric area: the area, the check numbers you actually ran, and any
@@ -189,6 +212,23 @@ PASS / FAIL — <placement and dependency direction; deep dive: dotnet-architect
 ### What's Good
 - <name the patterns worth repeating>
 ```
+
+**Every finding is a header line and at most three labelled lines, and each of
+those lines is at most two sentences.** A finding has no fourth line. Anything
+longer is an appendix — put it under `## Notes` at the end and reference it by the
+finding's title. A `Failure:` line that cannot be written is not a finding: drop
+it to INFO or cut it.
+
+**Three things never appear in a finding**, because each is process narration
+rather than information:
+
+- **How the review reached it** — no *"the reviewer asked for…"*, no *"verified by
+  running…"*. State the conclusion; evidence the reader must re-check goes in
+  `## Notes`.
+- **A paragraph arguing the severity** — the severity is the heading the finding
+  sits under, and the `Failure:` line is its whole argument.
+- **Anything already in the header table** — the branch, the base and the scope
+  are stated once, at the top, and never again.
 
 Three rules for the findings themselves:
 
